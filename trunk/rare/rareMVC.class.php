@@ -58,6 +58,14 @@ class rareContext{
         $trace=debug_backtrace(true);
         $appDir=dirname(dirname($trace[0]['file']))."/";
         self::$instance=new rareContext($appDir);
+        $class_autoload=rareConfig::get("class_autoload",true);
+         if($class_autoload){
+             include 'rareAutoLoad.class.php';
+           $class_autoloadOption_default=array('dirs'=>self::$instance->getAppLibDir(),
+                                               'cache'=>self::$instance->getCacheDir()."classAutoLoad.php");
+            $option=array_merge($class_autoloadOption_default,rareConfig::get("class_autoload_option",array()));
+            rareAutoLoad::register($option);
+         }
         return self::$instance;
     }
     /**
@@ -82,10 +90,6 @@ class rareContext{
            $this->isScriptNameInUrl=true;
          }
         $this->uri=$this->uri?$this->uri:"index/index";
-//        dump($requestUri);
-//        dump($this->webRoot);
-//        dump($this->uri);
-//        dump($_SERVER);
     }
 
     public  function forward($uri){
@@ -109,7 +113,7 @@ class rareContext{
         $action->preExecute();
         $result=$action->execute();
         if($result!=null && empty($result))return;
-       $action->display();        
+        $action->display($result);        
     }
     
     public function parseActionUri($uri){
@@ -137,7 +141,7 @@ class rareContext{
        return $this->appDir;
     }
     public function getAppLibDir(){
-       return $this->getAppDir()."/lib/"; 
+       return $this->getAppDir()."lib/"; 
     }
 
     public function getModuleName(){
@@ -173,6 +177,16 @@ class rareContext{
     public function isScriptNameInUrl(){
      return $this->isScriptNameInUrl;
     }
+    public function getCacheDir(){
+      return $this->getAppDir()."cache/";
+    }
+        /**
+        * 判断是否是ajax 请求
+       * @return boolean
+        */
+    public static function isXmlHttpRequest(){
+       return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+     }
 }
 
 class rareView{
@@ -216,7 +230,7 @@ abstract class rareAction{
       $this->layout=$layout;
     }
    private  function getLayoutFile(){
-      if(false===$this->layout)return null;
+      if(false===$this->layout || rareContext::isXmlHttpRequest())return null;
       if(null==$this->layout){
           $layoutFile=$this->context->getLayoutDir().$this->context->getModuleName().".php";
           if(!file_exists($layoutFile)){
@@ -225,11 +239,12 @@ abstract class rareAction{
       }else{
         $layoutFile=$this->context->getLayoutDir().$this->layout.".php";
       }
+      return $layoutFile;
     }
     
     
     public function display($viewFile=null){
-        if($viewFile){
+        if(!empty($viewFile) && is_string($viewFile)){
                $pathArray=explode("/",$viewFile);
                $moduleName=$pathArray[0]=="~"?$this->moduleName:$pathArray[0];
                array_shift($pathArray);
