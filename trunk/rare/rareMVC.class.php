@@ -16,7 +16,7 @@ class rareContext{
     private $actionName;
     
     private $uri;
-    private $scriptName;//脚本名称 如index.php
+    private $scriptName;
     private $isScriptNameInUrl=false;
     
     private static $instance;
@@ -25,10 +25,10 @@ class rareContext{
         $this->webRoot=substr($_SERVER['SCRIPT_NAME'],0,strrpos($_SERVER['SCRIPT_NAME'],"/")+1);
         $pathInfo=pathinfo($_SERVER['SCRIPT_NAME']);
         $this->scriptName=$pathInfo["basename"];
-        
         $this->appDir=$appDir;
         $this->setWebRootUrl();    
         date_default_timezone_set('Asia/Shanghai');
+        header("Content-Type:text/html; charset=utf-8");
     }
     
     private function setWebRootUrl(){
@@ -101,7 +101,6 @@ class rareContext{
         $uriInfo=$this->parseActionUri($uri);
         $this->moduleName=$uriInfo['m'];
         $this->actionName=$uriInfo['a'];
-        
         $query=$uriInfo['q'];
         
         $actionFile=$this->getAppDir()."/module/".$this->moduleName."/action/".$this->actionName.".php";
@@ -118,6 +117,7 @@ class rareContext{
     
     public function parseActionUri($uri){
         $tmp=parse_url($uri);
+        $tmp['path']=preg_replace("/\.\w*/", "", $tmp['path']);
         $path=explode("/",$tmp['path']);
         if(empty($path[1]))$path[1]='index';
         $uriInfo=array();
@@ -127,7 +127,6 @@ class rareContext{
         $uriInfo["u"]=$uriInfo['m']."/".$uriInfo['a'];
         return $uriInfo;
     }
-    
     
    private function executeFilter(){
           $filterFile=$this->getAppLibDir()."myFilter.class.php";
@@ -204,7 +203,6 @@ class rareView{
     }
 }
 
-
 abstract class rareAction{
     protected  $context;
     protected  $layout=null;
@@ -212,6 +210,7 @@ abstract class rareAction{
     private $viewFile;
     protected  $moduleName;
     protected  $actionName;
+    private $isRender=false;
     
    public function __construct($moduleName,$actionName){
       $this->context=rareContext::getContext();
@@ -242,8 +241,9 @@ abstract class rareAction{
       return $layoutFile;
     }
     
-    
     public function display($viewFile=null){
+        if($this->isRender)return;
+        $this->isRender=true;
         if(!empty($viewFile) && is_string($viewFile)){
                $pathArray=explode("/",$viewFile);
                $moduleName=$pathArray[0]=="~"?$this->moduleName:$pathArray[0];
@@ -283,13 +283,17 @@ class rareConfig{
    }
 }
 
-function url($uri){
+function url($uri,$suffix=""){
      $context=rareContext::getContext();
      $url=$context->getWebRootUrl();
      if(($context->isScriptNameInUrl() && $context->getScriptName() != 'index.php' )|| !rareConfig::get("no_script_name",true)){
         $url.=$context->getScriptName()."/";
      }
-     return $url.ltrim($uri,"/");
+     $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
+     $uri=ltrim($uri,"/");
+     $tmp=parse_url($uri);
+     $uri=str_replace("/index", "", $tmp['path']).".".$suffix.(isset($tmp['query'])?"?".$tmp['query']:'');
+     return $url.$uri;
 }
 
 function public_path($uri){

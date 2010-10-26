@@ -3,7 +3,9 @@
 <?php }?>
 
 <div><?php echo $msg;?></div>
-
+<?php echo url('index/index?a=1&b=2','js')?>
+<br/>
+<?php echo url('demo/index?a=1&b=2','js')?>
 
 <form action="<?php echo url('index/loginCheck')?>" method="post" id="loginForm" autocomplete="off">
 <table>
