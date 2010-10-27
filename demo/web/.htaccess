@@ -1,13 +1,3 @@
- <IfModule expires_module>
-    ExpiresActive On
-    ExpiresByType image/gif A360000
-    ExpiresByType image/jpg A360000
-    ExpiresByType image/png A360000
-    ExpiresByType application/x-shockwave-flash A360000
-    ExpiresByType application/javascript A360000
-    ExpiresByType text/css A360000
- </IfModule>
- 
 <IfModule mod_rewrite.c>
   RewriteEngine On
   RewriteCond %{REQUEST_FILENAME} !-f

@@ -1,12 +1,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>rare demo</title>
+<?php rareView::include_title()?>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="keywords" content="rareMVC php framework"/>
 <meta name="description" content="rareMVC demo,这个是默认的模板"/>
-<script type="text/javascript" src="<?php echo public_path('js/jquery.js')?>"></script>
-<script type="text/javascript" src="<?php echo public_path('js/jqueryform.js')?>"></script>
+<?php rareView::include_js_css()?>
 </head>
     <body>
     <div>
