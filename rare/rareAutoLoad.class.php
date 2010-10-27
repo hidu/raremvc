@@ -127,6 +127,7 @@ class rareAutoLoad
       {
           throw new Exception('cache 不能写入');
       }
+      $this->classes=array();
       $dirs=$this->option['dirs'];
       if(!is_array($dirs))
       {
