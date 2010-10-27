@@ -188,7 +188,15 @@ class rareContext{
      }
 }
 
+/**
+ * 模板相关操作 
+ */
 class rareView{
+    /**
+     * 将数据渲染到模板中去
+     * @param array $vars
+     * @param string $viewFile 模板文件路径
+     */
    public static function render($vars,$viewFile){
         $currentPWD = getcwd();
         chdir(dirname($viewFile));
@@ -201,8 +209,80 @@ class rareView{
         chdir($currentPWD);
         return $content;
     }
+    /**
+     * 设置页面title
+     * @param string $title
+     * @param boolean $clean 是否将title 完全重新设置，为false 表示新添加的补充到当前标题的前面
+     */
+    public static function setTitle($title,$clean=false){
+        if(!$clean){
+            $title=$title."--".rareConfig::get("title","rare app");
+          }
+         rareConfig::set('title', $title);
+    }
+    /**
+     *添加js 文件 
+     * @param $js  js文件地址
+     * @param $index 显示顺序
+     */
+    public static function addJs($js,$index=999){
+        $jss=rareConfig::get("js");
+        if(!is_array($jss))$jss=explode(",", $jss);
+        $jss[$js]=$index;
+        rareConfig::set('js', $jss);
+    }
+    /**
+     * 添加一个css 文件到head 标签中
+     * @param $css
+     * @param $index  显示顺序
+     */
+    public static function addCss($css,$index=999){
+        $csss=rareConfig::get("css",array());
+        $csss[$css]=$index;
+        rareConfig::set('css', $csss);
+    }
+    /**
+     * 供模板调用的输出css 和js 链接的方法
+     */
+    public static function include_js_css(){
+       function _fill_url($_uri){
+           return (substr($_uri,0,1)=="/" || substr($_uri, 0,7)== 'http://' ||substr($_uri, 0,8)== 'https://')?$_uri:public_path($_uri); 
+        }
+        function _url_index($arr){
+            if(!is_array($arr))$arr=explode(",", $arr);
+            foreach ($arr as $_k=>$_v){
+                if(is_numeric($_k)){
+                    $arr[_fill_url($_v)]=999+$_k;
+                    unset($arr[$_k]);
+                  }else{
+                      $arr[_fill_url($_k)]=$_v;
+                      unset($arr[$_k]);
+                  }
+             }
+            asort($arr);
+            return $arr;
+        }
+        $csss=rareConfig::get("css",array());
+        $csss=_url_index($csss);
+        foreach ($csss as $css=>$index){
+            echo "<link rel=\"stylesheet\" href=\"{$css}\" type=\"text/css\" media=\"screen\" />\n";
+         }
+         
+        $jss=rareConfig::get("js",array());
+        $jss=_url_index($jss);
+        foreach ($jss as $js=>$index){
+            echo "<script type=\"text/javascript\" src=\"{$js}\"></script>\n";
+         }
+    }
+    
+    public static function include_title(){
+      echo "<title>".htmlspecialchars(rareConfig::get("title",'rare app'))."</title>";
+    }
 }
 
+/**
+ *动作类 
+ */
 abstract class rareAction{
     protected  $context;
     protected  $layout=null;
@@ -218,16 +298,29 @@ abstract class rareAction{
       $this->actionName=$actionName;
       $this->viewFile=$this->context->getModuleDir()."/".$moduleName."/view/".$actionName.".php";
     }
+    /**
+     *execute 前执行的方法 
+     */
    public function preExecute(){}
+   /**
+    *动作的入口 
+    */
    abstract function execute();
    
     public function forward($uri){
         $this->context->forward($uri);
     }
-    
+    /**
+     * 设置使用那个模板文件 默认使用的是default
+     * 模板文件目录位置为 templates/layout/
+     * @param mixd $layout string 类型时使用指定模板,为false 表示不需要模板
+     */
     public function setLayout($layout){
       $this->layout=$layout;
     }
+    /**
+     *获取模板文件的路径 
+     */
    private  function getLayoutFile(){
       if(false===$this->layout || rareContext::isXmlHttpRequest())return null;
       if(null==$this->layout){
@@ -241,6 +334,10 @@ abstract class rareAction{
       return $layoutFile;
     }
     
+    /**
+     * 渲染模板
+     * @param $viewFile
+     */
     public function display($viewFile=null){
         if($this->isRender)return;
         $this->isRender=true;
@@ -263,8 +360,8 @@ abstract class rareAction{
 }
 
 class rareConfig{
+   private  static $configs=array(); 
    public static function getAll($configName='default'){
-       static $configs=array();
        if(isset($configs[$configName])){
           return $configs[$configName];
         }
@@ -273,7 +370,7 @@ class rareConfig{
        if(file_exists($file)){
           $config=require $file;
         }
-       $configs[$configName]=$config;
+       self::$configs[$configName]=$config;
        return $config;
    }
    
@@ -281,8 +378,19 @@ class rareConfig{
        $config=self::getAll($configName);
        return isset($config[$item])?$config[$item]:$default;
    }
+   
+   public static function set($item,$val,$configName='default'){
+       self::getAll($configName);
+       self::$configs[$configName][$item]=$val;
+   }
 }
 
+/**
+ * 将程序内部地址转换为外面地址
+ * 如 url('hello/index?a=1') 输出地址为http://127.0.0.1/appName/hello.html?a=1
+ * @param string $uri
+ * @param string $suffix
+ */
 function url($uri,$suffix=""){
      $context=rareContext::getContext();
      $url=$context->getWebRootUrl();
@@ -295,11 +403,21 @@ function url($uri,$suffix=""){
      $uri=str_replace("/index", "", $tmp['path']).".".$suffix.(isset($tmp['query'])?"?".$tmp['query']:'');
      return $url.$uri;
 }
-
+/**
+ * 输出web 相对根目录的地址
+ * 如 public_path('js/hello.js') 输出为http://127.0.0.1/appName/js/hello.js
+ * @param string $uri
+ */
 function public_path($uri){
      return rareContext::getContext()->getWebRootUrl().ltrim($uri,"/");
 }
 
+/**
+ * 获取一个组件
+ * 组件的位置在templates/component/
+ * @param string $name  组件名称
+ * @param array $param  参数 
+ */
 function fetch($name,$param=null){
      $componentFile=rareContext::getContext()->getComponentDir().trim($name,"/").".php";
      return rareView::render($param, $componentFile);
