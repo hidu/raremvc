@@ -22,27 +22,12 @@ class rareContext{
     private static $instance;
     
     public function __construct($appDir){
-        $this->webRoot=substr($_SERVER['SCRIPT_NAME'],0,strrpos($_SERVER['SCRIPT_NAME'],"/")+1);
-        $pathInfo=pathinfo($_SERVER['SCRIPT_NAME']);
-        $this->scriptName=$pathInfo["basename"];
         $this->appDir=$appDir;
-        $this->setWebRootUrl();    
         date_default_timezone_set('Asia/Shanghai');
         header("Content-Type:text/html; charset=utf-8");
     }
     
-    private function setWebRootUrl(){
-        $webRootUrl= 'http://'.$_SERVER['HTTP_HOST'];
-        if(80 != $_SERVER['SERVER_PORT'] ){
-            if($this->isSecure()){
-              $webRootUrl = 'https://'.$_SERVER['HTTP_HOST'];
-            }else{
-              $webRootUrl.=$_SERVER['SERVER_PORT'];
-            }
-         }
-        $webRootUrl.=$this->webRoot;
-        $this->webRootUrl=$webRootUrl;
-    }
+    
     
      public function isSecure(){
          return (
@@ -81,7 +66,13 @@ class rareContext{
         $this->executeActtion($this->uri);
     }
     
+    
     private function parseRequest(){
+        $this->webRoot=substr($_SERVER['SCRIPT_NAME'],0,strrpos($_SERVER['SCRIPT_NAME'],"/")+1);
+        $pathInfo=pathinfo($_SERVER['SCRIPT_NAME']);
+        $this->scriptName=$pathInfo["basename"];
+        $this->setWebRootUrl();
+        
         $requestUri=$_SERVER['REQUEST_URI'];
         $this->uri=substr($requestUri, strlen($this->webRoot));
         $scriptNamelen=strlen($this->scriptName);
@@ -90,6 +81,19 @@ class rareContext{
            $this->isScriptNameInUrl=true;
          }
         $this->uri=$this->uri?$this->uri:"index/index";
+    }
+    
+    private function setWebRootUrl(){
+        $webRootUrl= 'http://'.$_SERVER['HTTP_HOST'];
+        if(80 != $_SERVER['SERVER_PORT'] ){
+            if($this->isSecure()){
+              $webRootUrl = 'https://'.$_SERVER['HTTP_HOST'];
+            }else{
+              $webRootUrl.=$_SERVER['SERVER_PORT'];
+            }
+         }
+        $webRootUrl.=$this->webRoot;
+        $this->webRootUrl=$webRootUrl;
     }
 
     public  function forward($uri){
@@ -103,7 +107,7 @@ class rareContext{
         $this->actionName=$uriInfo['a'];
         $query=$uriInfo['q'];
         
-        $actionFile=$this->getAppDir()."/module/".$this->moduleName."/action/".$this->actionName.".php";
+        $actionFile=$this->getModuleDir().$this->moduleName."/action/".$this->actionName.".php";
         chdir(dirname($actionFile));
         
         include($actionFile);
@@ -117,6 +121,7 @@ class rareContext{
     
     public function parseActionUri($uri){
         $tmp=parse_url($uri);
+        if(empty($tmp['path']))$tmp['path']='index';
         $tmp['path']=preg_replace("/\.\w*/", "", $tmp['path']);
         $path=explode("/",$tmp['path']);
         if(empty($path[1]))$path[1]='index';
@@ -167,6 +172,9 @@ class rareContext{
     
     public function getWebRootUrl(){
       return $this->webRootUrl;
+    }
+    public function getWebRoot(){
+      return $this->webRoot;
     }
     
     public function getScriptName(){
@@ -276,7 +284,7 @@ class rareView{
     }
     
     public static function include_title(){
-      echo "<title>".htmlspecialchars(rareConfig::get("title",'rare app'))."</title>";
+      echo "<title>".htmlspecialchars(rareConfig::get("title","rare app"))."</title>";
     }
 }
 
@@ -296,7 +304,7 @@ abstract class rareAction{
       $this->context=rareContext::getContext();
       $this->moduleName=$moduleName;
       $this->actionName=$actionName;
-      $this->viewFile=$this->context->getModuleDir()."/".$moduleName."/view/".$actionName.".php";
+      $this->viewFile=$this->context->getModuleDir().$moduleName."/view/".$actionName.".php";
     }
     /**
      *execute 前执行的方法 
@@ -362,8 +370,8 @@ abstract class rareAction{
 class rareConfig{
    private  static $configs=array(); 
    public static function getAll($configName='default'){
-       if(isset($configs[$configName])){
-          return $configs[$configName];
+       if(isset(self::$configs[$configName])){
+          return self::$configs[$configName];
         }
        $file=rareContext::getContext()->getAppDir()."config/".$configName.".php";
        $config=array();
@@ -393,7 +401,7 @@ class rareConfig{
  */
 function url($uri,$suffix=""){
      $context=rareContext::getContext();
-     $url=$context->getWebRootUrl();
+     $url=public_path("/");
      if(($context->isScriptNameInUrl() && $context->getScriptName() != 'index.php' )|| !rareConfig::get("no_script_name",true)){
         $url.=$context->getScriptName()."/";
      }
@@ -409,7 +417,11 @@ function url($uri,$suffix=""){
  * @param string $uri
  */
 function public_path($uri){
-     return rareContext::getContext()->getWebRootUrl().ltrim($uri,"/");
+    if(rareConfig::get('url_http_host',false)){
+       return rareContext::getContext()->getWebRootUrl().ltrim($uri,"/");
+    }else{
+       return rareContext::getContext()->getWebRoot().ltrim($uri,"/");
+    }
 }
 
 /**
