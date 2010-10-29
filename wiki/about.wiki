@@ -10,3 +10,44 @@ rareMVC 的入口文件：
 include '../../rare/rareMVC.class.php';
 rareContext::createApp()->run();
 }}}
+
+*rare 程序的目录结构*
+
+|-- cache
+|   `-- classAutoLoad.php.php
+|-- config
+|   `-- default.php
+|-- lib
+|   |-- autoloadTest.class.php
+|   `-- helper
+|       `-- test.php
+|-- module
+|   |-- demo
+|   |   |-- action
+|   |   |   |-- ajax.php
+|   |   |   |-- hello.php
+|   |   |   `-- index.php
+|   |   `-- view
+|   |       |-- ajax.php
+|   |       `-- hello.php
+|   `-- index
+|       |-- action
+|       |   |-- a.php
+|       |   |-- b.php
+|       |   |-- index.php
+|       |   `-- loginCheck.php
+|       `-- view
+|           `-- index.php
+|-- templates
+|   |-- component
+|   |   |-- list
+|   |   |   `-- yule.php
+|   |   `-- news.php
+|   `-- layout
+|       `-- default.php
+`-- web
+    |-- index.php
+    |-- js
+    |   |-- jqueryform.js
+    |   `-- jquery.js
+    `-- test.php
