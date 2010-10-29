@@ -1,0 +1,5 @@
+#summary One-sentence summary of this page.
+
+= 关于rareMVC framework =
+
+rareMVC 是一款简单的php 框架
