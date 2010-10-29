@@ -8,3 +8,4 @@ index/index的程序不需要做任何修改，会判断出是ajax 而不需要�
 <div style="border:2px solid #B7D1F2;" id="ajaxDiv">
 预留的空位
 </div>
+<?php use_helper("test");test();?>

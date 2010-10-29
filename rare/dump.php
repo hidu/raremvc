@@ -1,78 +1,19 @@
 <?php
 
-/////////////////////////////////////////////////////////////////////////////////////////////////
-//调试工具
-
-/**
- * 输出变量的内容，通常用于调试
- *
- * @package Core
- *
- * @param mixed $vars 要输出的变量
- * @param string $label
- * @param boolean $return
- */
-  function dumpp($vars, $label = '', $return = false)
-{
-    if (true) {
-        $content = "<pre style='background:#fff;text-align:left;font-size: 13px; line-height: 12px;border: 1px solid #cccccc;margin:0'>";
-        if ($label != '') {
-            $content .= "<strong><font color=red>{$label} :</font></strong>\n";
-        }
-        $content .= htmlspecialchars(print_r($vars, true));
-        $content .= "\n</pre>\n";
-    } else {
-        $content = $label . " :\n" . print_r($vars, true);
-    }
-    $content=str_replace("=&gt;","<font color=red>=&gt;</font>",$content);
-    if ($return) { return $content; }
-    echo $content;
-    return null;
-}
-
-/*
-function dump($var, $info = FALSE)
-{
-    $scope = false;
-    $prefix = 'unique';
-    $suffix = 'value';
-
-    if($scope) $vals = $scope;
-    else $vals = $GLOBALS;
-
-    $old = $var;
-    $var = $new = $prefix.rand().$suffix; $vname = FALSE;
-    foreach($vals as $key => $val) if($val === $new) $vname = $key;
-    $var = $old;
-
-    echo "<pre style='margin: 0px 0px 10px 0px; display: block;text-align:left; background: white; color: black; font-family: Verdana; border: 1px solid #cccccc; padding: 5px; font-size: 13px; line-height: 13px;'>";
-    if($info != FALSE) echo "<b style='color: red;'>$info:</b><br>";
-    do_dump($var, '$'.$vname);
-    echo "</pre>";
-}
-
-*/
-//石柱国升级过的dump函数
  function dump($var, $info = FALSE)
 {
     $trace = debug_backtrace();
     $vLine = file( $trace[0]['file']);
+    
     $fLine = $vLine[ $trace[0]['line'] - 1];
     preg_match("#\\$(\w+)#", $fLine, $match);
     $vname = $match[0];
-
 
     echo "<pre style='margin: 0px 0px 10px 0px; display: block;text-align:left; background: white; color: black; font-family: Verdana; border: 1px solid #cccccc; padding: 5px; font-size: 13px; line-height: 13px;'>";
     if($info != FALSE) echo "<b style='color: red;'>$info:</b><br>";
     do_dump($var, $vname);
     echo "</pre>";
 }
-
-
-
-
-
-
 
 
 function do_dump($var, $var_name = NULL, $indent = NULL, $reference = NULL)
@@ -127,14 +68,4 @@ function do_dump($var, $var_name = NULL, $indent = NULL, $reference = NULL)
 
         $var = $var[$keyvar];
     }
-}
-
-function dumpDubug($obj,$label=null){
-   $_isDebug=router::getContext()->config->debug|| helper::getVal($_GET[':pdebug'],0);
-   if(!$_isDebug)return;
-  try{
-      $firephp = FirePHP::getInstance(true);
-      $firephp->info($label,$obj);
-  }catch(Exception  $e){}
-   
 }

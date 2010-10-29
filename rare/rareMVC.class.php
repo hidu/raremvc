@@ -6,6 +6,9 @@
  * @version 1.0 a
  */
 
+/**
+ * app 入口类
+ */
 class rareContext{
     
     private $appDir;
@@ -26,9 +29,7 @@ class rareContext{
         date_default_timezone_set('Asia/Shanghai');
         header("Content-Type:text/html; charset=utf-8");
     }
-    
-    
-    
+      //是否是https       
      public function isSecure(){
          return (
            (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == 1))
@@ -38,14 +39,14 @@ class rareContext{
           (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https')
          );
       }
-    
+    //创建一个rare app实例，在这里会注册类自动装载
     public static function createApp(){
         $trace=debug_backtrace(true);
         $appDir=dirname(dirname($trace[0]['file']))."/";
         self::$instance=new rareContext($appDir);
         $class_autoload=rareConfig::get("class_autoload",true);
          if($class_autoload){
-             include 'rareAutoLoad.class.php';
+             include dirname(__FILE__).'/rareAutoLoad.class.php';
            $class_autoloadOption_default=array('dirs'=>self::$instance->getAppLibDir(),
                                                'cache'=>self::$instance->getCacheDir()."classAutoLoad.php");
             $option=array_merge($class_autoloadOption_default,rareConfig::get("class_autoload_option",array()));
@@ -59,14 +60,13 @@ class rareContext{
     public static function getContext(){
         return self::$instance;
     }
-    
+    //运行程序，解析url地址、执行过滤器、执行动作方法等    
     public function run(){
         $this->parseRequest();
         $this->executeFilter();    
         $this->executeActtion($this->uri);
     }
-    
-    
+    //解析url地址
     private function parseRequest(){
         $this->webRoot=substr($_SERVER['SCRIPT_NAME'],0,strrpos($_SERVER['SCRIPT_NAME'],"/")+1);
         $pathInfo=pathinfo($_SERVER['SCRIPT_NAME']);
@@ -82,7 +82,7 @@ class rareContext{
          }
         $this->uri=$this->uri?$this->uri:"index/index";
     }
-    
+    //计算程序完整的url地址
     private function setWebRootUrl(){
         $webRootUrl= 'http://'.$_SERVER['HTTP_HOST'];
         if(80 != $_SERVER['SERVER_PORT'] ){
@@ -95,12 +95,12 @@ class rareContext{
         $webRootUrl.=$this->webRoot;
         $this->webRootUrl=$webRootUrl;
     }
-
+    //内部跳转 执行指定的动作 action同名时会出错(类重名)。
     public  function forward($uri){
         $this->executeActtion($uri);
         die;
     }
-    
+    //执行指定动作
     public  function executeActtion($uri){
         $uriInfo=$this->parseActionUri($uri);
         $this->moduleName=$uriInfo['m'];
@@ -118,7 +118,7 @@ class rareContext{
         if($result!=null && empty($result))return;
         $action->display($result);        
     }
-    
+    //将当前的url解析为action 方便识别的数组格式
     public function parseActionUri($uri){
         $tmp=parse_url($uri);
         if(empty($tmp['path']))$tmp['path']='index';
@@ -132,7 +132,7 @@ class rareContext{
         $uriInfo["u"]=$uriInfo['m']."/".$uriInfo['a'];
         return $uriInfo;
     }
-    
+    //执行过滤器
    private function executeFilter(){
           $filterFile=$this->getAppLibDir()."myFilter.class.php";
           if(file_exists($filterFile)){
@@ -187,10 +187,7 @@ class rareContext{
     public function getCacheDir(){
       return $this->getAppDir()."cache/";
     }
-        /**
-        * 判断是否是ajax 请求
-       * @return boolean
-        */
+    //是否是ajax 请求
     public static function isXmlHttpRequest(){
        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
      }
@@ -366,7 +363,10 @@ abstract class rareAction{
          }
     }
 }
-
+/**
+ * 配置操作类，设置、读者指定的配置文件
+ * @author duwei
+ */
 class rareConfig{
    private  static $configs=array(); 
    public static function getAll($configName='default'){
@@ -433,4 +433,16 @@ function public_path($uri){
 function fetch($name,$param=null){
      $componentFile=rareContext::getContext()->getComponentDir().trim($name,"/").".php";
      return rareView::render($param, $componentFile);
+}
+/**
+ * 调用简单的helper 文件，文件如lib/helper/hello.php
+ * @param $helper
+ */
+function use_helper($helper){
+    static $helpers=array();
+    if(in_array($helper, $helpers))return;
+    $helperFile=rareContext::getContext()->getAppLibDir()."helper/".$helper.".php";
+    if(!file_exists($helperFile))die("can not find helper ".$helperFile);
+    include $helperFile;
+    $helpers[$helper]=1;
 }
