@@ -2,4 +2,11 @@
 
 = 关于rareMVC framework =
 
-rareMVC 是一款简单的php 框架
+rareMVC 是一款简单的php 框架，rare 包含 rareContext 、rareAction  、rareConfig,以及几个常用的方法。
+和其他php框架一样，rareMVC框架是单一入口的(所有请求通过index.php)。
+rareMVC 的入口文件：
+{{{
+<?php
+include '../../rare/rareMVC.class.php';
+rareContext::createApp()->run();
+}}}
