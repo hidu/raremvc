@@ -8,6 +8,7 @@ mkdir templates/component/
 mkdir module/index/action/ -p
 mkdir module/index/view/ -p
 mkdir lib
+mkdir lib/helper
 mkdir config
 mkdir cache
 chmod 777 cache

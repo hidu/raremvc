@@ -1,4 +1,4 @@
 <?php
 include '../../rare/rareMVC.class.php';
-include '../lib/dump.php';
+include '../../rare/dump.php';
 rareContext::createApp()->run();
