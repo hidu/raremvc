@@ -12,7 +12,7 @@ rareContext::createApp()->run();
 }}}
 
 *rare 程序的目录结构*
-
+{{{
 |-- cache
 |   `-- classAutoLoad.php.php
 |-- config
@@ -46,8 +46,9 @@ rareContext::createApp()->run();
 |   `-- layout
 |       `-- default.php
 `-- web
-    |-- index.php
+    |-- index.php //入口文件 index.php
     |-- js
     |   |-- jqueryform.js
     |   `-- jquery.js
-    `-- test.php
+    `-- test.php //入口文件 test.php
+}}}
