@@ -22,6 +22,7 @@ class rareContext{
     private $scriptName;
     private $isScriptNameInUrl=false;
     
+    
     private static $instance;
     
     public function __construct($appDir){
@@ -40,14 +41,16 @@ class rareContext{
          );
       }
     //创建一个rare app实例，在这里会注册类自动装载
-    public static function createApp(){
-        $trace=debug_backtrace(true);
-        $appDir=dirname(dirname($trace[0]['file']))."/";
+    public static function createApp($appDir=''){
+        if(!$appDir){
+            $trace=debug_backtrace(true);
+            $appDir=dirname(dirname($trace[0]['file']))."/";
+         }
         self::$instance=new rareContext($appDir);
         $class_autoload=rareConfig::get("class_autoload",true);
          if($class_autoload){
-             include dirname(__FILE__).'/rareAutoLoad.class.php';
-           $class_autoloadOption_default=array('dirs'=>self::$instance->getAppLibDir(),
+            include dirname(__FILE__).'/rareAutoLoad.class.php';
+            $class_autoloadOption_default=array('dirs'=>self::$instance->getAppLibDir(),
                                                'cache'=>self::$instance->getCacheDir()."classAutoLoad.php");
             $option=array_merge($class_autoloadOption_default,rareConfig::get("class_autoload_option",array()));
             rareAutoLoad::register($option);
@@ -185,7 +188,7 @@ class rareContext{
      return $this->isScriptNameInUrl;
     }
     public function getCacheDir(){
-      return $this->getAppDir()."cache/";
+      return rareConfig::get('cache_dir',$this->getAppDir()."cache/");
     }
     //是否是ajax 请求
     public static function isXmlHttpRequest(){
