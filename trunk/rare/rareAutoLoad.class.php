@@ -23,6 +23,7 @@ class rareAutoLoad
    private $classes=array();
    private $option;
    
+   private $hand=false;//是否手动
    /**
     * @param array $option 需要参数 dirs：扫描目录  cache：缓存文件
     */
@@ -37,7 +38,11 @@ class rareAutoLoad
          $calFile=$trac[2]['file'];
          $option['cache']="/tmp/rareautoLoad_".md5($calFile)."_".filemtime($calFile);
        }
+       if(isset($option['hand']))$this->hand=(boolean)$option['hand'];
        $this->cacheFile=$option['cache'].".php";
+       if($this->hand && php_sapi_name()!='cli'){
+          $this->cacheFile=rareContext::getContext()->getConfigDir()."autoLoad.php";
+        }
        $this->getClasses();
   }
    
@@ -67,7 +72,7 @@ class rareAutoLoad
         {
           return;
         }
-        ini_set('unserialize_callback_func', 'spl_autoload_call');
+       // ini_set('unserialize_callback_func', 'spl_autoload_call');
         if (false === spl_autoload_register(array(self::getInstance($option), 'autoload')))
         {
           throw new Exception(sprintf('Unable to register %s::autoload as an autoloading method.', get_class(self::getInstance())));
@@ -88,7 +93,11 @@ class rareAutoLoad
         }
         if (isset($this->classes[$class]))
         {
-          require($this->classes[$class]);
+          $file=$this->classes[$class];
+          if(isset($this->option['rootDir']) && $this->hand){
+                       $file=$this->option['rootDir'].$file;
+            }
+          require($file);
           return true;
         }else
         {
@@ -123,6 +132,7 @@ class rareAutoLoad
    */
   private function reload()
   {
+      if($this->hand && php_sapi_name()!="cli")return;
       if(!is_writable(dirname($this->cacheFile)))
       {
           throw new Exception('cache 不能写入');
@@ -138,7 +148,6 @@ class rareAutoLoad
          if(!$dir)continue;
          $this->scanDir($dir);
       } 
-     
          
       $phpData="<?php\n/**\n*autoLoadCache\n*@since ".date('Y-m-d H:i:s')."\n*/\n";
       ksort($this->classes);
@@ -166,6 +175,9 @@ class rareAutoLoad
             if(strpos($fileName,$this->option['suffix']))
             {
                 preg_match_all('~^\s*(?:abstract\s+|final\s+)?(?:class|interface)\s+(\w+)~mi', file_get_contents($file), $classes);
+               if(isset($this->option['rootDir']) && $this->hand){
+                   $file=substr(realpath($file),strlen($this->option['rootDir']));
+                  }
                 foreach ($classes[1] as $class)
                 {
                   $this->classes[$class] = $file;
@@ -174,4 +186,32 @@ class rareAutoLoad
           }
       }
   }
+}
+
+//cli 模式下 手动扫描lib 目录下的class 文件 参数为app 的路径
+//php rareAutoLoad.class.php ../demo
+//autoLoad 文件会写入到 ../demo/config/autoLoad.php 文件中
+if(php_sapi_name()=="cli"){
+    $appDir=$_SERVER['argv'][1];
+    if(empty($appDir)){
+     die('app dir need');
+    }
+    $appDir=realpath($appDir);
+    if(!file_exists($appDir) || !is_dir($appDir)){
+      die($appDir." not exist!");
+    }
+   
+    $defaultConfigFile=$appDir."/config/default.php";
+    $autoLoadFile=$appDir."/config/autoLoad.php";
+    unlink($autoLoadFile);
+    $option=array();
+    if(file_exists($defaultConfigFile)){
+      $defaultConfig=require $defaultConfigFile;
+      $option=isset($defaultConfig['class_autoload_option'])?$defaultConfig['class_autoload_option']:array();
+    }
+    if(empty($option['dirs']))$option['dirs']=$appDir."/lib/";
+    $option['cache']=$appDir."/config/autoLoad";
+    date_default_timezone_set('Asia/Shanghai');
+    rareAutoLoad::register($option);
+    echo "class scan finish!\n";
 }
