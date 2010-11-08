@@ -187,6 +187,10 @@ class rareContext{
     public function isScriptNameInUrl(){
      return $this->isScriptNameInUrl;
     }
+    
+    public function getConfigDir(){
+        return $this->getAppDir()."config/";
+    }
     public function getCacheDir(){
       return rareConfig::get('cache_dir',$this->getAppDir()."cache/");
     }
