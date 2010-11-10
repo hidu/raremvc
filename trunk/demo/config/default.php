@@ -7,7 +7,8 @@ return array(
 //                ‘suffix’=>'.class.php'   //需要类自动装载的php类文件的后缀 
                   "hand"=>true,   //是否手动更新class 路径文件 ，为false 时 缓存文件写入到cache 目录中，
                                        //为true 是需要手动允许ararAutoLoad.class.php 文件
-                  "rootDir"=>dirname(dirname(dirname(__FILE__))) //hand=true 时 需要定义 程序根目录
+                  "rootDir"=>dirname(dirname(dirname(__FILE__))), //hand=true 时 需要定义 程序根目录
+                  "noCache"=>true 
                  ),
 //    'suffix'=>'html'                     //默认的url后缀
    'title'=>'rare demo app',
