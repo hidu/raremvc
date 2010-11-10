@@ -47,14 +47,6 @@ class rareContext{
             $appDir=dirname(dirname($trace[0]['file']))."/";
          }
         self::$instance=new rareContext($appDir);
-        $class_autoload=rareConfig::get("class_autoload",true);
-         if($class_autoload){
-            include dirname(__FILE__).'/rareAutoLoad.class.php';
-            $class_autoloadOption_default=array('dirs'=>self::$instance->getAppLibDir(),
-                                               'cache'=>self::$instance->getCacheDir()."classAutoLoad.php");
-            $option=array_merge($class_autoloadOption_default,rareConfig::get("class_autoload_option",array()));
-            rareAutoLoad::register($option);
-         }
         return self::$instance;
     }
     /**
@@ -66,8 +58,24 @@ class rareContext{
     //运行程序，解析url地址、执行过滤器、执行动作方法等    
     public function run(){
         $this->parseRequest();
+        $this->regAutoLoad();
         $this->executeFilter();    
         $this->executeActtion($this->uri);
+    }
+     //注册class auto load
+    private function regAutoLoad(){
+          $class_autoload=rareConfig::get("class_autoload",true);
+         if($class_autoload){
+            include dirname(__FILE__).'/rareAutoLoad.class.php';
+            $_autoloadOption=array('dirs'=>$this->getAppLibDir(),
+                                   'cache'=>$this->getCacheDir()."classAutoLoad.php"
+                                        );
+            if(isset($_autoloadOption['hand']) && $_autoloadOption['hand']){
+                $_autoloadOption['cache']=$this->getConfigDir()."autoLoad";
+              }
+            $option=array_merge($_autoloadOption,rareConfig::get("class_autoload_option",array()));
+            rareAutoLoad::register($option);
+         }
     }
     //解析url地址
     private function parseRequest(){
