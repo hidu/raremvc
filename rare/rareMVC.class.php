@@ -29,6 +29,7 @@ class rareContext{
         $this->appDir=$appDir;
         date_default_timezone_set('Asia/Shanghai');
         header("Content-Type:text/html; charset=utf-8");
+        header("rareMVC:1.0 20101123");
     }
     //是否是https
     public function isSecure(){
@@ -70,11 +71,11 @@ class rareContext{
             $_autoloadOption=array('dirs'=>$this->getAppLibDir(),
                                    'cache'=>$this->getCacheDir()."classAutoLoad.php"
                                    );
-                                   if(isset($_autoloadOption['hand']) && $_autoloadOption['hand']){
-                                       $_autoloadOption['cache']=$this->getConfigDir()."autoLoad";
-                                   }
-                                   $option=array_merge($_autoloadOption,rareConfig::get("class_autoload_option",array()));
-                                   rareAutoLoad::register($option);
+            if(isset($_autoloadOption['hand']) && $_autoloadOption['hand']){
+               $_autoloadOption['cache']=$this->getConfigDir()."autoLoad";
+              }
+            $option=array_merge($_autoloadOption,rareConfig::get("class_autoload_option",array()));
+            rareAutoLoad::register($option);
         }
     }
     //解析url地址
@@ -350,7 +351,7 @@ abstract class rareAction{
             $layoutFile=$this->context->getLayoutDir().$this->context->getModuleName().".php";
             if(!file_exists($layoutFile)){
                 $layoutFile=$this->context->getLayoutDir()."default.php";
-            }
+              }
         }else{
             $layoutFile=$this->context->getLayoutDir().$this->layout.".php";
         }
