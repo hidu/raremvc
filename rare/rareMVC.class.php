@@ -425,9 +425,9 @@ function url($uri,$suffix=""){
         $url.=$context->getScriptName()."/";
     }
     $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
-    $uri=ltrim($uri,"/");
+    $uri=preg_replace("/~\//", $context->getModuleName()."/",ltrim($uri,"/"));
     $tmp=parse_url($uri);
-    $uri=str_replace("/index", "", $tmp['path']).".".$suffix.(isset($tmp['query'])?"?".$tmp['query']:'');
+    $uri=preg_replace("/\/index$/", "", $tmp['path']).".".$suffix.(isset($tmp['query'])?"?".$tmp['query']:'');
     return $url.$uri;
 }
 /**
