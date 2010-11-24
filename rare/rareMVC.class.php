@@ -300,7 +300,7 @@ class rareView{
     }
 
     public static function include_title(){
-        echo "<title>".htmlspecialchars(rareConfig::get("title","rare app"))."</title>";
+        echo "<title>".htmlspecialchars(rareConfig::get("title","rare app"))."</title>\n";
     }
 }
 
