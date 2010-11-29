@@ -310,6 +310,7 @@ class rareView{
 abstract class rareAction{
     protected  $context;
     protected  $layout=null;
+    protected  $layoutForce=false;//是否强制在任何情况下都使用layout
     public $vars;
     private $viewFile;
     protected  $moduleName;
@@ -343,10 +344,17 @@ abstract class rareAction{
         $this->layout=$layout;
     }
     /**
+     * 是否强制使用模板
+     * @param boolean $layoutForce
+     */
+    public function setLayoutForce($layoutForce=false){
+        $this->layoutForce=$layoutForce;
+    }
+    /**
      *获取模板文件的路径
      */
     private  function getLayoutFile(){
-        if(false===$this->layout || rareContext::isXmlHttpRequest())return null;
+        if(!$this->layoutForce && (false===$this->layout || rareContext::isXmlHttpRequest()))return null;
         if(null==$this->layout){
             $layoutFile=$this->context->getLayoutDir().$this->context->getModuleName().".php";
             if(!file_exists($layoutFile)){
