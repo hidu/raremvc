@@ -112,13 +112,21 @@ class rareContext{
         $this->executeActtion($uri);
         die;
     }
-    //执行指定动作
+    /**
+     * 执行指定动作
+     * $uri可以是 demo/index?a=123
+     */
     public  function executeActtion($uri){
         $uriInfo=$this->parseActionUri($uri);
         $this->moduleName=$uriInfo['m'];
         $this->actionName=$uriInfo['a'];
-        $query=$uriInfo['q'];
-
+        if($uriInfo['q']){
+           parse_str($uriInfo['q'],$query);
+           foreach ($query as $_k=>$_v){
+               $_GET[$_k]=$_v;
+             }
+         }
+        
         $actionFile=$this->getModuleDir().$this->moduleName."/action/".$this->actionName.".php";
         chdir(dirname($actionFile));
 
