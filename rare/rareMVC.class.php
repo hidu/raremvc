@@ -11,7 +11,8 @@
  */
 class rareContext{
 
-    private $appDir;
+    private $appDir;//当前app所在的目录
+    private $rootDir;//当前程序的根目录，应该是appDir的上一级目录
 
     private $webRoot;
     private $webRootUrl;
@@ -21,15 +22,19 @@ class rareContext{
     private $uri;
     private $scriptName;
     private $isScriptNameInUrl=false;
+    private $appName;//当前app的名称
+    private $version='1.0 20101210';
 
 
     private static $instance;
 
     public function __construct($appDir){
         $this->appDir=$appDir;
+        $this->appName=basename($this->appDir);
+        $this->rootDir=dirname($this->appDir)."/";
         date_default_timezone_set('Asia/Shanghai');
         header("Content-Type:text/html; charset=utf-8");
-        header("rareMVC:1.0 20101123");
+        header("rareMVC:".$this->version);
     }
     //是否是https
     public function isSecure(){
@@ -68,8 +73,8 @@ class rareContext{
         $class_autoload=rareConfig::get("class_autoload",true);
         if($class_autoload){
             include dirname(__FILE__).'/rareAutoLoad.class.php';
-            $_autoloadOption=array('dirs'=>$this->getAppLibDir(),
-                                   'cache'=>$this->getCacheDir()."classAutoLoad.php"
+            $_autoloadOption=array('dirs'=>$this->getAppLibDir().",".$this->getRootLibDir(),
+                                   'cache'=>$this->getCacheDir().$this->getAppName()."_classAutoLoad"
                                    );
             if(isset($_autoloadOption['hand']) && $_autoloadOption['hand']){
                $_autoloadOption['cache']=$this->getConfigDir()."autoLoad";
@@ -164,8 +169,19 @@ class rareContext{
     public function getAppDir(){
         return $this->appDir;
     }
+    
+    public function getRootDir(){
+         return $this->rootDir;
+    }
+    //获取当前app的名称 比如demo
+    public function getAppName(){
+      return $this->appName;
+    }
     public function getAppLibDir(){
         return $this->getAppDir()."lib/";
+    }
+    public function getRootLibDir(){
+         return $this->rootDir."lib/";
     }
 
     public function getModuleName(){
@@ -209,7 +225,7 @@ class rareContext{
         return $this->getAppDir()."config/";
     }
     public function getCacheDir(){
-        return rareConfig::get('cache_dir',$this->getAppDir()."cache/");
+        return rareConfig::get('cache_dir',$this->getRootDir()."cache/".$this->getAppName()."/");
     }
     public function getRequestUri(){
         return $this->uri;
@@ -480,4 +496,8 @@ function use_helper($helper){
     if(!file_exists($helperFile))die("can not find helper ".$helperFile);
     include $helperFile;
     $helpers[$helper]=1;
+}
+//检查目录是否存在，不存在则创建
+function directory($dir){
+    return is_dir($dir) or (directory(dirname($dir)) and mkdir($dir, 0777));
 }

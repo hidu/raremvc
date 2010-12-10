@@ -117,14 +117,16 @@ class rareAutoLoad
      */
     private function reload(){
         if($this->hand && php_sapi_name()!="cli" && !$this->option['noCache'])return;
-        if(!is_writable(dirname($this->cacheFile))) die('cache 不能写入');
+         $cachedir=dirname($this->cacheFile);
+         directory($cachedir);
+         if(!is_writable($cachedir)) die('cache 不能写入');
         
         $this->classes=array();
         $dirs=$this->option['dirs'];
         if(!is_array($dirs)) $dirs=explode(",", $dirs);
 
         foreach($dirs as $dir){
-            if(!$dir)continue;
+            if(!$dir || !file_exists($dir))continue;
             $this->scanDir($dir);
         }
         if($this->option['noCache'])return;
