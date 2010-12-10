@@ -225,7 +225,7 @@ class rareContext{
         return $this->getAppDir()."config/";
     }
     public function getCacheDir(){
-        return rareConfig::get('cache_dir',$this->getRootDir()."cache/".$this->getAppName()."/");
+        return rareConfig::get('cache_dir',$this->getRootDir()."cache/app_".$this->getAppName()."/");
     }
     public function getRequestUri(){
         return $this->uri;
