@@ -117,6 +117,33 @@ class rareContext{
         $this->executeActtion($uri);
         die;
     }
+    
+    public function error404(){
+        @header('HTTP/1.0 404');
+         $this->goError(404);      
+         die("404");
+     }
+     
+     private function goError($code){
+            $errorUri=rareConfig::get('error'.$code,'error/e'.$code);
+            if(substr($errorUri, 0, 4) == "http"){
+                header("location:".$errorUri);               
+            }else{
+                $tmp=explode("/",$errorUri);
+                if($this->isActionExist($tmp[0],$tmp[1])){
+                   $this->forward($errorUri);                         
+                  }                       
+              }  
+       }
+     
+     public function isActionExist($moduleName,$actionName){
+         $actionFile=$this->getActionFile($moduleName,$actionName);
+         return file_exists($actionFile);
+      }
+     
+     private function getActionFile($moduleName,$actionName){
+        return  $this->getModuleDir().$moduleName."/action/".$actionName.".php";
+       }      
     /**
      * 执行指定动作
      * $uri可以是 demo/index?a=123
@@ -132,9 +159,13 @@ class rareContext{
              }
          }
         
-        $actionFile=$this->getModuleDir().$this->moduleName."/action/".$this->actionName.".php";
+        $actionFile=$this->getActionFile($this->moduleName,$this->actionName);
+        if(!file_exists($actionFile)){
+             $this->error404();          
+          }
+        
         chdir(dirname($actionFile));
-
+            
         include($actionFile);
         $actionClass=$this->actionName."Action";
         $action = new $actionClass($this->moduleName,$this->actionName);
@@ -459,7 +490,11 @@ function url($uri,$suffix=""){
     $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
     $uri=preg_replace("/~\//", $context->getModuleName()."/",ltrim($uri,"/"));
     $tmp=parse_url($uri);
-    $uri=preg_replace("/\/index$/", "", $tmp['path']).".".$suffix.(isset($tmp['query'])?"?".$tmp['query']:'');
+    if( $tmp['path'] == 'index/index' ){
+      $uri=isset($tmp['query'])?"?".$tmp['query']:'';       
+    }else{         
+      $uri=preg_replace("/\/index$/", "", $tmp['path']).".".$suffix.(isset($tmp['query'])?"?".$tmp['query']:'');
+    }
     return $url.$uri;
 }
 /**
