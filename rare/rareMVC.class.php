@@ -9,6 +9,7 @@
 /**
  * app 入口类
  */
+!defined("PROD") && define("PROD",1);//是否是生产环境
 class rareContext{
 
     private $appDir;//当前app所在的目录
@@ -63,10 +64,21 @@ class rareContext{
     }
     //运行程序，解析url地址、执行过滤器、执行动作方法等
     public function run(){
+        $this->regShutdown();
         $this->parseRequest();
         $this->regAutoLoad();
         $this->executeFilter();
         $this->executeActtion($this->uri);
+    }
+    
+    private function regShutdown(){
+        function shutdown(){
+            $_error=error_get_last();
+            if($_error && $_error['type'] == E_ERROR ){
+              rareContext::getContext()->error500();
+            }
+        }
+        register_shutdown_function("shutdown");
     }
     //注册class auto load
     private function regAutoLoad(){
@@ -121,8 +133,19 @@ class rareContext{
     public function error404(){
         @header('HTTP/1.0 404');
          $this->goError(404);      
-         die("404");
+         die("the url you requist not found");
      }
+    //500错误
+    public function error500(){
+        @header('HTTP/1.0 500');
+         if(PROD){
+           $this->goError(500);
+           die("system error");
+         }else{
+             $_error=error_get_last();
+             die($_error['message']." in file ".$_error['file']." at line ".$_error['line']);
+         }      
+    } 
      /**
       * 当http错误发生时，跳转到错误页面。
       * 比如默认404 的错误页面为error/e404,当时当该action不存在时则不进行操作。
@@ -135,7 +158,7 @@ class rareContext{
                 header("location:".$errorUri);               
             }else{
                 $tmp=explode("/",$errorUri);
-                if($this->isActionExist($tmp[0],$tmp[1])){
+                if($tmp[0] != $this->moduleName && $tmp[1] != $this->actionName && $this->isActionExist($tmp[0],$tmp[1])){
                    $this->forward($errorUri);                         
                   }                       
               }  
