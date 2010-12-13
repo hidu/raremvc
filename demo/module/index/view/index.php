@@ -30,8 +30,8 @@ $().ready(function(){
 	$("#loginForm").ajaxForm({
 		dataType:"json",
 		success:function(data){
-		  alert(data.info);
-         if(data.status==1){
+		  alert(data.i);
+         if(data.s==1){
                alert("你可以做其他的事情！");
             }    
 		}
