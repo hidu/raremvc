@@ -133,7 +133,7 @@ class rareContext{
     public function error404(){
         @header('HTTP/1.0 404');
          $this->goError(404);      
-         die("the url you requist not found");
+         die("the url you request not found");
      }
     //500错误
     public function error500(){
