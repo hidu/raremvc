@@ -15,16 +15,17 @@ class rareContext{
     private $appDir;//当前app所在的目录
     private $rootDir;//当前程序的根目录，应该是appDir的上一级目录
 
-    private $webRoot;
-    private $webRootUrl;
+    private $webRoot;   //相对的程序根路径 eg /rare/
+    private $webRootUrl; //完整的程序的地址 eg http://127.0.0.1/rare/
     private $moduleName;
     private $actionName;
 
     private $uri;
-    private $scriptName;
-    private $isScriptNameInUrl=false;
+    private $scriptName;   //入口脚本名称 如index.php
+    private $isScriptNameInUrl=false;   //url中是否包含入口文件
     private $appName;//当前app的名称
     private $version='1.0 20101213';
+    private $cacheDir="";//cache目录
 
 
     private static $instance;
@@ -65,13 +66,14 @@ class rareContext{
     }
     //运行程序，解析url地址、执行过滤器、执行动作方法等
     public function run(){
+        $this->cacheDir=rareConfig::get('cache_dir',$this->getRootDir()."cache/app_".$this->getAppName()."/");
         $this->regShutdown();
         $this->parseRequest();
         $this->regAutoLoad();
         $this->executeFilter();
         $this->executeActtion($this->uri);
     }
-    
+    //注册shutdown 事件，当发生致命错误时执行error500方法或者打印出错信息
     private function regShutdown(){
         function shutdown(){
             $_error=error_get_last();
@@ -199,7 +201,13 @@ class rareContext{
         $actionClass=$this->actionName."Action";
         $action = new $actionClass($this->moduleName,$this->actionName);
         $action->preExecute();
-        $result=$action->execute();
+        
+        $restFn="execute".ucfirst(strtolower($_SERVER["REQUEST_METHOD"]));
+        if(method_exists($action, $restFn)){
+            $result=call_user_func(array($action,$restFn));
+         }else{
+           $result=$action->execute();
+         }
         if($result!=null && empty($result))return;
         $action->display($result);
     }
@@ -276,7 +284,7 @@ class rareContext{
     public function getScriptName(){
         return $this->scriptName;
     }
-
+    //url中是否包含脚本名称 如/rare/index.php/demo 为true
     public function isScriptNameInUrl(){
         return $this->isScriptNameInUrl;
     }
@@ -284,8 +292,9 @@ class rareContext{
     public function getConfigDir(){
         return $this->getAppDir()."config/";
     }
+    
     public function getCacheDir(){
-        return rareConfig::get('cache_dir',$this->getRootDir()."cache/app_".$this->getAppName()."/");
+        return $this->cacheDir;
     }
     public function getRequestUri(){
         return $this->uri;
@@ -409,6 +418,10 @@ abstract class rareAction{
         $this->actionName=$actionName;
         $this->viewFile=$this->context->getModuleDir().$moduleName."/view/".$actionName.".php";
     }
+    
+    public function getRequestParam($key,$default=null){
+        return isset($_REQUEST[$key])?$_REQUEST[$key]:$default;
+     }
     /**
      *execute 前执行的方法
      */
@@ -461,8 +474,12 @@ abstract class rareAction{
         $this->isRender=true;
         if(!empty($viewFile) && is_string($viewFile)){
             $pathArray=explode("/",$viewFile);
-            $moduleName=$pathArray[0]=="~"?$this->moduleName:$pathArray[0];
-            array_shift($pathArray);
+            if(count($pathArray)==1){
+               $moduleName=$this->moduleName;
+            }else{
+               $moduleName=$pathArray[0]=="~"?$this->moduleName:$pathArray[0];
+               array_shift($pathArray);
+              }
             $this->viewFile=$this->context->getModuleDir().$moduleName."/view/".join("/", $pathArray).".php";
         }
         if(!file_exists($this->viewFile))return;
@@ -518,14 +535,20 @@ function url($uri,$suffix=""){
     if(($context->isScriptNameInUrl() && $context->getScriptName() != 'index.php' )|| !rareConfig::get("no_script_name",true)){
         $url.=$context->getScriptName()."/";
     }
+    
     $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
-    $uri=preg_replace("/~\//", $context->getModuleName()."/",ltrim($uri,"/"));
     $tmp=parse_url($uri);
-    if( $tmp['path'] == 'index/index' || $tmp['path']=='index'){
-      $uri=isset($tmp['query'])?"?".$tmp['query']:'';       
-    }else{         
-      $uri=preg_replace("/\/index$/", "", $tmp['path']).".".$suffix.(isset($tmp['query'])?"?".$tmp['query']:'');
+    if(empty($tmp['path'])){
+        $tmp['path']=$context->getModuleName()."/".$context->getActionName();
     }
+    $uri=preg_replace("/~\//", $context->getModuleName()."/",ltrim($tmp['path'],"/"));
+    if( $uri == 'index/index' || $uri=='index'){
+        $uri="";
+    }        
+     $uri=preg_replace("/\/index$/", "", $uri);
+     if($uri && !str_endWith($uri, "/"))$uri.=".".$suffix;
+     
+     $uri.=isset($tmp['query'])?"?".$tmp['query']:'';       
     return $url.$uri;
 }
 /**
@@ -583,4 +606,16 @@ function jsonReturn($status=1,$info="",$data=""){
   $json['d']=$data;
   header("Content-Type:application/json");
   die(json_encode($json));
+}
+//字符串是否以指定值结尾
+if(!function_exists("str_endWith")){
+    function str_endWith($str,$endStr){
+        return substr($str, -(strlen($endStr)))==$endStr;
+    }
+}
+//字符串是否以指定值开始
+if(!function_exists("str_startWith")){
+    function str_startWith($str,$startStr){
+        return substr($str, 0,(strlen(startWith)))==$endStr;
+    }
 }
