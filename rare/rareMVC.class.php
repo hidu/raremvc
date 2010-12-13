@@ -23,7 +23,7 @@ class rareContext{
     private $scriptName;
     private $isScriptNameInUrl=false;
     private $appName;//当前app的名称
-    private $version='1.0 20101210';
+    private $version='1.0 20101213';
 
 
     private static $instance;
@@ -32,7 +32,7 @@ class rareContext{
         $this->appDir=$appDir;
         $this->appName=basename($this->appDir);
         $this->rootDir=dirname($this->appDir)."/";
-        date_default_timezone_set('Asia/Shanghai');
+        if(!date_default_timezone_get())date_default_timezone_set('Asia/Shanghai');
         header("Content-Type:text/html; charset=utf-8");
         header("rareMVC:".$this->version);
     }
@@ -123,7 +123,12 @@ class rareContext{
          $this->goError(404);      
          die("404");
      }
-     
+     /**
+      * 当http错误发生时，跳转到错误页面。
+      * 比如默认404 的错误页面为error/e404,当时当该action不存在时则不进行操作。
+      * 或者 也可以在配置文件中定义404页面：$config['error404']='http://www.exmaple.com/error.html';
+      * @param int $code
+      */
      private function goError($code){
             $errorUri=rareConfig::get('error'.$code,'error/e'.$code);
             if(substr($errorUri, 0, 4) == "http"){
@@ -282,7 +287,9 @@ class rareView{
         if(is_string($vars))parse_str($vars,$vars);
         if(is_array($vars))extract($vars);
         ob_start();
-        include $viewFile;
+        try{
+          include $viewFile;
+        }catch(Exception $e){error_log($e->getMessage());}
         $content= ob_get_contents();
         ob_end_clean();
         chdir($currentPWD);
@@ -528,11 +535,28 @@ function use_helper($helper){
     static $helpers=array();
     if(in_array($helper, $helpers))return;
     $helperFile=rareContext::getContext()->getAppLibDir()."helper/".$helper.".php";
-    if(!file_exists($helperFile))die("can not find helper ".$helperFile);
+    if(!file_exists($helperFile)){
+        $helperFile=rareContext::getContext()->getRootLibDir()."helper/".$helper.".php";
+        if(!file_exists($helperFile))die("can not find helper ".$helper);
+    }
     include $helperFile;
     $helpers[$helper]=1;
 }
 //检查目录是否存在，不存在则创建
 function directory($dir){
     return is_dir($dir) or (directory(dirname($dir)) and mkdir($dir, 0777));
+}
+/**
+ * 返回json数据 
+ * @param int $status 状态 建议0：失败 1：正常、成功
+ * @param string $info  提示信息
+ * @param mix $data   返回的数据,字符串或者数组
+ */
+function jsonReturn($status=1,$info="",$data=""){
+  $json=array();
+  $json['s']=$status;
+  $json['i']=$info;
+  $json['d']=$data;
+  header("Content-Type:application/json");
+  die(json_encode($json));
 }
