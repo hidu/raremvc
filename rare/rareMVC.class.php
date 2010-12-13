@@ -418,9 +418,15 @@ abstract class rareAction{
         $this->actionName=$actionName;
         $this->viewFile=$this->context->getModuleDir().$moduleName."/view/".$actionName.".php";
     }
-    
-    public function getRequestParam($key,$default=null){
-        return isset($_REQUEST[$key])?$_REQUEST[$key]:$default;
+    /**
+     * 获取request值
+     * @param string $key  变量名称
+     * @param string $default  默认值
+     * @param boolean $defaultOnEmpty 是否当值为empty时就使用默认值。比如$a=$this->getRequestParam('a',1) 若request值为0，实际取货的为1
+     */
+    public function getRequestParam($key,$default=null,$defaultOnEmpty=true){
+        $value=isset($_REQUEST[$key])?trim($_REQUEST[$key]):$default;
+        return $defaultOnEmpty?(empty($value)?$default:$value):$value;
      }
     /**
      *execute 前执行的方法
