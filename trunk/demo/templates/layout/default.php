@@ -15,6 +15,8 @@
        <li><a href="<?php echo url('index/a')?>">内部跳转：forward</a></li>
        <li><a href="<?php echo url('index/b')?>">渲染其他视图</a></li>
        <li><a href="<?php echo url('demo/ajax')?>">模板与ajax</a></li>
+       <li><a href="<?php echo url('demo/thisis404')?>">这是一个404</a></li>
+       <li><a href="<?php echo url('demo/thisis500')?>">这是一个500</a></li>
     </ol>
     </div>
     <?php echo $content;?>
