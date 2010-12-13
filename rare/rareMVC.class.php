@@ -33,7 +33,8 @@ class rareContext{
         $this->appDir=$appDir;
         $this->appName=basename($this->appDir);
         $this->rootDir=dirname($this->appDir)."/";
-        if(!date_default_timezone_get())date_default_timezone_set('Asia/Shanghai');
+        @$timeZone=date_default_timezone_get();
+        date_default_timezone_set($timeZone?$timeZone:'Asia/Shanghai');
         header("Content-Type:text/html; charset=utf-8");
         header("rareMVC:".$this->version);
     }
@@ -520,7 +521,7 @@ function url($uri,$suffix=""){
     $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
     $uri=preg_replace("/~\//", $context->getModuleName()."/",ltrim($uri,"/"));
     $tmp=parse_url($uri);
-    if( $tmp['path'] == 'index/index' ){
+    if( $tmp['path'] == 'index/index' || $tmp['path']=='index'){
       $uri=isset($tmp['query'])?"?".$tmp['query']:'';       
     }else{         
       $uri=preg_replace("/\/index$/", "", $tmp['path']).".".$suffix.(isset($tmp['query'])?"?".$tmp['query']:'');
