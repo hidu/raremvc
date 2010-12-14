@@ -156,6 +156,7 @@ class rareContext{
       * @param int $code
       */
      private function goError($code){
+           ob_clean();
             $errorUri=rareConfig::get('error'.$code,'error/e'.$code);
             if(substr($errorUri, 0, 4) == "http"){
                 header("location:".$errorUri);               
