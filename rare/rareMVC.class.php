@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;   //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;   //url中是否包含入口文件
     private $appName;//当前app的名称
-    private $version='1.0 20101213';
+    private $version='1.0 20101214';
     private $cacheDir="";//cache目录
 
 
@@ -127,11 +127,6 @@ class rareContext{
         $webRootUrl.=$this->webRoot;
         $this->webRootUrl=$webRootUrl;
     }
-    //内部跳转 执行指定的动作 action同名时会出错(类重名)。
-    public  function forward($uri){
-        $this->executeActtion($uri);
-        die;
-    }
     
     public function error404(){
         @header('HTTP/1.0 404');
@@ -181,6 +176,7 @@ class rareContext{
      * $uri可以是 demo/index?a=123
      */
     public  function executeActtion($uri){
+        ob_clean();
         $uriInfo=$this->parseActionUri($uri);
         $this->moduleName=$uriInfo['m'];
         $this->actionName=$uriInfo['a'];
@@ -436,9 +432,7 @@ abstract class rareAction{
      */
     abstract function execute();
      
-    public function forward($uri){
-        $this->context->forward($uri);
-    }
+   
     /**
      * 设置使用那个模板文件 默认使用的是default
      * 模板文件目录位置为 templates/layout/
@@ -623,4 +617,13 @@ if(!function_exists("str_startWith")){
     function str_startWith($str,$startStr){
         return substr($str, 0,(strlen(startWith)))==$endStr;
     }
+}
+//内部地址跳转
+function forward($uri){
+   rareContext::getContext()->executeActtion($uri);die;
+ }
+//客户端地址跳转    
+function redirect($url){
+    if(!str_startWith($url, "http"))$url=url($url);
+    header("Location: ".$url);die;
 }
