@@ -608,14 +608,14 @@ function jsonReturn($status=1,$info="",$data=""){
 }
 //字符串是否以指定值结尾
 if(!function_exists("str_endWith")){
-    function str_endWith($str,$endStr){
-        return substr($str, -(strlen($endStr)))==$endStr;
+    function str_endWith($str,$subStr){
+        return substr($str, -(strlen($subStr)))==$subStr;
     }
 }
 //字符串是否以指定值开始
 if(!function_exists("str_startWith")){
-    function str_startWith($str,$startStr){
-        return substr($str, 0,(strlen(startWith)))==$endStr;
+    function str_startWith($str,$subStr){
+        return substr($str, 0,(strlen($subStr)))==$subStr;
     }
 }
 //内部地址跳转
