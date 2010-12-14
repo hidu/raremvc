@@ -9,7 +9,7 @@
 /**
  * app 入口类
  */
-!defined("PROD") && define("PROD",1);//是否是生产环境
+!defined("PROD") && define("PROD",0);//是否是生产环境默认为否
 class rareContext{
 
     private $appDir;//当前app所在的目录
@@ -153,12 +153,12 @@ class rareContext{
      private function goError($code){
            ob_clean();
             $errorUri=rareConfig::get('error'.$code,'error/e'.$code);
-            if(substr($errorUri, 0, 4) == "http"){
-                header("location:".$errorUri);               
+            if(str_startWith($errorUri, "http://") || str_startWith($errorUri, "https://")){
+                redirect($errorUri);              
             }else{
                 $tmp=explode("/",$errorUri);
                 if($tmp[0] != $this->moduleName && $tmp[1] != $this->actionName && $this->isActionExist($tmp[0],$tmp[1])){
-                   $this->forward($errorUri);                         
+                   forward($errorUri);                         
                   }                       
               }  
        }
@@ -586,7 +586,7 @@ function use_helper($helper){
         if(!file_exists($helperFile))die("can not find helper ".$helper);
     }
     include $helperFile;
-    $helpers[$helper]=1;
+    $helpers[]=$helper;
 }
 //检查目录是否存在，不存在则创建
 function directory($dir){
@@ -624,6 +624,6 @@ function forward($uri){
  }
 //客户端地址跳转    
 function redirect($url){
-    if(!str_startWith($url, "http"))$url=url($url);
+    if(!str_startWith($url, "http://") || !str_startWith($url, "https://"))$url=url($url);
     header("Location: ".$url);die;
 }
