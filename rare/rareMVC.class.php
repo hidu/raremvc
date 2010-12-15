@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;   //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;   //url中是否包含入口文件
     private $appName;//当前app的名称
-    private $version='1.0 20101214';
+    private $version='1.0 20101215';
     private $cacheDir="";//cache目录
 
 
@@ -113,6 +113,9 @@ class rareContext{
             $this->isScriptNameInUrl=true;
         }
         $this->uri=$this->uri?$this->uri:"index/index";
+        $uriInfo=$this->parseActionUri($this->uri);
+        $this->moduleName=$uriInfo['m'];
+        $this->actionName=$uriInfo['a'];
     }
     //计算程序完整的url地址
     private function setWebRootUrl(){
