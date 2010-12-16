@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;   //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;   //url中是否包含入口文件
     private $appName;//当前app的名称
-    private $version='1.0 20101215';
+    private $version='1.0 20101216';
     private $cacheDir="";//cache目录
 
 
@@ -260,18 +260,15 @@ class rareContext{
         return $this->actionName;
     }
 
-    public function getTemplatesDir(){
-        return $this->getAppDir()."templates/";
-    }
     public function getLayoutDir(){
-        return $this->getTemplatesDir()."layout/";
+        return $this->getAppDir()."layout/";
     }
     public function getModuleDir(){
         return $this->getAppDir()."module/";
     }
 
     public function getComponentDir(){
-        return $this->getTemplatesDir()."component/";
+        return $this->getAppDir()."component/";
     }
 
     public function getWebRootUrl(){
@@ -315,9 +312,10 @@ class rareView{
      * @param string $viewFile 模板文件路径
      */
     public static function render($vars,$viewFile){
-        $currentPWD = getcwd();
+        $rare_currentPWD = getcwd();
         chdir(dirname($viewFile));
         if(is_string($vars))parse_str($vars,$vars);
+        $vars['rare_vars']=$vars;
         if(is_array($vars))extract($vars);
         ob_start();
         try{
@@ -325,7 +323,7 @@ class rareView{
         }catch(Exception $e){error_log($e->getMessage());}
         $content= ob_get_contents();
         ob_end_clean();
-        chdir($currentPWD);
+        chdir($rare_currentPWD);
         return $content;
     }
     /**
@@ -485,13 +483,13 @@ abstract class rareAction{
             $this->viewFile=$this->context->getModuleDir().$moduleName."/view/".join("/", $pathArray).".php";
         }
         if(!file_exists($this->viewFile))return;
-        $content=rareView::render($this->vars, $this->viewFile);
+        $body=rareView::render($this->vars, $this->viewFile);
         $layoutFile=$this->getLayoutFile();
         if($layoutFile){
             chdir(dirname($layoutFile));
             include($layoutFile);
         }else{
-            echo $content;
+            echo $body;
         }
     }
 }

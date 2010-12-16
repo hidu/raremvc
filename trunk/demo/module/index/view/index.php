@@ -1,3 +1,5 @@
+<?php dump($rare_vars)?>
+
 <?php if(isset($date)){?>
 <div>今天的日期是：<?php echo $date;?></div>
 <?php }?>
