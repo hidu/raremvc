@@ -21,6 +21,6 @@
            <li><a href="<?php echo url('demo/thisis500two')?>">这是一个500two</a></li>
     </ol>
     </div>
-    <?php echo $content;?>
+    <?php echo $body;?>
     </body> 
 </html>
