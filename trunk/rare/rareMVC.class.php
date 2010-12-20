@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;   //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;   //url中是否包含入口文件
     private $appName;//当前app的名称
-    private $version='1.0 20101218';
+    private $version='1.0 20101220';
     private $cacheDir="";//cache目录
 
 
@@ -179,7 +179,7 @@ class rareContext{
      * $uri可以是 demo/index?a=123
      */
     public  function executeActtion($uri){
-        ob_clean();
+       // ob_clean();
         $uriInfo=$this->parseActionUri($uri);
         $this->moduleName=$uriInfo['m'];
         $this->actionName=$uriInfo['a'];
@@ -199,15 +199,15 @@ class rareContext{
             
         include($actionFile);
         $actionClass=$this->actionName."Action";
-        //添加namespace支持 可以给action添加namespace rareModule\{moduleName}
-        if(!class_exists($actionClass) && version_compare(PHP_VERSION, '5.3.0') >= 0){
-           $actionClass="rareModule\\{$this->moduleName}\\".$actionClass;
+        if(class_exists($this->moduleName.'_'.$actionClass)){
+           $actionClass=$this->moduleName.'_'.$actionClass;
         }
+        
         $action = new $actionClass($this->moduleName,$this->actionName);
         $action->preExecute();
         
         $restFn="execute".ucfirst(strtolower($_SERVER["REQUEST_METHOD"]));
-        if(0&&method_exists($action, $restFn)){
+        if(method_exists($action, $restFn)){
             $result=call_user_func(array($action,$restFn));
          }else{
            $result=$action->execute();
