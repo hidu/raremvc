@@ -1,5 +1,5 @@
 <?php
-class  indexAction extends rareAction{
+class  demo_indexAction extends rareAction{
   public function execute(){
     echo "rare";
   }
