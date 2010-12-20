@@ -5,6 +5,8 @@
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <meta name="keywords" content="rareMVC php framework"/>
 <meta name="description" content="rareMVC demo,这个是默认的模板"/>
+<?php rareView::addCss("a.js")?>
+<?php rareView::addCss("b.js")?>
 <?php rareView::include_js_css()?>
 </head>
     <body>
