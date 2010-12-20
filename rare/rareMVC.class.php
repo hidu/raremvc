@@ -346,52 +346,55 @@ class rareView{
      * @param $js  js文件地址
      * @param $index 显示顺序
      */
-    public static function addJs($js,$index=999){
-        $jss=rareConfig::get("js");
-        if(!is_array($jss))$jss=explode(",", $jss);
-        $jss[$js]=$index;
-        rareConfig::set('js', $jss);
+    public static function addJs($js,$index=null){
+      self::_staticIndex("js", $js,$index);
     }
     /**
      * 添加一个css 文件到head 标签中
      * @param $css
      * @param $index  显示顺序
      */
-    public static function addCss($css,$index=999){
-        $csss=rareConfig::get("css",array());
-        $csss[$css]=$index;
-        rareConfig::set('css', $csss);
+    public static function addCss($css,$index=null){
+         self::_staticIndex("css", $css,$index);
+    }
+    /**
+     * 添加一个css 文件到head 标签中
+     * @param $css
+     * @param $index  显示顺序
+     */
+    private static function _staticIndex($type,$uri,$index=null){
+        $tmp=rareConfig::get($type,array());
+        if(!is_array($tmp))$tmp=explode(",", $tmp);
+        if(is_numeric($index)){
+            $index=(int)$index;
+           if($index>=count($tmp)){
+              $tmp[]=$uri;
+            }else{
+              $_tmp=array_slice($tmp, 0,$index);
+              $_tmp[]=$uri;
+              $tmp=array_merge($_tmp,array_slice($tmp, $index));
+             }
+        }else{
+           $tmp[]=$uri;
+         }
+       rareConfig::set($type, $tmp);
     }
     /**
      * 供模板调用的输出css 和js 链接的方法
      */
     public static function include_js_css(){
         function _fill_url($_uri){
-            return (substr($_uri,0,1)=="/" || substr($_uri, 0,7)== 'http://' ||substr($_uri, 0,8)== 'https://')?$_uri:public_path($_uri);
-        }
-        function _url_index($arr){
-            if(!is_array($arr))$arr=explode(",", $arr);
-            foreach ($arr as $_k=>$_v){
-                if(is_numeric($_k)){
-                    $arr[_fill_url($_v)]=999+$_k;
-                    unset($arr[$_k]);
-                }else{
-                    $arr[_fill_url($_k)]=$_v;
-                    unset($arr[$_k]);
-                }
-            }
-            asort($arr);
-            return $arr;
+            return (str_startWith($_uri, "/") || str_startWith($_uri,'http://') ||str_startWith($_uri,'https://'))?$_uri:public_path($_uri,true);
         }
         $csss=rareConfig::get("css",array());
-        $csss=_url_index($csss);
-        foreach ($csss as $css=>$index){
+        foreach ($csss as $css){
+            $css=_fill_url($css);
             echo "<link rel=\"stylesheet\" href=\"{$css}\" type=\"text/css\" media=\"screen\" />\n";
         }
          
         $jss=rareConfig::get("js",array());
-        $jss=_url_index($jss);
-        foreach ($jss as $js=>$index){
+        foreach ($jss as $js){
+             $js=_fill_url($js);
             echo "<script type=\"text/javascript\" src=\"{$js}\"></script>\n";
         }
     }
@@ -533,9 +536,9 @@ class rareConfig{
  * @param string $uri
  * @param string $suffix
  */
-function url($uri,$suffix=""){
+function url($uri,$suffix="",$full=false){
     $context=rareContext::getContext();
-    $url=public_path("/");
+    $url=public_path("/",$full);
     if(($context->isScriptNameInUrl() && $context->getScriptName() != 'index.php' )|| !rareConfig::get("no_script_name",true)){
         $url.=$context->getScriptName()."/";
     }
@@ -560,8 +563,8 @@ function url($uri,$suffix=""){
  * 如 public_path('js/hello.js') 输出为http://127.0.0.1/appName/js/hello.js
  * @param string $uri
  */
-function public_path($uri){
-    if(rareConfig::get('url_http_host',false)){
+function public_path($uri,$full=false){
+    if($full || rareConfig::get('url_http_host',false)){
         return rareContext::getContext()->getWebRootUrl().ltrim($uri,"/");
     }else{
         return rareContext::getContext()->getWebRoot().ltrim($uri,"/");
@@ -575,8 +578,26 @@ function public_path($uri){
  * @param array $param  参数
  */
 function fetch($name,$param=null){
+    $tmp=parse_url($name);
+    $name=$tmp['path'];
+    if(isset($tmp['query'])){
+       $param=rare_param_merge($tmp['query'], $param);
+     }
+     dump($param);
     $componentFile=rareContext::getContext()->getComponentDir().trim($name,"/").".php";
     return rareView::render($param, $componentFile);
+}
+//参数合并,将
+function rare_param_merge(){
+     $numargs = func_num_args();
+     $param=array();
+     for($i=0;$i<$numargs;$i++){
+        $_param=func_get_arg($i);
+       if(is_string($_param))parse_str($_param,$_param);
+       if(!is_array($_param))$_param=array();
+       $param=array_merge($param,$_param);
+      }
+     return $param;
 }
 /**
  * 调用简单的helper 文件，文件如lib/helper/hello.php

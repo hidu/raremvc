@@ -13,4 +13,5 @@ return array(
 //    'suffix'=>'html'                     //默认的url后缀
    'title'=>'rare demo app',
    'js'=>'js/jquery.js,js/jqueryform.js',
+   'css'=>'js/jquery.js,js/jqueryform.js',
 );
