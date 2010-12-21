@@ -592,7 +592,6 @@ function fetch($name,$param=null){
     if(isset($tmp['query'])){
        $param=rare_param_merge($tmp['query'], $param);
      }
-     dump($param);
     $componentFile=rareContext::getContext()->getComponentDir().trim($name,"/").".php";
     return rareView::render($param, $componentFile);
 }
