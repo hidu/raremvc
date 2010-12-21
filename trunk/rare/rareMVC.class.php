@@ -384,7 +384,7 @@ class rareView{
      */
     public static function include_js_css(){
         function _fill_url($_uris){
-            if(is_string(_uris))$_uris=explode(",", $_uris);
+            if(is_string($_uris))$_uris=explode(",", $_uris);
             $tmp=array();
             foreach($_uris as $_uri){
               $_uri=trim($_uri);
