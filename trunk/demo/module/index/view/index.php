@@ -3,7 +3,7 @@
 <?php if(isset($date)){?>
 <div>今天的日期是：<?php echo $date;?></div>
 <?php }?>
-
+currentUri:<?php echo rare_currentUri("b=");?>
 <div><?php echo $msg;?></div>
 <?php echo url('index/index?a=1&b=2','js')?>
 <br/>

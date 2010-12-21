@@ -39,16 +39,7 @@ class rareContext{
         header("Content-Type:text/html; charset=utf-8");
         header("rareMVC:".$this->version);
     }
-    //是否是https
-    public function isSecure(){
-        return (
-        (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == 1))
-        ||
-        (isset($_SERVER['HTTP_SSL_HTTPS']) && (strtolower($_SERVER['HTTP_SSL_HTTPS']) == 'on' || $_SERVER['HTTP_SSL_HTTPS'] == 1))
-        ||
-        (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https')
-        );
-    }
+    
     //创建一个rare app实例，在这里会注册类自动装载
     public static function createApp($appDir=''){
         if(!$appDir){
@@ -121,7 +112,7 @@ class rareContext{
     private function setWebRootUrl(){
         $webRootUrl= 'http://'.$_SERVER['HTTP_HOST'];
         if(80 != $_SERVER['SERVER_PORT'] ){
-            if($this->isSecure()){
+            if(rare_isHttps()){
                 $webRootUrl = 'https://'.$_SERVER['HTTP_HOST'];
             }else{
                 $webRootUrl.=$_SERVER['SERVER_PORT'];
@@ -300,10 +291,7 @@ class rareContext{
     public function getRequestUri(){
         return $this->uri;
     }
-    //是否是ajax 请求
-    public static function isXmlHttpRequest(){
-        return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
-    }
+    
 }
 
 /**
@@ -324,7 +312,7 @@ class rareView{
         ob_start();
         try{
           include $viewFile;
-        }catch(Exception $e){error_log($e->getMessage());}
+        }catch(Exception $e){}
         $content= ob_get_contents();
         ob_end_clean();
         chdir($rare_currentPWD);
@@ -469,7 +457,7 @@ abstract class rareAction{
      *获取模板文件的路径
      */
     private  function getLayoutFile(){
-        if(!$this->layoutForce && (false===$this->layout || rareContext::isXmlHttpRequest()))return null;
+        if(!$this->layoutForce && (false===$this->layout || rare_isXmlHttpRequest()))return null;
         if(null==$this->layout){
             $layoutFile=$this->context->getLayoutDir().$this->context->getModuleName().".php";
             if(!file_exists($layoutFile)){
@@ -660,4 +648,26 @@ function forward($uri){
 function redirect($url){
     if(!str_startWith($url, "http://") && !str_startWith($url, "https://"))$url=url($url);
     header("Location: ".$url);die;
+}
+//是否是https
+function rare_isHttps(){
+    return (
+    (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == 1))
+    ||
+    (isset($_SERVER['HTTP_SSL_HTTPS']) && (strtolower($_SERVER['HTTP_SSL_HTTPS']) == 'on' || $_SERVER['HTTP_SSL_HTTPS'] == 1))
+    ||
+    (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https')
+    );
+}
+//是否是ajax 请求
+function rare_isXmlHttpRequest(){
+    return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
+}
+//得到当前的url地址,并且可以添加其他的额外的参数
+function rare_currentUri($param=""){
+      $uri=$_SERVER['REQUEST_URI'];
+      $p=parse_url($uri);
+      $param=rare_param_merge($p['query'],$param);
+      $param=http_build_query($param);
+      return $param?$p['path']."?".$param:$p['path'];
 }
