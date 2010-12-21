@@ -383,18 +383,27 @@ class rareView{
      * 供模板调用的输出css 和js 链接的方法
      */
     public static function include_js_css(){
-        function _fill_url($_uri){
-            return (str_startWith($_uri, "/") || str_startWith($_uri,'http://') ||str_startWith($_uri,'https://'))?$_uri:public_path($_uri,true);
+        function _fill_url($_uris){
+            if(is_string(_uris))$_uris=explode(",", $_uris);
+            $tmp=array();
+            foreach($_uris as $_uri){
+              $_uri=trim($_uri);
+              if(!$_uri)continue;
+              $tmp[]=(str_startWith($_uri, "/") || str_startWith($_uri,'http://') ||str_startWith($_uri,'https://'))?$_uri:public_path($_uri,true);
+            }
+            return array_unique($tmp);
         }
-        $csss=rareConfig::get("css",array());
+        $csss=_fill_url(rareConfig::get("css",array()));
         foreach ($csss as $css){
-            $css=_fill_url($css);
+            $cssVersion=rareConfig::get("cssVersion",null);
+            $css.=$cssVersion?"?version=".$cssVersion:"";
             echo "<link rel=\"stylesheet\" href=\"{$css}\" type=\"text/css\" media=\"screen\" />\n";
         }
          
-        $jss=rareConfig::get("js",array());
+        $jss=_fill_url(rareConfig::get("js",array()));
         foreach ($jss as $js){
-             $js=_fill_url($js);
+            $jsVersion=rareConfig::get("jsVersion",null);
+            $js.=$jsVersion?"?version=".$jsVersion:"";
             echo "<script type=\"text/javascript\" src=\"{$js}\"></script>\n";
         }
     }
