@@ -408,11 +408,11 @@ abstract class rareAction{
     protected  $context;
     protected  $layout=null;
     protected  $layoutForce=false;//是否强制在任何情况下都使用layout
-    public $vars;
-    private $viewFile;
+    public     $vars;
+    private    $viewFile;
     protected  $moduleName;
     protected  $actionName;
-    private $isRender=false;
+    private    $isRender=false;
 
     public function __construct($moduleName,$actionName){
         $this->context=rareContext::getContext();

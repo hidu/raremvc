@@ -1,28 +1,36 @@
 #!/bin/sh
 ## 请不要在当前目录下允许该脚本
 ##到空的目录中运行，不要重复允许，会将已有的文件覆盖掉
+echo "============================================"
+echo "=====当前脚本仅仅用来初始化一个APP========="
+echo "=====重复运行会覆盖当前已有文件=============="
+echo "============================================"
 
 mkdir web/
-mkdir templates/layout/ -p
-mkdir templates/component/
+mkdir layout/ -p
+mkdir component/
 mkdir module/index/action/ -p
 mkdir module/index/view/ -p
 mkdir lib
 mkdir lib/helper
 mkdir config
-mkdir cache
-chmod 777 cache
 
 ### index.php file
 echo "<?php
-include '.`dirname $0`/rareMVC.class.php';
+include '../`dirname $0`/rareMVC.class.php';
 rareContext::createApp()->run();">web/index.php
 
 
 ### index action
 echo "<?php
 class indexAction extends rareAction{
+    public function preExecute(){
+    
+    }
     public function execute(){
+    
+    }
+    public function executePost(){
     
     }
 }
@@ -48,25 +56,25 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www
 <head>
 <title>rare app</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<?php rareView::include_js_css()?>
 </head>
 <body>
-<?php echo $content;?>
+<?php echo $body;?>
 </body>
-</html>'>templates/layout/default.php
+</html>'>layout/default.php
 
 
 ###default config
 echo "<?php
-//程序默认的配置文件
-return array(
-//   'no_script_name'=>true,               // 是否启用url地址重写，隐藏入口文件，默认为true
-//   'class_autoload'=>true,               //是否允许类自动装载，默认是允许 app 的 lib 目录下的.class.php 的文件可以
-//   'class_autoload_option'=>array(
-//                'dirs'=>'',              //定义那个目录下的php 类文件可以允许自动装载，一般情况下不需要添加，不能为空
-//                ‘suffix’=>'.class.php'   //需要类自动装载的php类文件的后缀 
-//                 ),
-//    'suffix'=>'html'                     //默认的url后缀    
-);
+//rare 程序默认的配置文件
+\$config=array();
+//\$config['no_script_name']=true;               // 是否启用url地址重写，隐藏入口文件，默认为true
+//\$config['class_autoload']=true;              //是否允许类自动装载，默认是允许 app 的 lib 目录下的.class.php 的文件可以
+//\$config['class_autoload_option']['dirs']=''; //定义那个目录下的php 类文件可以允许自动装载，一般情况下不需要添加，不能为空
+//\$config['class_autoload_option'][‘suffix’]='.class.php';   //需要类自动装载的php类文件的后缀 
+//\$config['suffix']='html';                     //默认的url后缀    
+
+return $config;
 ">config/default.php
 
 ###db config
