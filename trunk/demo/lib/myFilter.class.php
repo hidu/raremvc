@@ -10,4 +10,8 @@ class myFilter{
     $error=error_get_last();
     dump($error);
    }
+   
+   public function beforeExecute(){
+      echo time();
+   }
 }

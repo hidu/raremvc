@@ -1,7 +1,6 @@
 <?php
 /**
- *  rareMVC
- *
+ * rareMVC
  * @author duwei duv123@gmail.com
  * @version 1.0 a
  */
@@ -24,8 +23,9 @@ class rareContext{
     private $scriptName;   //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;   //url中是否包含入口文件
     private $appName;//当前app的名称
-    private $version='1.0 20101220';
+    private $version='1.0 20101227';
     private $cacheDir="";//cache目录
+    private $filter=null;//过滤器
 
 
     private static $instance;
@@ -186,6 +186,8 @@ class rareContext{
              $this->error404();          
           }
         
+        $this->executeFilter("beforeExecute");//执行具体动作前执行过滤器指定方法
+        
         chdir(dirname($actionFile));
             
         include($actionFile);
@@ -221,11 +223,16 @@ class rareContext{
         return $uriInfo;
     }
     //执行过滤器
-    private function executeFilter(){
-        $filterFile=$this->getAppLibDir()."myFilter.class.php";
-        if(file_exists($filterFile)){
-            include $filterFile;
-            new myFilter($this);
+    private function executeFilter($method=''){
+        if($this->filter==null){
+            $filterFile=$this->getAppLibDir()."myFilter.class.php";
+            if(file_exists($filterFile)){
+                include $filterFile;
+                $this->filter=new myFilter($this);
+            }
+        }
+        if(!empty($method) && method_exists($this->filter, $method)){
+            $this->filter->$method();
         }
     }
 
