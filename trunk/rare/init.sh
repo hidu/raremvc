@@ -1,6 +1,7 @@
 #!/bin/sh
-## 请不要在当前目录下允许该脚本
-##到空的目录中运行，不要重复允许，会将已有的文件覆盖掉
+##当前脚本是初始化一个app。
+## 请不要在当前脚本的目录下运行该脚本
+##先建立一个app目录，然后到空app目录中运行。重复运行，会将已有的文件覆盖掉
 echo "============================================"
 echo "=====当前脚本仅仅用来初始化一个APP========="
 echo "=====重复运行会覆盖当前已有文件=============="
@@ -74,15 +75,15 @@ echo "<?php
 //\$config['class_autoload_option'][‘suffix’]='.class.php';   //需要类自动装载的php类文件的后缀 
 //\$config['suffix']='html';                     //默认的url后缀    
 
-return $config;
+return \$config;
 ">config/default.php
 
 ###db config
 echo "<?php
 //数据库配置文件
-return array(
+\$db=array();
 
-);
+return \$db;
 ">config/db.php
 
 
