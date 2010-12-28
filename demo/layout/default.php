@@ -12,7 +12,7 @@
     <body>
     <div>
     <ol>
-       <li><a href="<?php echo url('index/index?a=1&b=2')?>">首页</a></li>
+       <li><a href="<?php echo url('index/index?a=1&b=2&c=你好')?>">首页</a></li>
        <li><a href="<?php echo url('demo/hello?a=2&b=1')?>">hello</a></li>
        <li><a href="<?php echo url('index/a')?>">内部跳转：forward</a></li>
        <li><a href="<?php echo url('index/b')?>">渲染其他视图</a></li>
