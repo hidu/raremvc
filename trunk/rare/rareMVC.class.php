@@ -11,21 +11,21 @@
 !defined("PROD") && define("PROD",0);                //是否是生产环境默认为否,对自定义错误页面等会有影响
 class rareContext{
 
-    private $appDir;                                 //当前app所在的目录
-    private $rootDir;                                //当前程序的根目录，应该是appDir的上一级目录
+    private $appDir;                                               //当前app所在的目录
+    private $rootDir;                                              //当前程序的根目录，应该是appDir的上一级目录
 
-    private $webRoot;                                //相对的程序根路径 eg /rare/
-    private $webRootUrl;                             //完整的程序的地址 eg http://127.0.0.1/rare/
+    private $webRoot;                                           //相对的程序根路径 eg /rare/
+    private $webRootUrl;                                      //完整的程序的地址 eg http://127.0.0.1/rare/
     private $moduleName;
     private $actionName;
 
     private $uri;
-    private $scriptName;                              //入口脚本名称 如index.php
-    private $isScriptNameInUrl=false;                 //url中是否包含入口文件
-    private $appName;                                 //当前app的名称
-    private $version='1.0 20101228';                  //当前框架版本
-    private $cacheDir="";                             //cache目录
-    private $filter=null;                             //过滤器
+    private $scriptName;                                      //入口脚本名称 如index.php
+    private $isScriptNameInUrl=false;                   //url中是否包含入口文件
+    private $appName;                                        //当前app的名称
+    private $version='1.0 20101228';                    //当前框架版本
+    private $cacheDir="";                                    //cache目录
+    private $filter=null;                                       //过滤器
 
 
     private static $instance;
