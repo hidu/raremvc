@@ -11,21 +11,21 @@
 !defined("PROD") && define("PROD",0);                //是否是生产环境默认为否,对自定义错误页面等会有影响
 class rareContext{
 
-    private $appDir;                                               //当前app所在的目录
-    private $rootDir;                                              //当前程序的根目录，应该是appDir的上一级目录
+    private $appDir;                                 //当前app所在的目录
+    private $rootDir;                                //当前程序的根目录，应该是appDir的上一级目录
 
-    private $webRoot;                                           //相对的程序根路径 eg /rare/
-    private $webRootUrl;                                      //完整的程序的地址 eg http://127.0.0.1/rare/
+    private $webRoot;                                //相对的程序根路径 eg /rare/
+    private $webRootUrl;                             //完整的程序的地址 eg http://127.0.0.1/rare/
     private $moduleName;
     private $actionName;
 
     private $uri;
-    private $scriptName;                                      //入口脚本名称 如index.php
-    private $isScriptNameInUrl=false;                   //url中是否包含入口文件
-    private $appName;                                        //当前app的名称
-    private $version='1.0 20101228';                    //当前框架版本
-    private $cacheDir="";                                    //cache目录
-    private $filter=null;                                       //过滤器
+    private $scriptName;                             //入口脚本名称 如index.php
+    private $isScriptNameInUrl=false;                //url中是否包含入口文件
+    private $appName;                                //当前app的名称
+    private $version='1.0 20110104';                 //当前框架版本
+    private $cacheDir="";                            //cache目录
+    private $filter=null;                            //过滤器
 
 
     private static $instance;
@@ -97,7 +97,7 @@ class rareContext{
         $this->setWebRootUrl();
 
         $requestUri=$_SERVER['REQUEST_URI'];
-        $this->uri=substr($requestUri, strlen($this->webRoot));
+        $this->uri=trim(substr($requestUri, strlen($this->webRoot)),"/");
         $scriptNamelen=strlen($this->scriptName);
         if(substr($this->uri, 0,$scriptNamelen)==$this->scriptName){
             $this->uri=substr($this->uri, strlen($this->scriptName)+1);
@@ -125,7 +125,7 @@ class rareContext{
     public function error404(){
         @header('HTTP/1.0 404');
          $this->goError(404);      
-         die("the url you request not found");
+         die("the url you request not found:".$this->uri);
      }
     //500错误
     public function error500(){
@@ -145,7 +145,7 @@ class rareContext{
       * @param int $code
       */
      private function goError($code){
-           ob_clean();
+           if(PROD)ob_clean();
             $errorUri=rareConfig::get('error'.$code,'error/e'.$code);
             if(str_startWith($errorUri, "http://") || str_startWith($errorUri, "https://")){
                 redirect($errorUri);              
@@ -258,8 +258,8 @@ class rareContext{
         return $this->moduleName;
     }
 
-    public function getActionName(){
-        return $this->actionName;
+    public function getActionName($full=false){
+        return $full?$this->moduleName."/".$this->actionName:$this->actionName;
     }
 
     public function getLayoutDir(){
@@ -332,7 +332,7 @@ class rareView{
      */
     public static function setTitle($title,$clean=false){
         if(!$clean){
-            $title=$title."--".rareConfig::get("title","rare app");
+            $title=$title."-".rareConfig::get("title","rare app");
         }
         rareConfig::set('title', $title);
     }
@@ -543,7 +543,8 @@ class rareConfig{
 function url($uri,$suffix="",$full=false){
     $context=rareContext::getContext();
     $url=public_path("/",$full);
-    if(($context->isScriptNameInUrl() && $context->getScriptName() != 'index.php' )|| !rareConfig::get("no_script_name",true)){
+    $script_name=rareConfig::get("script_name","index.php");//默认的index.php文件
+    if(($context->isScriptNameInUrl() && $context->getScriptName() != $script_name )|| !rareConfig::get("no_script_name",true)){
         $url.=$context->getScriptName()."/";
     }
     
@@ -556,13 +557,14 @@ function url($uri,$suffix="",$full=false){
     if( $uri == 'index/index' || $uri=='index'){
         $uri="";
     }        
-     $uri=preg_replace("/\/index$/", "", $uri);
+     $uri=preg_replace("/\/index$/", "", trim($uri,"/"));
+     
      if($uri && !str_endWith($uri, "/"))$uri.=".".$suffix;
      
      if(isset($tmp['query'])){
          parse_str($tmp['query'],$_tmp);
          $uri.="?".http_build_query($_tmp);
-     }       
+     }      
     return $url.$uri;
 }
 /**
@@ -661,13 +663,10 @@ function redirect($url){
 }
 //是否是https
 function rare_isHttps(){
-    return (
-    (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == 1))
-    ||
-    (isset($_SERVER['HTTP_SSL_HTTPS']) && (strtolower($_SERVER['HTTP_SSL_HTTPS']) == 'on' || $_SERVER['HTTP_SSL_HTTPS'] == 1))
-    ||
-    (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https')
-    );
+    return ( (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == 1)) ||
+             (isset($_SERVER['HTTP_SSL_HTTPS']) && (strtolower($_SERVER['HTTP_SSL_HTTPS']) == 'on' || $_SERVER['HTTP_SSL_HTTPS'] == 1)) ||
+             (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https')
+            );
 }
 //是否是ajax 请求
 function rare_isXmlHttpRequest(){
