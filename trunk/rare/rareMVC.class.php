@@ -61,7 +61,7 @@ class rareContext{
         $this->regShutdown();
         $this->parseRequest();
         $this->regAutoLoad();
-        $this->executeFilter();
+        $this->executeFilter("doFilter");
         $this->executeActtion($this->uri);
     }
     //注册shutdown 事件，当发生致命错误时执行error500方法或者打印出错信息
@@ -157,7 +157,6 @@ class rareContext{
      * $uri可以是 demo/index?a=123
      */
     public  function executeActtion($uri){
-       // ob_clean();
         $uriInfo=$this->parseActionUri($uri);
         $this->moduleName=$uriInfo['m'];
         $this->actionName=$uriInfo['a'];
@@ -211,12 +210,15 @@ class rareContext{
     }
     //执行过滤器
     private function executeFilter($method=''){
+        if($this->filter ===false)return;
         if($this->filter==null){
             $filterFile=$this->getAppLibDir()."myFilter.class.php";
             if(file_exists($filterFile)){
                 include $filterFile;
-                $this->filter=new myFilter($this);
-            }
+                $this->filter=new myFilter();
+             }else{
+                 $this->filter=false;return;
+              }
         }
         if(!empty($method) && method_exists($this->filter, $method)){
             $this->filter->$method();
@@ -318,9 +320,7 @@ class rareView{
      * @param boolean $clean 是否将title 完全重新设置，为false 表示新添加的补充到当前标题的前面
      */
     public static function setTitle($title,$clean=false){
-        if(!$clean){
-            $title=$title."-".rareConfig::get("title","rare app");
-        }
+        if(!$clean) $title=$title."-".rareConfig::get("title","rare app");
         rareConfig::set('title', $title);
     }
     /**
@@ -670,7 +670,6 @@ function rare_currentUri($param="",$full=false){
       $param=http_build_query($param);
       return $host.($param?$p['path']."?".$param:$p['path']);
 }
-
 
 function rare_httpHost(){
     $host= 'http://'.$_SERVER['HTTP_HOST'];
