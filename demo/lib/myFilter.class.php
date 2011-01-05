@@ -1,6 +1,7 @@
 <?php
 class myFilter{
-   public function __construct($context){
+   
+   public function doFilter(){
    }
    
    public function debug_dump(){
