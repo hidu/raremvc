@@ -94,7 +94,7 @@ class rareContext{
         $this->webRoot=substr($_SERVER['SCRIPT_NAME'],0,strrpos($_SERVER['SCRIPT_NAME'],"/")+1);
         $pathInfo=pathinfo($_SERVER['SCRIPT_NAME']);
         $this->scriptName=$pathInfo["basename"];
-        $this->setWebRootUrl();
+        $this->webRootUrl=rare_httpHost().$this->webRoot;
 
         $requestUri=$_SERVER['REQUEST_URI'];
         $this->uri=trim(substr($requestUri, strlen($this->webRoot)),"/");
@@ -107,19 +107,6 @@ class rareContext{
         $uriInfo=$this->parseActionUri($this->uri);
         $this->moduleName=$uriInfo['m'];
         $this->actionName=$uriInfo['a'];
-    }
-    //计算程序完整的url地址
-    private function setWebRootUrl(){
-        $webRootUrl= 'http://'.$_SERVER['HTTP_HOST'];
-        if(80 != $_SERVER['SERVER_PORT'] ){
-            if(rare_isHttps()){
-                $webRootUrl = 'https://'.$_SERVER['HTTP_HOST'];
-            }else{
-                $webRootUrl.=$_SERVER['SERVER_PORT'];
-            }
-        }
-        $webRootUrl.=$this->webRoot;
-        $this->webRootUrl=$webRootUrl;
     }
     
     public function error404(){
@@ -673,11 +660,26 @@ function rare_isXmlHttpRequest(){
     return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
 }
 //得到当前的url地址,并且可以添加其他的额外的参数
-function rare_currentUri($param=""){
+function rare_currentUri($param="",$full=false){
+      $host="";
+      if($full)$host=rare_httpHost();
       $uri=$_SERVER['REQUEST_URI'];
-      if(!$param)return $uri;
+      if(!$param)return $host.$uri;
       $p=parse_url($uri);
       $param=rare_param_merge($p['query'],$param);
       $param=http_build_query($param);
-      return $param?$p['path']."?".$param:$p['path'];
+      return $host.($param?$p['path']."?".$param:$p['path']);
+}
+
+
+function rare_httpHost(){
+    $host= 'http://'.$_SERVER['HTTP_HOST'];
+    if(80 != $_SERVER['SERVER_PORT'] ){
+        if(rare_isHttps()){
+            $host = 'https://'.$_SERVER['HTTP_HOST'];
+        }else{
+            $host.=$_SERVER['SERVER_PORT'];
+        }
+    }
+    return $host;
 }
