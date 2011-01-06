@@ -46,7 +46,7 @@ echo "<?php
  *app default filter 
  */
 class myFilter{
-   public function __construct(\$context){
+   public function doFilter(){
    }
 }
 ">lib/myFilter.class.php
@@ -69,11 +69,13 @@ echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www
 echo "<?php
 //rare 程序默认的配置文件
 \$config=array();
-//\$config['no_script_name']=true;               // 是否启用url地址重写，隐藏入口文件，默认为true
-//\$config['class_autoload']=true;              //是否允许类自动装载，默认是允许 app 的 lib 目录下的.class.php 的文件可以
-//\$config['class_autoload_option']['dirs']=''; //定义那个目录下的php 类文件可以允许自动装载，一般情况下不需要添加，不能为空
-//\$config['class_autoload_option'][‘suffix’]='.class.php';   //需要类自动装载的php类文件的后缀 
-//\$config['suffix']='html';                     //默认的url后缀    
+//\$config['no_script_name']=true;                                    // 是否启用url地址重写，隐藏入口文件，默认为true
+//\$config['class_autoload']=true;                                      //是否允许类自动装载，默认是允许 app 的 lib 目录下的.class.php 的文件可以
+//\$config['class_autoload_option']['dirs']='';                      //定义那个目录下的php 类文件可以允许自动装载，一般情况下不需要添加，不能为空
+//\$config['class_autoload_option']['suffix']='.class.php';    //需要类自动装载的php类文件的后缀 
+//\$config['suffix']='html';                                                //默认的url后缀
+//\$config['timezone']='Asia/Shanghai';                           //默认的时区      
+//\$config['charset']='utf-8';                                           //默认的字符编码
 
 return \$config;
 ">config/default.php

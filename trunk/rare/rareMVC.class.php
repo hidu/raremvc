@@ -34,9 +34,6 @@ class rareContext{
         $this->appDir=$appDir;
         $this->appName=basename($this->appDir);
         $this->rootDir=dirname($this->appDir)."/";
-        @$timeZone=date_default_timezone_get();
-        date_default_timezone_set($timeZone?$timeZone:'Asia/Shanghai');
-        header("Content-Type:text/html; charset=utf-8");
         header("rareMVC:".$this->version);
     }
     
@@ -59,11 +56,18 @@ class rareContext{
     public function run(){
         $this->cacheDir=rareConfig::get('cache_dir',$this->getRootDir()."cache/app_".$this->getAppName()."/");
         $this->regShutdown();
+        $this->init();
         $this->parseRequest();
         $this->regAutoLoad();
         $this->executeFilter("doFilter");
         $this->executeActtion($this->uri);
     }
+    
+    private function init(){
+        date_default_timezone_set(rareConfig::get('timezone','Asia/Shanghai'));
+        header("Content-Type:text/html; charset=".rareConfig::get('charset','utf-8'));
+    }
+    
     //注册shutdown 事件，当发生致命错误时执行error500方法或者打印出错信息
     private function regShutdown(){
         function shutdown(){
