@@ -23,7 +23,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.0 20110105';                 //当前框架版本
+    private $version='1.0 20110106';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -164,6 +164,7 @@ class rareContext{
            parse_str($uriInfo['q'],$query);
            foreach ($query as $_k=>$_v){
                $_GET[$_k]=$_v;
+               $_REQUEST[$_k]=$_v;
              }
          }
         
@@ -628,16 +629,12 @@ function jsonReturn($status=1,$info="",$data=""){
   die(json_encode($json));
 }
 //字符串是否以指定值结尾
-if(!function_exists("str_endWith")){
-    function str_endWith($str,$subStr){
-        return substr($str, -(strlen($subStr)))==$subStr;
-    }
+function str_endWith($str,$subStr){
+    return substr($str, -(strlen($subStr)))==$subStr;
 }
 //字符串是否以指定值开始
-if(!function_exists("str_startWith")){
-    function str_startWith($str,$subStr){
-        return substr($str, 0,(strlen($subStr)))==$subStr;
-    }
+function str_startWith($str,$subStr){
+    return substr($str, 0,(strlen($subStr)))==$subStr;
 }
 //内部地址跳转
 function forward($uri){
