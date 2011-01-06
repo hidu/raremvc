@@ -645,7 +645,7 @@ function forward($uri){
  }
 //客户端地址跳转    
 function redirect($url){
-    if(!str_startWith($url, "http://") && !str_startWith($url, "https://"))$url=url($url);
+    if(!str_startWith($url, "http://") && !str_startWith($url, "https://") && !str_startWith($url, "/"))$url=url($url);
     header("Location: ".$url);die;
 }
 //是否是https
