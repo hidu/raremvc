@@ -23,7 +23,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.0 20110106';                 //当前框架版本
+    private $version='1.0 20110107';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -116,18 +116,24 @@ class rareContext{
     public function error404(){
         @header('HTTP/1.0 404');
          $this->goError(404);      
-         die("the url you request not found:".$this->uri);
+         $this->_errorPage("404 Not Found","The requested URL <b>{$this->uri}</b> was not found on this server.");
      }
     //500错误
     public function error500(){
         @header('HTTP/1.0 500');
          if(PROD){
            $this->goError(500);
-           die("system error");
+           $this->_errorPage("500 Internal Server Error", "");
          }else{
              $_error=error_get_last();
-             die($_error['message']." in file ".$_error['file']." at line ".$_error['line']);
+             $this->_errorPage("500 Internal Server Error", $_error['message']." in file ".$_error['file']." at line ".$_error['line']);
          }      
+    }
+    private function _errorPage($title,$msg){
+        $html="<html><head><meta http-equiv='content-type' content='text/html;charset=".rareConfig::get('charset','utf-8')."'>".
+               "<title>{$title}</title></head><body><p style='margin-top:15px;background:#3366cc;color:white'>Error</p>".
+               "<h1>{$title}</h1>{$msg}<p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
+        die($html);
     } 
      /**
       * 当http错误发生时，跳转到错误页面。
