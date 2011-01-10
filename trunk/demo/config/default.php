@@ -10,7 +10,7 @@ return array(
 //                  "rootDir"=>dirname(dirname(dirname(__FILE__))), //hand=true 时 需要定义 程序根目录
 //                  "noCache"=>true 
 //                 ),
-//    'suffix'=>'html'                     //默认的url后缀
+//    'suffix'=>'html',                     //默认的url后缀,若不需要后缀输入false
    'title'=>'rare demo app',
    'js'=>'js/jquery.js,js/jqueryform.js',
    'css'=>'js/jquery.js,js/jqueryform.js',

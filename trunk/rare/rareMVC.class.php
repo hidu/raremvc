@@ -540,10 +540,10 @@ class rareConfig{
  */
 function url($uri,$suffix="",$full=false){
     $context=rareContext::getContext();
-    $url=public_path("/",$full);
+    $urlPrex=public_path("/",$full);
     $script_name=rareConfig::get("script_name","index.php");//默认的index.php文件
     if(($context->isScriptNameInUrl() && $context->getScriptName() != $script_name )|| !rareConfig::get("no_script_name",true)){
-        $url.=$context->getScriptName()."/";
+        $urlPrex.=$context->getScriptName()."/";
     }
     
     $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
@@ -557,13 +557,13 @@ function url($uri,$suffix="",$full=false){
     }        
      $uri=preg_replace("/\/index$/", "", trim($uri,"/"));
      
-     if($uri && !str_endWith($uri, "/"))$uri.=".".$suffix;
+     if($suffix && $uri && !str_endWith($uri, "/"))$uri.=".".$suffix;
      
      if(isset($tmp['query'])){
          parse_str($tmp['query'],$_tmp);
          $uri.="?".http_build_query($_tmp);
      }      
-    return $url.$uri;
+    return $urlPrex.$uri;
 }
 /**
  * 输出web 相对根目录的地址
