@@ -1,6 +1,7 @@
 <?php
 class helloAction extends rareAction{
   public function execute(){
-     echo a::hello();
+  //   echo a::hello();
+    die("hello");
   }
 }
