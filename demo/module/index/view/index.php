@@ -5,7 +5,7 @@
 <?php }?>
 currentUri:<?php echo rare_currentUri("b=");?>
 <div><?php echo $msg;?></div>
-<?php echo url('index/index?a=1&b=2','js')?>
+<?php echo url('index/index?a=1&b=2','js',true)?>
 <br/>
 <?php echo url('demo/index?a=1&b=2','js')?>
 

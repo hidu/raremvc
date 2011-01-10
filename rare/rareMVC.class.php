@@ -679,12 +679,12 @@ function rare_currentUri($param="",$full=false){
 }
 
 function rare_httpHost(){
-    $host= 'http://'.$_SERVER['HTTP_HOST'];
+    $host= 'http://'.$_SERVER['SERVER_NAME'];
     if(80 != $_SERVER['SERVER_PORT'] ){
         if(rare_isHttps()){
-            $host = 'https://'.$_SERVER['HTTP_HOST'];
+            $host = 'https://'.$_SERVER['SERVER_NAME'];
         }else{
-            $host.=$_SERVER['SERVER_PORT'];
+            $host.=":".$_SERVER['SERVER_PORT'];
         }
     }
     return $host;
