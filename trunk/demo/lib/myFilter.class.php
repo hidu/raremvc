@@ -13,6 +13,5 @@ class myFilter{
    }
    
    public function beforeExecute(){
-      echo time();
    }
 }
