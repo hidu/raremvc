@@ -636,6 +636,7 @@ function jsonReturn($status=1,$info="",$data=""){
   $json['i']=$info;
   $json['d']=$data;
   header("Content-Type:application/json");
+  ob_clean();//clear output:Notice and others
   die(json_encode($json));
 }
 //字符串是否以指定值结尾
