@@ -2,7 +2,7 @@
 /**
  * rareMVC
  * @author duwei duv123@gmail.com
- * @version 1.0 a
+ * @version 1.1
  */
 
 /**
@@ -23,7 +23,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.0 20110110';                 //当前框架版本
+    private $version='1.1 20110121';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -72,7 +72,7 @@ class rareContext{
     private function regShutdown(){
         function shutdown(){
             $_error=error_get_last();
-            if($_error && $_error['type'] == E_ERROR ){
+            if($_error && !in_array($_error['type'],array(E_WARNING,E_NOTICE,E_USER_NOTICE,E_USER_WARNING))){
               rareContext::getContext()->error500();
             }
         }
@@ -108,6 +108,9 @@ class rareContext{
             $this->isScriptNameInUrl=true;
         }
         $this->uri=$this->uri?$this->uri:"index/index";
+        include_once dirname(__FILE__).'/rareRouter.class.php';
+        rareRouter::init();
+        $this->uri=rareRouter::parse($this->uri);
         $uriInfo=$this->parseActionUri($this->uri);
         $this->moduleName=$uriInfo['m'];
         $this->actionName=$uriInfo['a'];
@@ -209,7 +212,7 @@ class rareContext{
     public function parseActionUri($uri){
         $tmp=parse_url($uri);
         if(empty($tmp['path']))$tmp['path']='index';
-        $tmp['path']=preg_replace("/\.\w*/", "", $tmp['path']);
+        $tmp['path']=preg_replace("/\.\w*$/", "", $tmp['path']);
         $path=explode("/",$tmp['path']);
         if(empty($path[1]))$path[1]='index';
         $uriInfo=array();
@@ -546,24 +549,25 @@ function url($uri,$suffix="",$full=false){
         $urlPrex.=$context->getScriptName()."/";
     }
     
-    $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
     $tmp=parse_url($uri);
+    $query=array();
+    if(isset($tmp['query']))parse_str($tmp['query'],$query);
+      
     if(empty($tmp['path'])){
         $tmp['path']=$context->getModuleName()."/".$context->getActionName();
     }
-    $uri=preg_replace("/~\//", $context->getModuleName()."/",ltrim($tmp['path'],"/"));
-    if( $uri == 'index/index' || $uri=='index'){
-        $uri="";
-    }        
-     $uri=preg_replace("/\/index$/", "", trim($uri,"/"));
-     
-     if($suffix && $uri && !str_endWith($uri, "/"))$uri.=".".$suffix;
-     
-     if(isset($tmp['query'])){
-         parse_str($tmp['query'],$_tmp);
-         $uri.="?".http_build_query($_tmp);
-     }      
-    return $urlPrex.$uri;
+    $uri=trim(preg_replace("/~\//", $context->getModuleName()."/",ltrim($tmp['path'],"/")),"/");
+    if(!strpos($uri, "/"))     $uri.="/index";
+    if( $uri == 'index/index') $uri="";
+    $uri=preg_replace("/\/index$/", "", $uri);
+    
+    $generate=rareRouter::generate($uri, $query);
+    if($generate)list($uri,$query)=$generate;
+    
+    $queryStr=$query?"?".http_build_query($query):"";
+    $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
+    $suffix=($suffix && $uri && !str_endWith($uri, "/"))?(".".$suffix):"";
+    return $urlPrex.$uri.$suffix.$queryStr;
 }
 /**
  * 输出web 相对根目录的地址
@@ -674,7 +678,7 @@ function rare_currentUri($param="",$full=false){
       $uri=$_SERVER['REQUEST_URI'];
       if(!$param)return $host.$uri;
       $p=parse_url($uri);
-      $param=rare_param_merge($p['query'],$param);
+      $param=rare_param_merge(isset($p['query'])?$p['query']:array(),$param);
       $param=http_build_query($param);
       return $host.($param?$p['path']."?".$param:$p['path']);
 }
