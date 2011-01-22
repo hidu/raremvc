@@ -6,8 +6,8 @@
     $vLine = file( $trace[0]['file']);
     
     $fLine = $vLine[ $trace[0]['line'] - 1];
-    preg_match("#\\$(\w+)#", $fLine, $match);
-    $vname = $match[0];
+    preg_match("/dump\(\\$([\w|\'|\"|\]|\[]+)\)/", $fLine, $match);
+    $vname = $match[1];
 
     echo "<pre style='margin: 0px 0px 10px 0px; display: block;text-align:left; background: white; color: black; font-family: Verdana; border: 1px solid #cccccc; padding: 5px; font-size: 13px; line-height: 13px;'>";
     if($info != FALSE) echo "<b style='color: red;'>$info:</b><br>";
