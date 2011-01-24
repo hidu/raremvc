@@ -1,8 +1,9 @@
 <?php
 /**
  *rare 路由解析 
+ * @package rare
  * @author duwei
- *
+ * @version  $Id: rareRouter.class.php duwei $
  */
 class rareRouter{
    private static $config; 
@@ -49,7 +50,7 @@ class rareRouter{
        $path=isset($tmp['path'])?trim($tmp['path'],"/"):"index/index";
        foreach (self::$config as $actionName=>$action){
            foreach ($action as $actionUrl){
-               if(preg_match_all("/".$actionUrl['url_reg']."/",$path,$matches,PREG_SET_ORDER)){
+               if(preg_match_all("#".$actionUrl['url_reg']."#",$path,$matches,PREG_SET_ORDER)){
                      array_shift($matches[0]);
                      $tmp1=array();
                     foreach ($actionUrl['_params'] as $k=>$v){
@@ -69,12 +70,11 @@ class rareRouter{
    public static function generate($actionFullName,$query){
        if(!self::$config || !isset(self::$config[$actionFullName]))return;
        $config=self::$config[$actionFullName];
-//       dump($config);dump($query);
        foreach ($config as $action){
            $isMatch=true;$_params=array();
            if(count($action['param'])>count($query))continue;
            foreach ($action['param'] as $k=>$reg){
-               if(!isset($query[$k]) || !preg_match("/".$reg."/", $query[$k])){
+               if(!isset($query[$k]) || !preg_match("#".$reg."#", $query[$k])){
                     $isMatch=false;
                      break;
                   }
