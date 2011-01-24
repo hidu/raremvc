@@ -71,8 +71,8 @@ class rareRouter{
        if(!self::$config || !isset(self::$config[$actionFullName]))return;
        $config=self::$config[$actionFullName];
        foreach ($config as $action){
-           $isMatch=true;$_params=array();
            if(count($action['param'])>count($query))continue;
+           $isMatch=true;$_params=array();
            foreach ($action['param'] as $k=>$reg){
                if(!isset($query[$k]) || !preg_match("#".$reg."#", $query[$k])){
                     $isMatch=false;

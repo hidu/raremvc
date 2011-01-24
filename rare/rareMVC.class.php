@@ -24,13 +24,13 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.1 20110121';                 //当前框架版本
+    private $version='1.1 20110124';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
 
-    private static $instance;
-
+    private static $instance;                         //app实例    
+        
     public function __construct($appDir){
         $this->appDir=$appDir;
         $this->appName=basename($this->appDir);
@@ -512,6 +512,10 @@ abstract class rareAction{
  */
 class rareConfig{
     private  static $configs=array();
+    /**
+     *  读取某个配置文件
+     * @param $configName 配置文件名称 不带.php的部分
+     */
     public static function getAll($configName='default'){
         if(isset(self::$configs[$configName])){
             return self::$configs[$configName];
@@ -525,11 +529,22 @@ class rareConfig{
         return $config;
     }
      
+    /**
+     * 读取指定配置文件的指定条目的内容，若没有设置则返回默认值
+     * @param string $item   条目名称
+     * @param object $default   默认值
+     * @param string $configName 配置文件名称
+     */
     public static function get($item,$default=null,$configName="default"){
         $config=self::getAll($configName);
         return isset($config[$item])?$config[$item]:$default;
     }
-     
+     /**
+      * 设置指定配置的指定条目为指定的值(只对当前请求有效，不会保存)
+      * @param string $item  条目名称
+      * @param object $val   设置的值
+      * @param string $configName  配置文件名称
+      */
     public static function set($item,$val,$configName='default'){
         self::getAll($configName);
         self::$configs[$configName][$item]=$val;

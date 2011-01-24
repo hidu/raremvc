@@ -112,8 +112,8 @@ class rareAutoLoad
     private function reload(){
         if($this->hand)return;
          $cachedir=dirname($this->cacheFile);
-         directory($cachedir);
-         if(!is_writable($cachedir)) die('cache 不能写入');
+         $this->directory($cachedir);
+         if(!is_writable($cachedir)) die('can not write cache!');
         
         $this->classes=array();
         $dirs=$this->option['dirs'];
@@ -151,5 +151,9 @@ class rareAutoLoad
                 }
             }
         }
+    }
+    
+   private function directory($dir){
+        return is_dir($dir) or ($this->directory(dirname($dir)) and mkdir($dir, 0777));
     }
 }
