@@ -71,13 +71,13 @@ class rareContext{
     
     //注册shutdown 事件，当发生致命错误时执行error500方法或者打印出错信息
     private function regShutdown(){
-        function shutdown(){
+        function _rare_shutdown_catch_error(){
             $_error=error_get_last();
             if($_error && !in_array($_error['type'],array(E_WARNING,E_NOTICE,E_USER_NOTICE,E_USER_WARNING))){
               rareContext::getContext()->error500();
             }
         }
-        register_shutdown_function("shutdown");
+        register_shutdown_function("_rare_shutdown_catch_error");
     }
     //注册class auto load
     private function regAutoLoad(){
