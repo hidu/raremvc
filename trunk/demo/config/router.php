@@ -12,8 +12,8 @@ $config=array();
 //                            ),
 //                           );
 
-$config['demo/hello'][]="demohello/{a}-{b}";
-//$config['demo/hello'][]="demohello-{b}";   
+//$config['demo/hello']="demohello/{a}-{b}";
+$config['demo/hello'][]="demohello-{b}";   
 //                                                   
 //$config['demo/hello'][]=array(
 //                        "url"=>"demohello-{a}",

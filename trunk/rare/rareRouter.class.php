@@ -15,6 +15,7 @@ class rareRouter{
        }
        foreach ($config as $actionFullName=>$items){
            $tmp=explode("/", $actionFullName);
+           if(is_string($items))$items=array(array('url'=>$items));
            foreach ($items as $k=>$item){
                if(is_string($item)){
                     $items[$k]=$item=array("url"=>$item);
