@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.1 20110124';                 //当前框架版本
+    private $version='1.1 20110125';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -574,11 +574,12 @@ function url($uri,$suffix="",$full=false){
     }
     $uri=trim(preg_replace("/~\//", $context->getModuleName()."/",ltrim($tmp['path'],"/")),"/");
     if(!strpos($uri, "/"))     $uri.="/index";
-    if( $uri == 'index/index') $uri="";
-    $uri=preg_replace("/\/index$/", "", $uri);
     
     $generate=rareRouter::generate($uri, $query);
     if($generate)list($uri,$query)=$generate;
+    
+    if( $uri == 'index/index') $uri="";
+    $uri=preg_replace("/\/index$/", "", $uri);
     
     $queryStr=$query?"?".http_build_query($query):"";
     $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
