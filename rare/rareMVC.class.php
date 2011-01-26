@@ -28,7 +28,6 @@ class rareContext{
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
-
     private static $instance;                         //app实例    
         
     public function __construct($appDir){
@@ -74,7 +73,7 @@ class rareContext{
         function _rare_shutdown_catch_error(){
             $_error=error_get_last();
             if($_error && !in_array($_error['type'],array(E_WARNING,E_NOTICE,E_USER_NOTICE,E_USER_WARNING))){
-              rareContext::getContext()->error500();
+              rareContext::getContext()->error500($_error);
             }
         }
         register_shutdown_function("_rare_shutdown_catch_error");
@@ -123,13 +122,12 @@ class rareContext{
          $this->_errorPage("404 Not Found","The requested URL <b>{$this->uri}</b> was not found on this server.");
      }
     //500错误
-    public function error500(){
+    public function error500($_error=array()){
         @header('HTTP/1.0 500');
          if(PROD){
            $this->goError(500);
            $this->_errorPage("500 Internal Server Error", "");
          }else{
-             $_error=error_get_last();
              $this->_errorPage("500 Internal Server Error", $_error['message']." in file ".$_error['file']." at line ".$_error['line']);
          }      
     }
