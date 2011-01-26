@@ -72,7 +72,7 @@ class rareContext{
     private function regShutdown(){
         function _rare_shutdown_catch_error(){
             $_error=error_get_last();
-            if($_error && !in_array($_error['type'],array(E_WARNING,E_NOTICE,E_USER_NOTICE,E_USER_WARNING))){
+            if($_error && in_array($_error['type'],array(1,4,16,64,256,4096,E_ALL))){
               rareContext::getContext()->error500($_error);
             }
         }
