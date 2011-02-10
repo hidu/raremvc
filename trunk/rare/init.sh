@@ -1,5 +1,5 @@
 #!/bin/sh
-##当前脚本是初始化一个app。
+##当前脚本的用途是初始化一个app。
 ## 请不要在当前脚本的目录下运行该脚本
 ##先建立一个app目录，然后到空app目录中运行。重复运行，会将已有的文件覆盖掉
 echo "============================================"
@@ -47,6 +47,7 @@ echo "<?php
  */
 class myFilter{
    public function doFilter(){
+       session_start();
    }
 }
 ">lib/myFilter.class.php
@@ -55,7 +56,7 @@ class myFilter{
 echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
-<title>rare app</title>
+<?php rareView::include_title();?>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
 <?php rareView::include_js_css()?>
 </head>
@@ -76,6 +77,7 @@ echo "<?php
 //\$config['suffix']='html';                                                //默认的url后缀
 //\$config['timezone']='Asia/Shanghai';                           //默认的时区      
 //\$config['charset']='utf-8';                                           //默认的字符编码
+//\$config['title']='rare';                                                  //默认的title
 
 return \$config;
 ">config/default.php
