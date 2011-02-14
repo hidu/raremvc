@@ -143,7 +143,7 @@ class rareAutoLoad
             if(is_dir($file) && strpos($fileName,'.')!==0){
                 $this->scanDir($file);
             }else{
-                if(strpos($fileName,$this->option['suffix'])){
+                if($this->str_endWith($fileName,$this->option['suffix'])){
                     preg_match_all('~^\s*(?:abstract\s+|final\s+)?(?:class|interface)\s+(\w+)~mi', file_get_contents($file), $classes);
                     foreach ($classes[1] as $class){
                         $this->classes[$class] = $file;
@@ -155,5 +155,9 @@ class rareAutoLoad
     
    private function directory($dir){
         return is_dir($dir) or ($this->directory(dirname($dir)) and mkdir($dir, 0777));
+    }
+    
+    function str_endWith($str,$subStr){
+        return substr($str, -(strlen($subStr)))==$subStr;
     }
 }
