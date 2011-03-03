@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.1 20110125';                 //当前框架版本
+    private $version='1.2 20110302';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -54,7 +54,6 @@ class rareContext{
     }
     //运行程序，解析url地址、执行过滤器、执行动作方法等
     public function run(){
-        $this->cacheDir=rareConfig::get('cache_dir',$this->getRootDir()."cache/app_".$this->getAppName()."/");
         $this->regShutdown();
         $this->init();
         $this->parseRequest();
@@ -66,6 +65,8 @@ class rareContext{
     private function init(){
         date_default_timezone_set(rareConfig::get('timezone','Asia/Shanghai'));
         header("Content-Type:text/html; charset=".rareConfig::get('charset','utf-8'));
+        rareConfig::set('cache_dir',rareConfig::get("cache_dir",$this->getRootDir()."cache/")."app_".$this->getAppName()."/");
+        define('RARE_CACHE_DIR', $this->getCacheDir());
     }
     
     //注册shutdown 事件，当发生致命错误时执行error500方法或者打印出错信息
@@ -83,7 +84,7 @@ class rareContext{
         $class_autoload=rareConfig::get("class_autoload",true);
         if($class_autoload){
             include dirname(__FILE__).'/rareAutoLoad.class.php';
-            $_autoloadOption=array('dirs'=>$this->getAppLibDir().",".$this->getRootLibDir(),
+            $_autoloadOption=array('dirs'=>$this->getRootLibDir().",".$this->getAppLibDir(),
                                    'cache'=>$this->getCacheDir().$this->getAppName()."_classAutoLoad"
                                    );
             if(isset($_autoloadOption['hand']) && $_autoloadOption['hand']){
@@ -119,7 +120,7 @@ class rareContext{
     public function error404(){
         @header('HTTP/1.0 404');
          $this->goError(404);      
-         $this->_errorPage("404 Not Found","The requested URL <b>{$this->uri}</b> was not found on this server.");
+         $this->_errorPage("404 Not Found","The requested URL <b>{$_SERVER['REQUEST_URI']}</b> was not found on this server.");
      }
     //500错误
     public function error500($_error=array()){
@@ -128,13 +129,13 @@ class rareContext{
            $this->goError(500);
            $this->_errorPage("500 Internal Server Error", "");
          }else{
-             $this->_errorPage("500 Internal Server Error", $_error['message']." in file ".$_error['file']." at line ".$_error['line']);
+             $this->_errorPage("500 Internal Server Error", "<pre>".$_error['message']."</pre> in file ".$_error['file']." at line ".$_error['line']);
          }      
     }
     private function _errorPage($title,$msg){
-        $html="<html><head><meta http-equiv='content-type' content='text/html;charset=".rareConfig::get('charset','utf-8')."'>".
+        $html="<!DOCTYPE html><html><head><meta http-equiv='content-type' content='text/html;charset=".rareConfig::get('charset','utf-8')."'>".
                "<title>{$title}</title></head><body><p style='margin-top:15px;background:#3366cc;color:white'>Error</p>".
-               "<h1>{$title}</h1>{$msg}<p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
+               "<h1>{$title}</h1>{$msg}<br/><a href='".public_path("")."'>Go Home</a><p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
         die($html);
     } 
      /**
@@ -143,10 +144,10 @@ class rareContext{
       * 或者 也可以在配置文件中定义404页面：$config['error404']='http://www.exmaple.com/error.html';
       * @param int $code
       */
-     private function goError($code){
-           if(PROD)ob_clean();
+     public function goError($code){
+           ob_clean();
             $errorUri=rareConfig::get('error'.$code,'error/e'.$code);
-            if(str_startWith($errorUri, "http://") || str_startWith($errorUri, "https://")){
+            if(_rare_isUrl($errorUri)){
                 redirect($errorUri);              
             }else{
                 $tmp=explode("/",$errorUri);
@@ -295,7 +296,7 @@ class rareContext{
     }
     
     public function getCacheDir(){
-        return $this->cacheDir;
+        return rareConfig::get("cache_dir");
     }
     public function getRequestUri(){
         return $this->uri;
@@ -378,34 +379,47 @@ class rareView{
      * 供模板调用的输出css 和js 链接的方法
      */
     public static function include_js_css(){
-        function _fill_url($_uris){
+        function _rare_fill_url($_uris){
             if(is_string($_uris))$_uris=explode(",", $_uris);
             $tmp=array();
             foreach($_uris as $_uri){
               $_uri=trim($_uri);
               if(!$_uri)continue;
-              $tmp[]=(str_startWith($_uri, "/") || str_startWith($_uri,'http://') ||str_startWith($_uri,'https://'))?$_uri:public_path($_uri,true);
+              $tmp[]=_rare_isUrl($_uri)?$_uri:public_path($_uri);
             }
             return array_unique($tmp);
         }
-        $csss=_fill_url(rareConfig::get("css",array()));
+        $csss=_rare_fill_url(rareConfig::get("css",array()));
+        _rare_runCallback("css", array(&$csss));
+        $cssVersion=rareConfig::get("cssVersion",null);
         foreach ($csss as $css){
-            $cssVersion=rareConfig::get("cssVersion",null);
             $css.=$cssVersion?"?version=".$cssVersion:"";
             echo "<link rel=\"stylesheet\" href=\"{$css}\" type=\"text/css\" media=\"screen\" />\n";
         }
          
-        $jss=_fill_url(rareConfig::get("js",array()));
+        $jss=_rare_fill_url(rareConfig::get("js",array()));
+        _rare_runCallback('js', array(&$jss));
+        $jsVersion=rareConfig::get("jsVersion",null);
         foreach ($jss as $js){
-            $jsVersion=rareConfig::get("jsVersion",null);
             $js.=$jsVersion?"?version=".$jsVersion:"";
             echo "<script type=\"text/javascript\" src=\"{$js}\"></script>\n";
         }
     }
 
     public static function include_title(){
+        echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=".rareConfig::get('charset','utf-8')."\" />\n";
         echo "<title>".htmlspecialchars(rareConfig::get("title","rare app"))."</title>\n";
+         if($keywords=rareConfig::get('meta.keywords'))echo "<meta name=\"keywords\" content=\"".htmlspecialchars($keywords)."\" />\n";
+         if($description=rareConfig::get('meta.description'))echo "<meta name=\"description\" content=\"".htmlspecialchars($description)."\" />\n";
     }
+     //设置meta 的关键词
+    public static function setMeta_keywords($keywords){
+        rareConfig::set('meta.keywords', $keywords);   
+     }
+     //设置meta的描述
+    public static function setMeta_description($description){
+        rareConfig::set('meta.description', $description);   
+     }
 }
 
 /**
@@ -573,6 +587,9 @@ function url($uri,$suffix="",$full=false){
     $uri=trim(preg_replace("/~\//", $context->getModuleName()."/",ltrim($tmp['path'],"/")),"/");
     if(!strpos($uri, "/"))     $uri.="/index";
     
+    $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
+     _rare_runCallback('url', array(&$uri,&$query,&$suffix));//run callback function
+     
     $generate=rareRouter::generate($uri, $query);
     if($generate)list($uri,$query)=$generate;
     
@@ -580,7 +597,6 @@ function url($uri,$suffix="",$full=false){
     $uri=preg_replace("/\/index$/", "", $uri);
     
     $queryStr=$query?"?".http_build_query($query):"";
-    $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
     $suffix=($suffix && $uri && !str_endWith($uri, "/"))?(".".$suffix):"";
     return $urlPrex.$uri.$suffix.$queryStr;
 }
@@ -670,9 +686,10 @@ function str_startWith($str,$subStr){
 function forward($uri){
    rareContext::getContext()->executeActtion($uri);die;
  }
-//客户端地址跳转    
+//客户端地址跳转 可以调用callBack函数进行跳转前的验证    
 function redirect($url){
-    if(!str_startWith($url, "http://") && !str_startWith($url, "https://") && !str_startWith($url, "/"))$url=url($url);
+    if(!_rare_isUrl($url))$url=url($url);
+    _rare_runCallback('redirect', array($url));
     header("Location: ".$url);die;
 }
 //是否是https
@@ -708,4 +725,12 @@ function rare_httpHost(){
         }
     }
     return $host;
+}
+
+function _rare_isUrl($url){
+  return str_startWith($url, "http://") || str_startWith($url, "https://") || str_startWith($url, "/");
+}
+//run user callback function
+function _rare_runCallback($funName,$params){
+  if(method_exists("_rare_callback", $funName))call_user_func_array(array('_rare_callback',$funName),$params);
 }

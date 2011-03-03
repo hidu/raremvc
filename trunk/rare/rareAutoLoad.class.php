@@ -118,7 +118,8 @@ class rareAutoLoad
         $this->classes=array();
         $dirs=$this->option['dirs'];
         if(!is_array($dirs)) $dirs=explode(",", $dirs);
-
+        
+        $dirs=array_unique($dirs);
         foreach($dirs as $dir){
             if(!$dir || !file_exists($dir))continue;
             $this->scanDir($dir);
