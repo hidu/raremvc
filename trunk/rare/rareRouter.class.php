@@ -46,9 +46,9 @@ class rareRouter{
   
    public static function parse($uri){
        if(!self::$config)return $uri;
-       $uri=preg_replace("/\.\w*$/", "", $uri);
        $tmp=parse_url($uri);
        $path=isset($tmp['path'])?trim($tmp['path'],"/"):"index/index";
+       $path=preg_replace("/\.\w*$/", "", $path);
        foreach (self::$config as $actionName=>$action){
            foreach ($action as $actionUrl){
                if(preg_match_all("#".$actionUrl['url_reg']."#",$path,$matches,PREG_SET_ORDER)){
@@ -84,7 +84,7 @@ class rareRouter{
              }
             if(!$isMatch)continue;
             $url=strtr($action['url_param'], $_params);
-          return array($url,$query);
+          return array($url,$query,isset($action['suffix'])?$action['suffix']:null);
        }
    }
 }

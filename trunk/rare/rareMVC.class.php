@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110302';                 //当前框架版本
+    private $version='1.2 20110307';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -133,9 +133,10 @@ class rareContext{
          }      
     }
     private function _errorPage($title,$msg){
+        ob_clean();
         $html="<!DOCTYPE html><html><head><meta http-equiv='content-type' content='text/html;charset=".rareConfig::get('charset','utf-8')."'>".
                "<title>{$title}</title></head><body><p style='margin-top:15px;background:#3366cc;color:white'>Error</p>".
-               "<h1>{$title}</h1>{$msg}<br/><a href='".public_path("")."'>Go Home</a><p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
+               "<h1>{$title}</h1>{$msg}<br/><br/><a href='".public_path("")."'>Go Home</a><p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
         die($html);
     } 
      /**
@@ -591,7 +592,10 @@ function url($uri,$suffix="",$full=false){
      _rare_runCallback('url', array(&$uri,&$query,&$suffix));//run callback function
      
     $generate=rareRouter::generate($uri, $query);
-    if($generate)list($uri,$query)=$generate;
+    if($generate){
+       list($uri,$query,$_suffix)=$generate;
+        if(isset($_suffix))$suffix=$_suffix;
+    }
     
     if( $uri == 'index/index') $uri="";
     $uri=preg_replace("/\/index$/", "", $uri);
