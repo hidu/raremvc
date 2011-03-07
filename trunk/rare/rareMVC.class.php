@@ -391,7 +391,7 @@ class rareView{
             return array_unique($tmp);
         }
         $csss=_rare_fill_url(rareConfig::get("css",array()));
-        _rare_runCallback("css", array(&$csss));
+        _rare_runHook("css", array(&$csss));
         $cssVersion=rareConfig::get("cssVersion",null);
         foreach ($csss as $css){
             $css.=$cssVersion?"?version=".$cssVersion:"";
@@ -399,7 +399,7 @@ class rareView{
         }
          
         $jss=_rare_fill_url(rareConfig::get("js",array()));
-        _rare_runCallback('js', array(&$jss));
+        _rare_runHook('js', array(&$jss));
         $jsVersion=rareConfig::get("jsVersion",null);
         foreach ($jss as $js){
             $js.=$jsVersion?"?version=".$jsVersion:"";
@@ -589,7 +589,7 @@ function url($uri,$suffix="",$full=false){
     if(!strpos($uri, "/"))     $uri.="/index";
     
     $suffix=$suffix?$suffix:rareConfig::get('suffix','html');
-     _rare_runCallback('url', array(&$uri,&$query,&$suffix));//run callback function
+     _rare_runHook('url', array(&$uri,&$query,&$suffix));//run callback function
      
     $generate=rareRouter::generate($uri, $query);
     if($generate){
@@ -693,7 +693,7 @@ function forward($uri){
 //客户端地址跳转 可以调用callBack函数进行跳转前的验证    
 function redirect($url){
     if(!_rare_isUrl($url))$url=url($url);
-    _rare_runCallback('redirect', array($url));
+    _rare_runHook('redirect', array($url));
     header("Location: ".$url);die;
 }
 //是否是https
@@ -734,7 +734,7 @@ function rare_httpHost(){
 function _rare_isUrl($url){
   return str_startWith($url, "http://") || str_startWith($url, "https://") || str_startWith($url, "/");
 }
-//run user callback function
-function _rare_runCallback($funName,$params){
-  if(method_exists("_rare_callback", $funName))call_user_func_array(array('_rare_callback',$funName),$params);
+//run user hook function
+function _rare_runHook($funName,$params){
+  if(method_exists("myHook", $funName))call_user_func_array(array('myHook',$funName),$params);
 }
