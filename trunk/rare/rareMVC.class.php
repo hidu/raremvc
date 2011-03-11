@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110307';                 //当前框架版本
+    private $version='1.2 20110311';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -734,7 +734,9 @@ function rare_httpHost(){
 function _rare_isUrl($url){
   return str_startWith($url, "http://") || str_startWith($url, "https://") || str_startWith($url, "/");
 }
-//run user hook function
+//run user hook function if myHook class exist,it will run auto
 function _rare_runHook($funName,$params){
-  if(method_exists("myHook", $funName))call_user_func_array(array('myHook',$funName),$params);
+  static $myHookExist=null;
+  if($myHookExist===null)$myHookExist=class_exists("myHook",true);
+  if($myHookExist && method_exists("myHook", $funName))call_user_func_array(array('myHook',$funName),$params);
 }
