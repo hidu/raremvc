@@ -79,16 +79,11 @@ class rareAutoLoad
      */
     public function autoload($class){
         if(class_exists($class, false) || interface_exists($class, false)) return true;
+        if(!$this->classes)return false;
         if (isset($this->classes[$class])){
             $file=$this->classes[$class];
             require($file);
             return true;
-        }else{
-            $this->reload();
-            if(isset($this->classes[$class])){
-                require($this->classes[$class]);
-                return true;
-            }
         }
         return false;
     }
@@ -99,9 +94,9 @@ class rareAutoLoad
     private function getClasses(){
         if(file_exists($this->cacheFile)){
             $this->classes=require($this->cacheFile);
-        }else{
-            $this->reload();
+            if(is_array($this->classes))return true;
         }
+        $this->reload();
     }
 
     /**
