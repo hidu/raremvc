@@ -124,6 +124,7 @@ class rareAutoLoad
         ksort($this->classes);
         $phpData.="return ".var_export($this->classes,true).";";
         file_put_contents($this->cacheFile, $phpData,LOCK_EX);
+        clearstatcache();
     }
 
     /**

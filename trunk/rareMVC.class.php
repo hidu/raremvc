@@ -24,7 +24,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110311';                 //当前框架版本
+    private $version='1.2 20110315';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -34,6 +34,9 @@ class rareContext{
         $this->appDir=$appDir;
         $this->appName=basename($this->appDir);
         $this->rootDir=dirname($this->appDir)."/";
+        define("RARE_APP_NAME", $this->appName);     
+        define("RARE_ROOT_DIR", $this->rootDir);     //预定义 程序根目录
+        define("RARE_APP_DIR",  $this->appDir);       //预定义 app根目录
         header("rareMVC:".$this->version);
     }
     
