@@ -1,5 +1,4 @@
 <?php
-define('rare_Session_appName', defined("AppName")?AppName:"rare");
 /**
  *@copyright rareMVC 
  *@author duwei
@@ -42,11 +41,11 @@ class rareUser{
    }
    
    public static function setAppSession($key,$value){
-       self::set(rare_Session_appName."/".$key, $value);
+       self::set(RARE_APP_NAME."/".$key, $value);
    }
 
    public static function getAppSession($key,$default=""){
-       return self::get($key,$default);
+       return self::get(RARE_APP_NAME."/".$key,$default);
    }
    
    

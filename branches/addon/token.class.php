@@ -45,10 +45,11 @@ class rareToken{
    * 在保存数据前(ajax)
    * @code
    *   if(!pToken::check())die("表单已过期!");
-   * @param boolean $tokenName
+   * @param string $tokenName
+   * @param string $requestMethod
    */
   public static function check($tokenName='token',$requestMethod="post"){
-    $token=$requestMethod=='post'?(isset($_POST[$tokenName])?$_POST[$tokenName]:null):(isset($_GET[$tokenName])?$_GET[$tokenName]:null);
+    $token=($requestMethod=='post')?(isset($_POST[$tokenName])?$_POST[$tokenName]:null):(isset($_GET[$tokenName])?$_GET[$tokenName]:null);
     if(empty($token) ||strlen($token)!=32)return false;
     return $token==rareUser::getAppSession($tokenName);
   }
