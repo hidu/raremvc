@@ -57,6 +57,9 @@ class rareRouter{
                     foreach ($actionUrl['_params'] as $k=>$v){
                           $tmp1[strtr($k,array("{"=>'',"}"=>''))]=urldecode(array_shift($matches[0]));
                        }
+                     foreach ($tmp1 as $_k=>$_v){
+                         $_GET[$_k]=$_REQUEST[$_k]=$_v;
+                     }
                     return $actionName."?".http_build_query($tmp1);
                  }
              }
