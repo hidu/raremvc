@@ -29,6 +29,8 @@ class rareAutoLoad
     private $option;
      
     private $hand=false;//是否手动运行该脚本进行class路径扫描,
+    
+    private $reloadCount=0;//reload操作的次数
     /**
     * @param array $option 需要参数 dirs：扫描目录  cache：缓存文件
     */
@@ -40,6 +42,7 @@ class rareAutoLoad
             $trac=debug_backtrace(false);
             $calFile=$trac[2]['file'];
             $option['cache']="/tmp/rareautoLoad_".md5($calFile)."_".filemtime($calFile);
+            @unlink($option['cache']);
         }
         if(isset($option['hand']))$this->hand=(boolean)$option['hand'];
         $this->cacheFile=$option['cache'].".php";
@@ -74,16 +77,34 @@ class rareAutoLoad
 
     /**
      * spl_autoload_call 调用 load class
+     * 若缓存文件中的类的路径不正确，会尝试reload一次
+     * 对reload后还不存在的类 缓存中记录其key，标记为 false,以避免缓存文件多次无效的更新
+     * 对于使用 class_exists 进行判断时默认会进行autoload操作
      * @param $class
      * @return
      */
     public function autoload($class){
         if(class_exists($class, false) || interface_exists($class, false)) return true;
-        if(!$this->classes)return false;
-        if (isset($this->classes[$class])){
+        if ($this->classes && isset($this->classes[$class]) ){
             $file=$this->classes[$class];
+            if(!$file)return false;
+            if(!file_exists($file) && !$this->hand){
+                $this->reload();
+                return $this->autoload($class);
+            }
             require($file);
             return true;
+        }{
+           $this->reload();
+           if(isset($this->classes[$class])){
+                $file=$this->classes[$class];
+                if(!$file)return false;
+                require($file);
+                return true;
+           }else{
+             $this->classes[$class]=false;
+             $this->saveCache();
+           }
         }
         return false;
     }
@@ -96,6 +117,7 @@ class rareAutoLoad
             $this->classes=require($this->cacheFile);
             if(is_array($this->classes))return true;
         }
+        $this->classes=array();
         $this->reload();
     }
 
@@ -105,12 +127,14 @@ class rareAutoLoad
      * @return
      */
     private function reload(){
+        $this->reloadCount++;
         if($this->hand)return;
          $cachedir=dirname($this->cacheFile);
          $this->directory($cachedir);
          if(!is_writable($cachedir)) die('can not write cache!');
         
-        $this->classes=array();
+        settype($this->classes, 'array');
+         
         $dirs=$this->option['dirs'];
         if(!is_array($dirs)) $dirs=explode(",", $dirs);
         
@@ -119,8 +143,13 @@ class rareAutoLoad
             if(!$dir || !file_exists($dir))continue;
             $this->scanDir($dir);
         }
-         
+        $this->saveCache();
+    }
+    
+    private function saveCache(){
+        if($this->hand)return;
         $phpData="<?php\n/**\n*autoLoadCache\n*@since ".date('Y-m-d H:i:s')."\n*/\n";
+        if(!is_array($this->classes))$this->classes=array();
         ksort($this->classes);
         $phpData.="return ".var_export($this->classes,true).";";
         file_put_contents($this->cacheFile, $phpData,LOCK_EX);

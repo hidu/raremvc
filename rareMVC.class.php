@@ -196,7 +196,7 @@ class rareContext{
             
         include($actionFile);
         $actionClass=$this->actionName."Action";
-        if(class_exists($this->moduleName.'_'.$actionClass)){
+        if(class_exists($this->moduleName.'_'.$actionClass,false)){
            $actionClass=$this->moduleName.'_'.$actionClass;
         }
         
