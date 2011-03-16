@@ -30,6 +30,7 @@ return $db;
 class rareDb{
      public static $sqls=array();
      public static $pageLabel="p";//分页参数名称
+     protected  static $defaultDbName="default";//默认数据库
      
      /**
       * 获取一个PDO对象
@@ -40,7 +41,7 @@ class rareDb{
     public static function getPdo($dbName=null,$type='master'){
          if($dbName && is_object($dbName))return $dbName;
          static $dbhs=array();
-         if(!$dbName)$dbName="default";
+         if(!$dbName)$dbName=self::$defaultDbName;
          if(strpos(".", $dbName)){
             $tmp=explode(".", $dbName);
             if(count($tmp)==2 && in_array($tmp[1], array("master",'slave'))){
@@ -72,9 +73,9 @@ class rareDb{
         if($config==null){
            $dbConfig=rareConfig::getAll('db');
            $config=self::init_config($dbConfig);
-           if(count($config)==1 && !isset($config['default'])){
+           if(count($config)==1 && !isset($config[self::$defaultDbName])){
                $_first=each($config);
-               $config['default']=$_first['value'];
+               $config[self::$defaultDbName]=$_first['value'];
             }
            $rootDbConfigFile=rareContext::getContext()->getRootLibDir()."config/db.php";
            if(file_exists($rootDbConfigFile)){
@@ -85,7 +86,7 @@ class rareDb{
                 }
             }
         }
-        if($dbName==null)$dbName="default";
+        if($dbName==null)$dbName=self::$defaultDbName;
        return $config[$dbName];
     }
     
@@ -340,7 +341,7 @@ class rareDb{
      * @param string $dbName
      */
     public static function getTableFileds($tableName,$dbName=null){
-        if(!$dbName)$dbName="default";
+        if(!$dbName)$dbName=self::$defaultDbName;
          $cache=new rareCache_object();
          $key="db_table_desc/".$dbName;
          if(!$cache->has($key)){

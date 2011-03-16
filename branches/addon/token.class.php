@@ -44,7 +44,7 @@ class rareToken{
    * 验证token 信息是否正确
    * 在保存数据前(ajax)
    * @code
-   *   if(!pToken::check())die("表单已过期!");
+   *   if(!rareToken::check())die("表单已过期!");
    * @param string $tokenName
    * @param string $requestMethod
    */
