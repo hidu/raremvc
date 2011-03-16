@@ -15,6 +15,9 @@ class rarePager{
     
     private $label="p"; //页面 变量 $_GET 参数 
     private $uri;
+    private $startPage; //开始条数
+    private $endPage;   //结束条数
+    private $startNum;  
 
     /**
      * $pageInfo=array('total'=>1000,'size'=>10,"p"=>1);
@@ -26,31 +29,40 @@ class rarePager{
        $this->page=(int)(isset($pageInfo['page'])?$pageInfo['page']:(isset($_GET[$this->label])?$_GET[$this->label]:1));
        if($this->page<=0) $this->page=1;
        $this->size=$pageInfo['size'];
+       $this->_count();
    }
    
-   public function __get($field){
-     return $this->$field;
+   public function getStartNum(){
+     return $this->startNum;
+   }
+   
+   public function getTotalPage(){
+     return $this->totalPage;
    }
    
    public function __set($key,$value){
      $this->$key=$value;
+     $this->_count();
      return $this;
    }
    
-   public function __toString(){
-      if($this->total<1)return "";
+   private function _count(){
       $this->totalPage=ceil($this->total/$this->size);
       if($this->page>$this->totalPage)$this->page=$this->totalPage;
-      
+      $this->startNum=($this->page-1)*$this->size+1;
       $subLinkNum=intval($this->linkNum/2);
-      $startPage=max(min($this->page-$subLinkNum,$this->totalPage-$this->linkNum),1);
-      $endPage=min(max($this->linkNum+1,$this->page+$subLinkNum),$this->totalPage);
-      
+      $this->startPage=max(min($this->page-$subLinkNum,$this->totalPage-$this->linkNum),1);
+      $this->endPage=min(max($this->linkNum+1,$this->page+$subLinkNum),$this->totalPage);
+   }
+   
+   public function __toString(){
+      $this->_count();
+      if($this->totalPage<2)return "";
       $html="<div class='rarePager'><ul>";
       $html.="<li class='rarePager_first'><a".($this->page>1?(" href='".$this->makeUrl(1)."'"):"")."><span style='font-family:Webdings'>9</span></a></li>";
       $html.="<li class='rarePager_prev'><a".($this->page>1?(" href='".$this->makeUrl($this->page-1))."'":"")."><span style='font-family:Webdings'>7</span></a></li>";
       
-      for($i=$startPage;$i<=$endPage;$i++){
+      for($i=$this->startPage;$i<=$this->endPage;$i++){
           if($i==$this->page){
              $html .="<li class='rarePager_current' rel='{$this->makeUrl($this->page)}'><a>{$this->page}</a></li>";
           }else{
