@@ -4,7 +4,7 @@
  * @author duwei
  * html表单输出工具类
  */
-class rareHtml{
+class rHtml{
     
    public static function select($name,$value,$options,$params=''){
        $html="<select name=\"{$name}\" ".self::_paramMerge($params,array('id'=>self::getIDByName($name)),true).">";
@@ -125,7 +125,7 @@ class rareHtml{
          for($i=0;$i<$numargs;$i++){
             $_param=func_get_arg($i);
             if($numargs-1==$i && $_param==true)continue;//最后一个参数为true
-           if(is_string($_param))$_param=rareTookit::string2Array($_param);
+           if(is_string($_param))$_param=rTookit::string2Array($_param);
            if(!is_array($_param))$_param=array();
            $param=array_merge($param,$_param);
           }

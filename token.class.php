@@ -5,7 +5,7 @@
  *表单token 生成和验证 
  *
  */
-class rareToken{
+class rToken{
   protected static $writeJs=false;
   public static function setHtmlMethodAsjs($jsType=true){
     self::$writeJs=$jsType;
@@ -19,7 +19,7 @@ class rareToken{
    */
   public static function tokenHiddenInput($tokenName='token'){
      $token= md5(uniqid(rand(), true));
-     rareUser::setAppSession($tokenName,$token);
+     $_SESSION[$tokenName]=$token;
      $hidden="<input type='hidden' name='{$tokenName}' value='".$token."'/>";
      
     return self::$writeJs?self::_writeAsJs($hidden):$hidden;
@@ -51,7 +51,7 @@ class rareToken{
   public static function check($tokenName='token',$requestMethod="post"){
     $token=($requestMethod=='post')?(isset($_POST[$tokenName])?$_POST[$tokenName]:null):(isset($_GET[$tokenName])?$_GET[$tokenName]:null);
     if(empty($token) ||strlen($token)!=32)return false;
-    return $token==rareUser::getAppSession($tokenName);
+    return isset($_SESSION[$tokenName]) && $token==$_SESSION[$tokenName];
   }
   
   /**
@@ -59,6 +59,6 @@ class rareToken{
    * @param unknown_type $tokenName
    */
   public static function clear($tokenName='token'){
-     rareUser::setAppSession($tokenName,null);
+     unset($_SESSION[$tokenName]);
   }
 }

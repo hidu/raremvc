@@ -4,7 +4,7 @@
  *@author duwei
  *对象缓存，缓存的数据会自动进行虚拟化处理、取出时进行反虚拟化
  */
-class rareCache_object extends rareCache_file{
+class rCache_object extends rCache_file{
     public function __construct(){
        parent::__construct();
     }

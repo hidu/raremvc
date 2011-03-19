@@ -1,5 +1,5 @@
 <?php
-class rareValidate{
+class rValidate{
   private $config;
   private $validate=true;
   

@@ -4,7 +4,7 @@
  * @author duwei
  *验证类型
  */
-class rareValidate_type {
+class rValidate_type {
     /**
      * 必填
      */

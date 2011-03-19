@@ -12,7 +12,7 @@
  *  } 
  *
  */
-class rarePageCahce{
+class rPageCahce{
    private static $curentKeys=array();
    private static $cacheHandle;      //缓存句柄
    public  static $defaultLifeTime=0;//默认有效期
@@ -43,7 +43,7 @@ class rarePageCahce{
     * @return rareCache
     */
    private static function getCacheHandle(){
-        if(is_null(self::$cacheHandle))self::$cacheHandle=new rareCache_file();
+        if(is_null(self::$cacheHandle))self::$cacheHandle=new rCache_file();
         return self::$cacheHandle;
    }
    

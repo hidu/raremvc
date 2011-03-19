@@ -5,7 +5,7 @@
  * @author duwei
  *
  */
-class rareCache_file extends rareCache{
+class rareCache_file extends rCache{
     protected  $cacheBath;
     public function __construct(){
        $this->cacheBath=dirname(RARE_CACHE_DIR)."/file/";

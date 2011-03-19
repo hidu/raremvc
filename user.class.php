@@ -4,7 +4,7 @@
  *@author duwei
  *统一的用户SESSION基础类
  */
-class rareUser{
+class rUser{
    const USER_ID="user_id";//用户ID
    const USER_LOGONNAME='user_logonName';//用户登录帐号
    const USER_REALNAME="user_realName";//用户真实名称、昵称

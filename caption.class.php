@@ -4,7 +4,7 @@
  * @author duwei
  *
  */
-class rareCaption{
+class rCaption{
     private static $key="rareCaption";   
     
     /**
