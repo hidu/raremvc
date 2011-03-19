@@ -5,7 +5,7 @@
  * @author duwei
  *
  */
-class rarePager{
+class rPager{
     private $total;      //总数
     private $size;       //每页显示数量
     private $linkNum=10;  //链接数量
