@@ -1,6 +1,8 @@
 <?php
 /**
  * 类自动装载
+ * http://raremvc.googlecode.com
+ * http://rare.hongtao3.com
  * @example
  * include 'rareAutoLoad.php';
  * $option=array('dirs'=>'/www/lib/share/,/www/lib/api/',//class 从那些目录中查找
