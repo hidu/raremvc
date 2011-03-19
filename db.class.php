@@ -132,9 +132,7 @@ class rareDb{
     public static function execQuery($sql,$params=array(),$dbName=null){
         $pdo=self::getPdo($dbName,'slave');
         self::_paramParse($sql, $params);
-        $sth=$pdo->prepare($sql);
-        $sth->execute($params);
-        self::_log($sql, $params);
+        $sth=self::_preExec($pdo, $sql, $params);
         return $sth;
     }
     
@@ -219,17 +217,24 @@ class rareDb{
     public static function exec($sql,$params=array(),$dbName=null){
         $pdo=self::getPdo($dbName,'master');
         self::_paramParse($sql, $params);
-        $sth=$pdo->prepare($sql);
-        $sth->execute($params);
-        self::_log($sql, $params);
+        $sth=self::_preExec($pdo, $sql, $params);
         return $sth->rowCount();
+    }
+    
+    private static function _preExec($pdo,$sql,$params){
+       try{
+          $sth=$pdo->prepare($sql);
+          $sth->execute($params);
+          self::_log($sql, $params);
+        }catch (Exception $e){
+            throw new Exception($e->getMessage()."\nsql:\n".$sql."\ndata:\n".print_r($params,true)."\n", $code, $previous);
+          }
+      return $sth;
     }
     
     public static function insert($sql,$params=array(),$dbName=null){
         $pdo=self::getPdo($dbName);
-        $sth=$pdo->prepare($sql);
-        $sth->execute($params);
-        self::_log($sql, $params);
+        $sth=self::_preExec($pdo, $sql, $params);
         return $pdo->lastInsertId();
     }
     
@@ -262,7 +267,9 @@ class rareDb{
          foreach ($data as $k=>$v){
            if(is_int($k)){   //如  hitNum=hitNum+1，可以是直接的函数
                $tmp[]=$v;
-           }else{            // 'title'=>'this is title'
+           }else if(is_numeric($v)){            // 'stateID'=>2
+               $tmp[]="`{$k}`=$v";
+           }else{           // 'title'=>'this is title'
                $tmp[]="`{$k}`=:k_{$k}";
                $param[":k_".$k]=$v;
              }

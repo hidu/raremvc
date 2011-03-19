@@ -7,11 +7,11 @@
 class rareHtml{
     
    public static function select($name,$value,$options,$params=''){
-       $html="<select name=\"{$name}\" ".self::_paramMerge($params,array('id'=>self::getIDByName($name)),true).">\n";
+       $html="<select name=\"{$name}\" ".self::_paramMerge($params,array('id'=>self::getIDByName($name)),true).">";
        if(!is_array($value))$value=explode(",", $value);
        $value=array_flip($value);
        foreach ($options as $_k=>$_v){
-           $html.="\t<option value=\"".self::h($_k)."\" ".(array_key_exists($_k, $value)?'selected="selected"':"").">".self::h($_v)."</option>\n";
+           $html.="<option value=\"".self::h($_k)."\" ".(array_key_exists($_k, $value)?'selected="selected"':"").">".self::h($_v)."</option>";
         }
         return $html."</select>\n";
    }
@@ -102,7 +102,8 @@ class rareHtml{
     }
     
     public static function js_alertGo($message,$url){
-        echo'<script>alert("'.self::h($message).'");location.href="'.$url.'";</script>';
+        $go=is_int($url)?"history.go($url)":"location.href='.$url.'";
+        echo'<script>alert("'.self::h($message).'");'.$go.';</script>';
         die;
     }
     
