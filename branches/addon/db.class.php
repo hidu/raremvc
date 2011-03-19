@@ -27,7 +27,7 @@ $db[$i]['slave']['passwd']="psw";
 return $db;
 ?>
  */
-class rareDb{
+class rDb{
      public static $sqls=array();
      public static $pageLabel="p";//分页参数名称
      protected  static $defaultDbName="default";//默认数据库
@@ -204,7 +204,7 @@ class rareDb{
         $pageInfo['page']=$page;
         $pageInfo['size']=$size;
         $pageInfo['total']=$total;
-        return array($list,new rarePager($pageInfo));
+        return array($list,new rPager($pageInfo));
      }
      
     /**

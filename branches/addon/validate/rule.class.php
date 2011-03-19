@@ -4,7 +4,7 @@
  * @author duwei
  *
  */
-class rareValidate_rule{
+class rValidate_rule{
   /**
    * 必填项
    * @param $name

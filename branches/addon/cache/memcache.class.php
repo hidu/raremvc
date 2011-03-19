@@ -5,7 +5,7 @@
  * @author duwei
  *
  */
-class rareCache_memcache extends rareCache{
+class rCache_memcache extends rCache{
   private $config;
   /**
    * @var Memcache

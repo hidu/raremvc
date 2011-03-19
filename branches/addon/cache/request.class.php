@@ -4,7 +4,7 @@
  * @author duwei
  *
  */
-class rareCache_request extends rareCache{
+class rCache_request extends rCache{
       private $cacheData=array();
       private static $init=null;
    

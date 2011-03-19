@@ -5,7 +5,7 @@
  * @author duwei
  *
  */
-class rareCache_no extends rareCache{
+class rCache_no extends rCache{
    public function has($key){
        return false;
    }

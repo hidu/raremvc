@@ -4,7 +4,7 @@
  *@author duwei
  *通用工具类
  */
-class rareTookit{
+class rTookit{
     
     /**
      *Converts string to array
