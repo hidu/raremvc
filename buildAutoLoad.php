@@ -1,5 +1,6 @@
 <?php
-//使用该工具生成autoload配置文件
+//当服务器不支持cache写的使用，可以利用该脚本在本地服务器生成autoload的配置文件
+
 //请将当前脚本在app的config目录下调用
 //cli 模式下 手动扫描lib 目录下的class 文件 参数为app 的路径
 //php ../../rare/buildAutoLoad.php
@@ -40,7 +41,11 @@ $phpData.="\$_rootDir=dirname(dirname(dirname(__FILE__)));\n";
 $phpData.="return array(\n";
 foreach ($classes as $_name=>$_path){
     echo $_name."===>{$_path}\n";
-  $phpData.="\t'{$_name}'=>\$_rootDir.'/".substr($_path, $_l)."',\n";
+    if($_path){
+      $phpData.="\t'{$_name}'=>\$_rootDir.'/".substr($_path, $_l)."',\n";
+    }else{
+      $phpData.="\t'{$_name}'=>".$_path.",\n";
+    }
 }
 $phpData.=");";
 

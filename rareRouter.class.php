@@ -1,6 +1,8 @@
 <?php
 /**
  *rare 路由解析 
+ * http://raremvc.googlecode.com
+ * http://rare.hongtao3.com
  * @package rare
  * @author duwei
  * @version  $Id: rareRouter.class.php duwei $

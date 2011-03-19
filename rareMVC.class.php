@@ -1,6 +1,9 @@
 <?php
 /**
  * rareMVC
+ * http://raremvc.googlecode.com
+ * http://rare.hongtao3.com
+ * 
  * @package rare
  * @author duwei duv123@gmail.com
  * @version 1.2
@@ -166,7 +169,7 @@ class rareContext{
          return file_exists($actionFile);
       }
      
-     private function getActionFile($moduleName,$actionName){
+     protected  function getActionFile($moduleName,$actionName){
         return  $this->getModuleDir().$moduleName."/action/".$actionName.".php";
        }      
     /**
@@ -434,10 +437,10 @@ abstract class rareAction{
     protected  $layout=null;
     protected  $layoutForce=false;//是否强制在任何情况下都使用layout
     public     $vars;
-    private    $viewFile;
+    protected  $viewFile;
     protected  $moduleName;
     protected  $actionName;
-    private    $isRender=false;
+    protected  $isRender=false;
 
     public function __construct($moduleName,$actionName){
         $this->context=rareContext::getContext();
@@ -739,7 +742,10 @@ function _rare_isUrl($url){
 }
 //run user hook function if myHook class exist,it will run auto
 function _rare_runHook($funName,$params){
-  static $myHookExist=null;
-  if($myHookExist===null)$myHookExist=class_exists("myHook",true);
-  if($myHookExist && method_exists("myHook", $funName))call_user_func_array(array('myHook',$funName),$params);
+  if(class_exists("myHook",true) && method_exists("myHook", $funName))
+   call_user_func_array(array('myHook',$funName),$params);
+}
+
+function rare_go404If($condition=true){
+  if($condition)rareContext::getContext()->error404();
 }
