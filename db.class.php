@@ -353,7 +353,7 @@ class rDB{
      */
     public static function getTableFileds($tableName,$dbName=null){
         if(!$dbName)$dbName=self::$defaultDbName;
-         $cache=new rareCache_object();
+         $cache=new rCache_object();
          $key="db_table_desc/".$dbName;
          if(!$cache->has($key)){
              $pdo=self::getPdo($dbName,'slave');
@@ -362,7 +362,7 @@ class rDB{
              foreach ($result as $row){
                 $row=each($row);
                 $_desc=$pdo->query("desc `{$row['value']}`")->fetchAll();
-                $tables[$row['value']]=rareTookit::arrayGetCols($_desc, 'Field');
+                $tables[$row['value']]=rTookit::arrayGetCols($_desc, 'Field');
               }
               $cache->set($key, $tables);
          }else{
