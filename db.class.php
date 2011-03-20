@@ -27,7 +27,7 @@ $db[$i]['slave']['passwd']="psw";
 return $db;
 ?>
  */
-class rDb{
+class rDB{
      public static $sqls=array();
      public static $pageLabel="p";//分页参数名称
      protected  static $defaultDbName="default";//默认数据库
@@ -331,12 +331,16 @@ class rDb{
      */    
     private static function _log($sql,$param){
          if(!(defined("RARE_DEBUG") && RARE_DEBUG))return;
-         if(class_exists("FirePHP",true)){
+         if(class_exists("FB",true)){
            try{
-                $tmp=array('sql'=>$sql,'param'=>$param);
-                 $firephp = FirePHP::getInstance(true);
-                 $firephp->fb($tmp ,FirePHP::INFO);
-                 unset($tmp);
+               if($param){
+                    $tmp=array('sql'=>$sql,'param'=>$param);
+                  }else{
+                    $tmp=$sql; 
+                    }
+                FirePHP::addSkipFile(__FILE__);
+                FB::info($tmp);    
+                unset($tmp);
            }catch(Exception  $e){}
          }
         self::$sqls[]=$sql;
