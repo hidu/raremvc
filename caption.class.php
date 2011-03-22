@@ -26,6 +26,10 @@ class rCaption{
     public static function getImage(){
         ob_clean();
         header("Content-Type:image/png");
+        header('Expires: Fri, 22 Mar 1970 18:59:00 GMT');
+        header('Last-Modified: ' . gmdate('D, d M Y H:i:s') . ' GMT');
+        header('Cache-Control: no-cache, must-revalidate');
+        header('Pragma: no-cache');
         
         $code=strtoupper(strtr(substr(md5(uniqid()),0,4),array('o'=>'p','0'=>'G')));
         $_SESSION[self::$key]=$code;
