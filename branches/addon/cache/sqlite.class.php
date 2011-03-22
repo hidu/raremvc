@@ -18,7 +18,9 @@ class rCache_sqlite extends rCache{
         if($q==false){
          $this->db->exec("create table cache(id varchar(255),data text,life int);CREATE UNIQUE INDEX [cache_unique] ON cache ([key])"); 
         }
-        $this->db->exec("delete from cache where life>0 and life<".time());
+        if(mt_rand(0, 100)==50){
+           $this->db->exec("delete from cache where life>0 and life<".time());
+        }
     }   
   
     public function has($key){
@@ -49,6 +51,16 @@ class rCache_sqlite extends rCache{
     
     public function removeAll(){
       return $sth=$this->db->exec("delete from cache");
+    }
+    
+    public function getBackend(){
+      return $this->db;
+    }
+    
+    public function getByLike($keyLike){
+       $sth=$this->db->prepare("select data from cache where id like '?'");
+       $sth->execute(array($keyLike));
+       return $sth->fetchAll();
     }
     
 }

@@ -15,7 +15,6 @@ class rCaption{
       return isset($_SESSION[self::$key]) && $caption==strtolower($_SESSION[self::$key]);
     }
     
-    
     public static function clean(){
          unset($_SESSION[self::$key]);
     }
@@ -43,11 +42,11 @@ class rCaption{
             $color = imagecolorallocate($image, mt_rand(0,255), mt_rand(0,255), mt_rand(0,255));
             imagesetpixel($image, mt_rand(0, $width), mt_rand(0,$height), $color);
         }
+        $colors=array();        
+        $colors[]  = imagecolorallocate($image,243,97,97);
+        $colors[]  = imagecolorallocate($image,83,104,189);
+        $colors[]  = imagecolorallocate($image,54,90,39);
         
-        $red = imagecolorallocate($image,0xf3,0x61,0x61);
-        $blue = imagecolorallocate($image,0x53,0x68,0xbd);
-        $green = imagecolorallocate($image,0x36,0x5A,0x27);
-        $colors = array($red, $blue, $green);
         $len  = strlen($code);
         for($num=0; $num<$len; $num++){
             imagestring($image, 5, 5+12*$num+mt_rand(0,4), 3+mt_rand(0,4), $code[$num], $colors[mt_rand(0,2)]);
