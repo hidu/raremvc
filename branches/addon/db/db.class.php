@@ -180,7 +180,7 @@ class rDB{
     public static function listPage($sql,$params=array(),$size=10,$dbName=null){
         $page=isset($_GET[self::$pageLabel])?(int)$_GET[self::$pageLabel]:1;
         $page=$page>0? $page:1;
-       
+        $sql=trim($sql);
         $pdo=self::getPdo($dbName,'slave');
         $driver_name=strtolower($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
         

@@ -13,13 +13,13 @@ class rHtml{
        foreach ($options as $_k=>$_v){
            $html.="<option value=\"".self::h($_k)."\" ".(array_key_exists($_k, $value)?'selected="selected"':"").">".self::h($_v)."</option>";
         }
-        return $html."</select>\n";
+        return $html."</select>";
    }
    
   
    
    public static function textArea($name,$value='',$params=''){
-     return '<textarea name="'.$name.'" '.self::_paramMerge(array('id'=>self::getIDByName($name)),$params,true).">".self::h($value)."</textarea>\n";
+     return '<textarea name="'.$name.'" '.self::_paramMerge(array('id'=>self::getIDByName($name)),$params,true).">".self::h($value)."</textarea>";
    }
    
    public static function input_radio($name,$value,$options,$params=""){
@@ -28,7 +28,7 @@ class rHtml{
            $_param=array();
             $_param['id']=self::getIDByName($name)."_{$_k}";
            if($_k==$value)$_param['checked']="checked";
-           $html.="<label>".self::_input('radio',$name,$_k,$params,$_param).self::h($_v)."</label>\n";
+           $html.="<label>".self::_input('radio',$name,$_k,$params,$_param).self::h($_v)."</label>";
         }
         return $html;
    }
@@ -38,7 +38,7 @@ class rHtml{
           list($_k,$_v)=each($options);
           $_param=array();
           if($_k==$value)$_param['checked']="checked";
-          return "<label>".self::_input('checkbox',$name,$_k,$params,$_param)."{$_v}</label>\n";
+          return "<label>".self::_input('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
       }else{
           if(!is_array($value))$value=explode(",",$value);
           $html="";
@@ -46,43 +46,43 @@ class rHtml{
               $_param=array();
               if(in_array($_k, $value))$_param['checked']="checked";
               $_param['id']=self::getIDByName($name)."_".$_k;
-              $html.="<label>".self::_input('checkbox',$name,$_k,$params,$_param)."{$_v}</label>\n";
+              $html.="<label>".self::_input('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
            }
           return $html;
       }
    }
    
    public static function input($name,$value="",$params=""){
-     return self::_input('text',$name,$value,$params)."\n";
+     return self::_input('text',$name,$value,$params);
    }
    
    public static function input_hidden($name,$value){
-       return self::_input('hidden',$name,$value)."\n";
+       return self::_input('hidden',$name,$value);
    }
    
    public static function input_file($name,$params=""){
-      return self::_input('file',$name,"",$params)."\n";
+      return self::_input('file',$name,"",$params);
    }
    
    public static function input_password($name,$value='',$params=""){
-      return self::_input('password',$name,$value,$params)."\n";
+      return self::_input('password',$name,$value,$params);
    }
    
    public static function input_image($src,$params=""){
-      return self::_input("image",'',$label,$params,array('src'=>$src))."\n"; 
+      return self::_input("image",'',$label,$params,array('src'=>$src)); 
    }
    
    public static function input_button($label,$params=""){
-      return self::_input("button",'',$label,$params)."\n"; 
+      return self::_input("button",'',$label,$params); 
    }
    
    public static function input_submit($label='',$params=""){
-      return self::_input("submit",'',$label,$params)."\n"; 
+      return self::_input("submit",'',$label,$params); 
    }
    
    
    public static function input_reset($label,$params=''){
-      return self::_input("reset",'',$label,$params)."\n"; 
+      return self::_input("reset",'',$label,$params); 
    }
    
    
@@ -98,7 +98,7 @@ class rHtml{
          if(!_rare_isUrl($url) && !str_startWith($url, '#') && !str_startWith($url, "javascript:")){
            $url=url($url);
          }
-        return '<a href="'.$url.'" '.self::_paramMerge($params,true).">".self::h($text)."</a>\n";
+        return '<a href="'.$url.'" '.self::_paramMerge($params,true).">".self::h($text)."</a>";
     }
     
     public static function js_alertGo($message,$url){
