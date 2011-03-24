@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110315';                 //当前框架版本
+    private $version='1.2 20110324';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -62,8 +62,8 @@ class rareContext{
     public function run(){
         $this->regShutdown();
         $this->init();
-        $this->parseRequest();
         $this->regAutoLoad();
+        $this->parseRequest();
         $this->executeFilter("doFilter");
         $this->executeActtion($this->uri);
     }
@@ -91,7 +91,7 @@ class rareContext{
         if($class_autoload){
             include dirname(__FILE__).'/rareAutoLoad.class.php';
             $_autoloadOption=array('dirs'=>$this->getRootLibDir().",".$this->getAppLibDir(),
-                                   'cache'=>$this->getCacheDir().$this->getAppName()."_classAutoLoad"
+                                   'cache'=>$this->getCacheDir()."classAutoLoad"
                                    );
             if(isset($_autoloadOption['hand']) && $_autoloadOption['hand']){
                $_autoloadOption['cache']=$this->getConfigDir()."autoLoad";
