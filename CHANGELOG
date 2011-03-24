@@ -1,0 +1,31 @@
+20110324
+  1.调整地址解析和注册类自动装载的先后顺序:地址解析置于后面
+  2.路由解析功能增强
+    2.1 之前进行正则匹配时没有添加开始和结束标记，现在已经添加上。(之前路由写法不用修改)
+    2.2 路由解析添加函数确认功能。当用正则表达式匹配后仍然不确定的地址可以使用函数去确认地址是否符合规则。
+        如
+          http://www.example.com/beijing 
+          http://www.example.com/shanghai
+          http://www.example.com/wuhan
+          http://www.example.com/xxxxx
+           .......................
+         这样的地址
+         路由可以这样写
+         $config['index/index'][]=array('url'=>'{city}',
+                              'param'=>array('id'=>'\w+'),
+                              'fn'=>"myUriCheck::city",
+                             );
+         当进行路由解析的时候
+           上述路由规则今回匹配几乎所有的地址
+           <?php
+              class myUriCheck{
+                 public static function city($path,$actionName,$param){
+                   $cities=array();
+                   //get the city list                    
+                   return in_array($param['city'],$cities);
+                 }
+              }
+             ?>                         
+             调用的函数返回true 表示当前路由有效。  
+      
+      note:路由规则的解析是由上而下的，上述路由最好放到最后。                         
