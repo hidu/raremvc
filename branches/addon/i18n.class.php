@@ -16,7 +16,7 @@ class rI18n{
    * 判断指定的语言客户端是否支持
    * @param string $lang
    */
-  public static function isLangSupport($lang){
+  public static function isSupport($lang){
      $accepts=self::getAccept();
      return in_array($lang, $accepts);
   }
