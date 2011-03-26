@@ -1,10 +1,9 @@
 <?php
 $config=array();
 $config['title']['rule']=array(
-                        rareValidate_type::Required,
-                        rareValidate_type::Email,
+                        rValidate_type::Required,
+                        rValidate_type::Email,
+                        rValidate_type::SmallThan=>'ttt'
                         );
 $config['title']['msg']="请输入正确的标题！";                        
-$config['title']['id']="title";                        
-
 return $config;
