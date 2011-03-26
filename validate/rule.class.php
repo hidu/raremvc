@@ -12,8 +12,10 @@ class rValidate_rule{
    * @return boolean
    */
   public static function required($value){
-      if(is_array($value)){
-          return count($value)>0;
+      if(is_array($value) && $value){
+          foreach ($value as $_tmp){
+             if(strlen(trim($tmp))) return true;
+          }
       }
        return strlen(trim($value))>0;
   }
@@ -26,7 +28,7 @@ class rValidate_rule{
     return mb_strlen($value,'utf-8')<=$length;
   }
   public static function equalTo($value,$to,$allvalue){
-    return $value==$allvalue[$to];
+    return strcmp($value,$allvalue[$to])==0;
   }
   public static function email($value){
       return preg_match("/^([a-zA-Z0-9_-])+([.a-zA-Z0-9_-])*([a-zA-Z0-9_-])*@([a-zA-Z0-9_-])+(.[a-zA-Z0-9_-])+/",$value);
@@ -37,7 +39,6 @@ class rValidate_rule{
   }
   /**
    * iso 格式的日期 eg 2008-08-08  
-   * 特别的 0000-00-00 也通过验证
    * @param $value
    * @return boolean
    */
@@ -190,7 +191,8 @@ class rValidate_rule{
    * @param $notValues  多个值用  | 分割
    * @return boolean
    */
-  public static function notEqual($value,$notValues){
+  public static function notIn($value,$notValues){
+      $values=explode("|", $notValues);
       return !in_array($value,$values);
   }
 
