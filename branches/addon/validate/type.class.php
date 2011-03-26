@@ -114,7 +114,7 @@ class rValidate_type {
     /**
      * 值不能等于
      */
-    const NotEqual='notEqual';
+    const NotIn='notIn';
 
     /**
      * 正则表达式
