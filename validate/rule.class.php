@@ -179,7 +179,7 @@ class rValidate_rule{
    * @return boolean
    */
   public static function smallThan($value,$to,$all){
-  	if($all[$to]){
+  	if(isset($all[$to])){
       return $value<=$all[$to];
   	}
   	return true;
@@ -206,5 +206,4 @@ class rValidate_rule{
   public static function regex($value,$regex){
     return !(!(preg_match($regex, $value)));
   }
-  
 }
