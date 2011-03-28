@@ -37,7 +37,7 @@ class rValidate_type {
 
 
     /**
-     * 日期  eg 2008-02-02
+     * 日期  eg 2012-12-12
      */
     const DateISO='dateISO';
 
