@@ -88,4 +88,28 @@ class rValidate{
     return $name?(isset($this->errorDetails[$name])?$this->errorDetails[$name]:array()):$this->errorDetails;
   }
   
+  /**
+   * 返回 jQuery Validation Plugin 支持的验证规则
+   * jQuery Validation Plugin：
+   *     http://bassistance.de/jquery-plugins/jquery-plugin-validation/
+   *     http://docs.jquery.com/Plugins/Validation
+   *     
+   * @param boolean $json
+   */
+  public function getJsRule($json=false){
+    $jsRule=array();
+    foreach($this->config as $name=>$subConfig){
+        foreach ($subConfig['rule'] as $k=>$v){
+           if(is_int($k)){
+             $jsRule['rules'][$name][$v]=true;
+            }else{
+             $jsRule['rules'][$name][$k]=$v;
+            }
+             $jsRule['messages'][$name]=$subConfig['msg'];
+         }
+     }
+     
+     return $json?json_encode($jsRule):$jsRule;
+  }
+  
 }

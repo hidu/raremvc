@@ -1,6 +1,9 @@
 <?php
 /**
- * 验证类
+ * 验证类,实现使用的验证规则
+ * 在该类中定义所有的验证规则,所有验证规则的实现使用static函数实现
+ * public static function 规则($当前值[,$参数1,$参数2,[$所有的值]])
+ * 最完整的函数例子如 equalTo($value,$to,$allvalue)
  * @author duwei
  *
  */
@@ -14,10 +17,10 @@ class rValidate_rule{
   public static function required($value){
       if(is_array($value) && $value){
           foreach ($value as $_tmp){
-             if(strlen(trim($tmp))) return true;
+             if(strlen(preg_replace("/\s/", "", $tmp))) return true;
           }
       }
-       return strlen(trim($value))>0;
+       return strlen(preg_replace("/\s/", "", $value))>0;
   }
   
   public static function minlength($value,$length){
