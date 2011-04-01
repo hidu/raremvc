@@ -1,19 +1,20 @@
 <?php
 /**
- * 数据库操作
+ * 数据库操作模板
  * 一个简单的sql模板类，只是对pdo的简单封装,主从模式，
  * 读操作统一使用从服务器，写操作统一使用主服务器。
  * 
  *@copyright rareMVC
- *@author duwei
- *
+ *@author duwei<duv123@gmail.com>
+ *@tutorial
+ *<pre>
  *数据库配置文件存放在
- *1.单个应用的数据库配置              /appDir/config/db.php
- *2.多个程序公用的数据库配置文件   /lib/config/db.php
+ *1.单个应用的数据库配置: /appDir/config/db.php 
+ *2.多个程序公用的数据库配置文件: /lib/config/db.php 
  *多存在两个配置文件，配置文件将会进行合并，app的配置文件将会覆盖公用配置的相同项目
  *
  *一个数据库配置文件:
- <?php
+ &lt;?php
 //数据库配置文件
 //多数据库配置，主从模式
 $db=array();
@@ -25,7 +26,8 @@ $db[$i]['slave']['dsn']="mysql:host=192.168.2.1; port=3306; dbname=myDb";
 $db[$i]['slave']['username']="user";
 $db[$i]['slave']['passwd']="psw";
 return $db;
-?>
+?&gt;
+</pre>
  */
 class rDB{
      public static $sqls=array();
@@ -147,10 +149,21 @@ class rDB{
         return self::execQuery($sql, $params,$dbName)->fetchAll();
     }
     /**
-     * 查询出一条记录
-     * @param string $sql
-     * @param array $params
-     * @param string $dbName
+     * 执行一条查询sql，sql使用占位符
+     * @tutorial
+    * <pre>
+    * $id=100;
+    * 1.一个参数
+    * rDB::query("select * from article where id=?", $id);
+    * rDB::query("select * from article where id=?", array($id));
+    * rDB::query("select * from article where id=:id", array('id'=>$id));
+    * 2.多个参数
+    * rDB::query("select * from article where id=? and dateCreated>=?", array($id,'2012-12-1 08:12:30'));
+    * rDB::query("select * from article where id=:id and dateCreated>=:date", array('id'=>$id,'date'=>'2012-12-1 08:12:30'));
+    * </pre>
+    * @param string $sql
+    * @param array $params 当参数只有一个时也可以直接写参数而不需要写成数组
+    * @param string $dbName  数据库表名
      */
     public static function query($sql,$params=array(),$dbName=null){
       return self::execQuery($sql, $params,$dbName)->fetch();
@@ -158,19 +171,21 @@ class rDB{
     
     /**
      * 分页查询
-     * 如
+     *@tutorial
+     *<pre> 
      * list($list,$pager)=rareDb::listPage("select * from artilce where cateID=? and createTime>?",array(1,date('Y-m-d H:i:s')),20);
      * $list是一个数组，为我们查询的数据
      * $pager  为一个 rarePager 对象，以实现__toString方向，可以在模板中直接输出 
-     *     如<?php echo $pager->setlinkNum(5);//每页显示5个链接，并输出?>
+     *   如&lt;?php echo $pager->setlinkNum(5);//每页显示5个链接，并输出?&gt;
      *  当前只实现了mysql 分页查询，其他数据库可以使用hook功能来实现
-     *  <?php
+     *  &lt;?php
      *  class myRareDb{
      *      public static function mssql($sql,$params=array(),$size=10,$dbName=null){
      *          //@todo
      *          return array($resultList,$totleNum);
      *        }
-     *  }?>   
+     *  }?&gt;
+     *  </pre>   
      * @param string $sql
      * @param array $params
      * @param int $size
