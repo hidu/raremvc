@@ -42,7 +42,7 @@ class rTookit{
        $tmp = array();
        if ($value){
           foreach ($array as $_subArray){
-             $tmp[$_subArray[$key]] = $_subArray[$key];
+             $tmp[$_subArray[$key]] = $_subArray[$value];
            }
         }else{
             foreach ($array as $_subArray){
@@ -58,5 +58,21 @@ class rTookit{
             $tmp[$_subArray[$key]][] = $_subArray;
         }
         return $$tmp;
+   }
+   
+   /**
+    * 支持html的字符串截取
+    * @param string $html
+    * @param int $length
+    */
+   public static function cutHtml($html,$length=300){
+      $html=strip_tags($html);
+      return self::cutStr($html,$length);
+   }
+   
+   public static function cutStr($str,$length=50){
+       preg_match_all("/./us", $str, $ar);
+       $newstring = join("", array_slice($ar[0], 0, $length));
+       return $newstring;
    }
 }

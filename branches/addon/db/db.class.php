@@ -245,7 +245,7 @@ class rDB{
           $sth->execute($params);
           self::_log($sql, $params);
         }catch (Exception $e){
-            throw new Exception($e->getMessage()."\nsql:\n".$sql."\ndata:\n".print_r($params,true)."\n", $code, $previous);
+            throw new Exception($e->getMessage()."\nsql:\n".$sql."\ndata:\n".print_r($params,true)."\n");
           }
       return $sth;
     }
