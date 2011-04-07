@@ -132,7 +132,7 @@ class rDB{
      * @param string $dbName
      * @return PDOStatement
      */
-    public static function execQuery($sql,$params=array(),$dbName=null){
+    public static function execQuery($sql,$params=null,$dbName=null){
         $pdo=self::getPdo($dbName,'slave');
         self::_paramParse($sql, $params);
         $sth=self::_preExec($pdo, $sql, $params);
@@ -145,7 +145,7 @@ class rDB{
      * @param array $params
      * @param string $dbName
      */
-    public static function queryAll($sql,$params=array(),$dbName=null){
+    public static function queryAll($sql,$params=null,$dbName=null){
         return self::execQuery($sql, $params,$dbName)->fetchAll();
     }
     /**
@@ -165,7 +165,7 @@ class rDB{
     * @param array $params 当参数只有一个时也可以直接写参数而不需要写成数组
     * @param string $dbName  数据库表名
      */
-    public static function query($sql,$params=array(),$dbName=null){
+    public static function query($sql,$params=null,$dbName=null){
       return self::execQuery($sql, $params,$dbName)->fetch();
     }
     
@@ -192,7 +192,7 @@ class rDB{
      * @param string $dbName
      * @return array     ($list,$pager) 
      */
-    public static function listPage($sql,$params=array(),$size=10,$dbName=null){
+    public static function listPage($sql,$params=null,$size=10,$dbName=null){
         $page=isset($_GET[self::$pageLabel])?(int)$_GET[self::$pageLabel]:1;
         $page=$page>0? $page:1;
         $sql=trim($sql);
@@ -226,7 +226,7 @@ class rDB{
      * @param string $dbName
      * @return int
      */
-    public static function exec($sql,$params=array(),$dbName=null){
+    public static function exec($sql,$params=null,$dbName=null){
         $pdo=self::getPdo($dbName,'master');
         self::_paramParse($sql, $params);
         $sth=self::_preExec($pdo, $sql, $params);
@@ -277,7 +277,7 @@ class rDB{
      * @param string $whereParam
      * @param string $dbName
      */
-    public static function table_update($tableName,$data,$where,$whereParam=array(),$dbName=null){
+    public static function table_update($tableName,$data,$where,$whereParam=null,$dbName=null){
          self::_dataFilter($tableName, $data);
          $sql="update `{$tableName}` set ";
          $tmp=array();
@@ -304,7 +304,7 @@ class rDB{
      * @param string $where
      * @param array $params
      */
-    private static function _paramParse(&$where,&$params){
+    public static function _paramParse(&$where,&$params){
        if(is_null($params) || $params==""){$params=array();return;};
        
        if(!is_array($params))$params=array($params);
@@ -315,12 +315,20 @@ class rDB{
               $tmp[":".ltrim($_k,":")]=$_v;
           }
        }else{
-          preg_match_all("/([\w_]+)\s*\=\s*\?\s+/i", $where." ", $matches,PREG_SET_ORDER);
+          preg_match_all("/`?([\w_]+)`?\s*[\=<>!]+\s*\?\s+/i", $where." ", $matches,PREG_SET_ORDER);
           if($matches){
              foreach ($matches as $_k=>$matche){
-                 $where=str_replace(trim($matche[0]), $matche[1]."=:rare_".$matche[1], $where);
-                 $tmp[":rare_".$matche[1]]=$params[$_k];
+                 $fieldName=":".$matche[1];//字段名称
+                 $i=0;
+                 while (array_key_exists($fieldName, $params)){
+                      $fieldName=":".$matche[1]."_".($i++);
+                    }
+                 $where=str_replace(trim($matche[0]), str_replace("?", $fieldName, $matche[0]), $where);
+                 if(array_key_exists($_k, $params)){
+                   $tmp[$fieldName]=$params[$_k];
+                   }
                }
+               dump($where);
            }
         }
        $params=$tmp;
@@ -334,7 +342,7 @@ class rDB{
      * @param array $whereParam
      * @param string $dbName
      */
-    public static function table_delete($tableName,$where,$whereParam=array(),$dbName=null){
+    public static function table_delete($tableName,$where,$whereParam=null,$dbName=null){
          $pdo=self::getPdo($dbName); 
          self::_paramParse($where, $whereParam);
          $param=$whereParam;
