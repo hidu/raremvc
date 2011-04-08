@@ -328,7 +328,6 @@ class rDB{
                    $tmp[$fieldName]=$params[$_k];
                    }
                }
-               dump($where);
            }
         }
        $params=$tmp;
@@ -360,6 +359,9 @@ class rDB{
            try{
                 $tmp=array('sql'=>$sql,'param'=>$param);
                 FirePHP::addSkipFile(__FILE__);
+                FirePHP::addSkipFile(dirname(__FILE__)."/driver/mysql.class.php");
+                FirePHP::addSkipFile(dirname(__FILE__)."/driver/postgresql.class.php");
+                FirePHP::addSkipFile(dirname(__FILE__)."/driver/sqlite.class.php");
                 FB::info($tmp);    
                 unset($tmp);
            }catch(Exception  $e){}
