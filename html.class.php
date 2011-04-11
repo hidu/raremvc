@@ -34,6 +34,7 @@ class rHtml{
    }
    
    public static function input_checkbox($name,$value,$options,$params=''){
+      if(!is_array($options))$options=array($options=>'');
       if(count($options)==1){
           list($_k,$_v)=each($options);
           $_param=array();
@@ -78,6 +79,10 @@ class rHtml{
    
    public static function input_submit($label='',$params=""){
       return self::_input("submit",'',$label,$params); 
+   }
+   
+   public static function submit($label="",$params=""){
+      return self::input_submit($label,$params);
    }
    
    
@@ -125,7 +130,7 @@ class rHtml{
          for($i=0;$i<$numargs;$i++){
             $_param=func_get_arg($i);
             if($numargs-1==$i && $_param==true)continue;//最后一个参数为true
-           if(is_string($_param))$_param=rTookit::string2Array($_param);
+           if(is_string($_param))$_param=sfToolkit::stringToArray($_param);
            if(!is_array($_param))$_param=array();
            $param=array_merge($param,$_param);
           }
