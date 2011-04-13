@@ -385,7 +385,7 @@ class rDB{
              foreach ($result as $row){
                 $row=each($row);
                 $_desc=$pdo->query("desc `{$row['value']}`")->fetchAll();
-                $tables[$row['value']]=rTookit::arrayGetCols($_desc, 'Field');
+                $tables[$row['value']]=qArray::getCols($_desc, 'Field');
               }
               $cache->set($key, $tables);
          }else{
