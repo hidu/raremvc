@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110324';                 //当前框架版本
+    private $version='1.2 20110413';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -327,9 +327,9 @@ class rareView{
         $vars['rare_vars']=$vars;
         if(is_array($vars))extract($vars);
         ob_start();
-        try{
+//        try{
           include $viewFile;
-        }catch(Exception $e){}
+//        }catch(Exception $e){}
         $content= ob_get_contents();
         ob_end_clean();
         chdir($rare_currentPWD);
@@ -673,14 +673,17 @@ function directory($dir){
  * 返回json数据 
  * @param int $status 状态 建议0：失败 1：正常、成功
  * @param string $info  提示信息
- * @param mix $data   返回的数据,字符串或者数组
+ * @param mix $data   返回的数据,字符串或者数组 
+ * @param boolean $header  返回结果是否修改header 的content-type 当使用ajaxFile上传文件时(iframe方式),标记为false 
  */
-function jsonReturn($status=1,$info="",$data=""){
+function jsonReturn($status=1,$info="",$data="",$header=true){
   $json=array();
   $json['s']=$status;
   $json['i']=$info;
   $json['d']=$data;
-  header("Content-Type:application/json");
+  if($header){
+     header("Content-Type:application/json;charset=".rareConfig::get('charset','utf-8'));
+  }
   ob_clean();//clear output:Notice and others
   die(json_encode($json));
 }
