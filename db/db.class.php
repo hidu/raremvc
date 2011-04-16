@@ -305,7 +305,7 @@ class rDB{
      * @param array $params
      */
     public static function _paramParse(&$where,&$params){
-       if(is_null($params) || $params==""){$params=array();return;};
+       if(is_null($params)){$params=array();return;};
        
        if(!is_array($params))$params=array($params);
        $_first=each($params);
