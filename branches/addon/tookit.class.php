@@ -34,6 +34,7 @@ class rTookit{
   
   /**
    * 设置 magic_quotes_gpc
+   * 
    * @param boolean $isQuote
    */
   public static function set_magic_quotes_gpc($isQuote=0){
@@ -77,5 +78,16 @@ class rTookit{
           $_REQUEST[$k]=$v;
          }
      }
+  }
+  
+  /**
+   *该方法用户修正ie6一些版本不能正确识别程序动态输出的js的问题。(表现为第一次不正常，刷新后运行正常)
+   *在动态js的action中调用该方法即可。 
+   */
+  public static function dynamic_js_header(){
+      header_remove("Pragma");
+      header_remove("Cache-Control");
+      header_remove('Expires');
+      header("Content-Type: text/javascript;charset=".rareConfig::get('charset','UTF-8'));
   }
 }
