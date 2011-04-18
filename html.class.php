@@ -28,7 +28,7 @@ class rHtml{
            $_param=array();
             $_param['id']=self::getIDByName($name)."_{$_k}";
            if($_k==$value)$_param['checked']="checked";
-           $html.="<label>".self::input('radio',$name,$_k,$params,$_param).self::h($_v)."</label>";
+           $html.="<label>".self::inputTag('radio',$name,$_k,$params,$_param).self::h($_v)."</label>";
         }
         return $html;
    }
@@ -39,7 +39,7 @@ class rHtml{
           list($_k,$_v)=each($options);
           $_param=array();
           if($_k==$value)$_param['checked']="checked";
-          return "<label>".self::input('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
+          return "<label>".self::inputTag('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
       }else{
           if(!is_array($value))$value=explode(",",$value);
           $html="";
@@ -47,38 +47,47 @@ class rHtml{
               $_param=array();
               if(in_array($_k, $value))$_param['checked']="checked";
               $_param['id']=self::getIDByName($name)."_".$_k;
-              $html.="<label>".self::input('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
+              $html.="<label>".self::inputTag('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
            }
           return $html;
       }
    }
    
+   public static function checkbox($name,$value,$itemValue,$params=''){
+       $_param=array();
+       if($itemValue ===true || $value==$itemValue)$_param['checked']='true';
+       if(str_endWith($name,"[]")){
+           $_param['id']=self::getIDByName($name)."_".$value;
+        }
+       return self::inputTag('checkbox',$name,$value,$params,$_param);
+   }
+   
    public static function input($name,$value="",$params=""){
-     return self::input('text',$name,$value,$params);
+     return self::inputTag('text',$name,$value,$params);
    }
    
    public static function input_hidden($name,$value){
-       return self::input('hidden',$name,$value);
+       return self::inputTag('hidden',$name,$value);
    }
    
    public static function input_file($name,$params=""){
-      return self::input('file',$name,"",$params);
+      return self::inputTag('file',$name,"",$params);
    }
    
    public static function input_password($name,$value='',$params=""){
-      return self::input('password',$name,$value,$params);
+      return self::inputTag('password',$name,$value,$params);
    }
    
    public static function input_image($src,$params=""){
-      return self::input("image",'',$label,$params,array('src'=>$src)); 
+      return self::inputTag("image",'',$label,$params,array('src'=>$src)); 
    }
    
    public static function input_button($label,$params=""){
-      return self::input("button",'',$label,$params); 
+      return self::inputTag("button",'',$label,$params); 
    }
    
    public static function input_submit($label='',$params=""){
-      return self::input("submit",'',$label,$params); 
+      return self::inputTag("submit",'',$label,$params); 
    }
    
    public static function submit($label="",$params=""){
@@ -87,7 +96,7 @@ class rHtml{
    
    
    public static function input_reset($label,$params=''){
-      return self::input("reset",'',$label,$params); 
+      return self::inputTag("reset",'',$label,$params); 
    }
    
    /**
@@ -96,7 +105,7 @@ class rHtml{
     * @param array|string $params
     */
    public static function input_email($name,$params=''){
-      return self::input('email',$name,$value,$params);
+      return self::inputTag('email',$name,$value,$params);
    }
    
    /**
@@ -105,7 +114,7 @@ class rHtml{
     * @param mix $params
     */
    public static function input_search($name,$params=''){
-      return self::input('search',$name,$value,$params);
+      return self::inputTag('search',$name,$value,$params);
    }
    
    /**
@@ -114,7 +123,7 @@ class rHtml{
     * @param mix $params
     */
    public static function input_url($name,$params=''){
-      return self::input('url',$name,$value,$params);
+      return self::inputTag('url',$name,$value,$params);
    }
    
    
@@ -140,7 +149,7 @@ class rHtml{
     }
     
    
-   public static function input($type='text',$name='',$value='',$param="",$paramMore=''){
+   public static function inputTag($type='text',$name='',$value='',$param="",$paramMore=''){
        $_param=array();
        if($name){
           $_param['name']=$name;
