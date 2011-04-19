@@ -1,10 +1,19 @@
+20110419
+    1.错误页面提示文字外面的pre标签去掉，采用nl2br替换
+    2.对action添加调用自定义方法的功能，
+    在配置文件中定义$config['customMethod']=true;可以启用。
+    在若在$_REQUESR中存在 $_REQUESR['method']="delete";同时存在对于的executeDelete方法，
+    该方法会被调用，而默认的execute以及executePost|executeGet则不会被调用。
+    
+    
 20110413
    rareView::render不再捕捉异常
    jsonReturn添加第4个参数(是否输出content-type)
       当使用ajax的时候，使用jsonReturn 输出放回结果，
       默认会发送header  Content-Type:application/json;charset=utf-8
       指定response的格式以获取更好的客户端兼容性和效率。
-      但是当使用ajax上传图片(iframe方式)的时候，如使用了jquery form plugin上传图片，上述header会导致浏览器提示下载文件，这是可以将第四个蚕丝$header=fasle,即可。
+      但是当使用ajax上传图片(iframe方式)的时候，如使用了jquery form plugin上传图片，
+      上述header会导致浏览器提示下载文件，这是可以将第四个蚕丝$header=fasle,即可。
       
 
 20110324
