@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110413';                 //当前框架版本
+    private $version='1.2 20110419';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -135,13 +135,13 @@ class rareContext{
            $this->goError(500);
            $this->_errorPage("500 Internal Server Error", "");
          }else{
-             $this->_errorPage("500 Internal Server Error", "<pre>".$_error['message']."</pre> in file ".$_error['file']." at line ".$_error['line']);
+             $this->_errorPage("500 Internal Server Error", nl2br($_error['message'])."in file ".$_error['file']." at line ".$_error['line']);
          }      
     }
     private function _errorPage($title,$msg){
         ob_clean();
         $html="<!DOCTYPE html><html><head><meta http-equiv='content-type' content='text/html;charset=".rareConfig::get('charset','utf-8')."'>".
-               "<title>{$title}</title></head><body><p style='margin-top:15px;background:#3366cc;color:white'>Error</p>".
+               "<title>{$title}</title></head><body><p style='background:#3366cc;color:white;padding:5px;font-weight:bold;'>Error</p>".
                "<h1>{$title}</h1>{$msg}<br/><br/><a href='".public_path("")."'>Go Home</a><p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
         die($html);
     } 
@@ -205,9 +205,21 @@ class rareContext{
         
         $action = new $actionClass($this->moduleName,$this->actionName);
         $action->preExecute();
-        
+
+        //自定义action方法 若需要使用，可以在config/default.php中定义 $config['customMethod']='method';
+        //如上定义自定义函数名称通过$_REQUEST['method']来确定，如method=delte 会运行executeDelete方法
+        $customMethod=rareConfig::get('customMethod');
+        $customFn=false;
+        if($customMethod){
+            if(!is_string($customMethod))$customMethod="method";
+             if(isset($_REQUEST[$customMethod]) && $_REQUEST[$customMethod]){
+              $customFn="execute".ucfirst(strtolower($_REQUEST[$customMethod]));
+             }
+          }
         $restFn="execute".ucfirst(strtolower($_SERVER["REQUEST_METHOD"]));
-        if(method_exists($action, $restFn)){
+        if($customFn && method_exists($action, $customFn)){
+            $result=call_user_func(array($action,$customFn));
+        }elseif(method_exists($action, $restFn)){
             $result=call_user_func(array($action,$restFn));
          }else{
            $result=$action->execute();
