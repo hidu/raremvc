@@ -331,6 +331,27 @@ class rDB{
            }
         }
        $params=$tmp;
+        
+        //------------------------------------------
+        //fix sql like: select * from table_name where id in(:ids)
+        preg_match_all("/\s+in\s*\(\s*(\:\w+)\s*\)/i", $where." ", $matches,PREG_SET_ORDER);
+        if($matches){
+            foreach ($matches as $_k=>$matche){
+                $fieldName=trim($matche[1],":");
+                $_val=$params[$matche[1]];
+                if(!is_array($_val)){
+                    $_val=explode(",", addslashes($_val));
+                  }
+                $_tmpStrArray=array();
+                foreach ($_val as $_item){
+                    $_tmpStrArray[]=is_numeric($_item)?$_item:"'".$_item."'";
+                  }
+                $_val=implode(",", $_tmpStrArray);
+                $where=str_replace($matche[0], " In (".$_val.") ", $where);
+                unset($params[$matche[1]]);
+              }
+         }
+        //==========================================
     }
     
     /**

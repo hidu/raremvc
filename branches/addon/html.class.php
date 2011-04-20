@@ -5,6 +5,14 @@
  * html表单输出工具类
  */
 class rHtml{
+   private static $autoID=true;
+   /**
+    * 是否允许自动添加id字段
+    * @param boolean $enable
+    */
+   public static function enableAutoID($enable){
+       self::$autoID=$enable;
+   }
     
    public static function select($name,$value,$options,$params=''){
        $html="<select name=\"{$name}\" ".self::_paramMerge($params,array('id'=>self::getIDByName($name)),true).">";
@@ -153,7 +161,9 @@ class rHtml{
        $_param=array();
        if($name){
           $_param['name']=$name;
-          $_param['id']=self::getIDByName($name);
+          if(self::$autoID){
+            $_param['id']=self::getIDByName($name);
+            }
        }
        $param=self::_paramMerge($param, $_param,$paramMore,true);
      return "<input type=\"{$type}\" value=\"".self::h($value)."\" {$param} />";
@@ -178,6 +188,20 @@ class rHtml{
                return $str;
           }
        return $param;
+    }
+    
+    /**
+     *html5 
+     * @param string $id
+     * @param string|array $values
+     */
+    public static function datalist($id,$values){
+        if(is_string($values))$values=explode(",", $values);
+        $html='<datalist id="'.$id.'">';
+        foreach ($values as $val){
+            $html.='<option value="'.self::h($val).">";
+         }
+         return $html."</datalist>";
     }
    
 }
