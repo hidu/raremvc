@@ -53,12 +53,12 @@ abstract class sfDatabaseSessionStorage extends sfSessionStorage
 
     if (!isset($this->options['db_table']))
     {
-      throw new sfInitializationException('You must provide a "db_table" option to sfDatabaseSessionStorage.');
+      throw new Exception('You must provide a "db_table" option to sfDatabaseSessionStorage.');
     }
 
     if (!isset($this->options['database']))
     {
-      throw new sfInitializationException('You must provide a "database" option to sfDatabaseSessionStorage.');
+      throw new Exception('You must provide a "database" option to sfDatabaseSessionStorage.');
     }
 
     // use this object as the session handler
@@ -87,37 +87,23 @@ abstract class sfDatabaseSessionStorage extends sfSessionStorage
   /**
    * Opens a session.
    *
+   * duwei modify 20110422
    * @param  string $path  (ignored)
    * @param  string $name  (ignored)
    *
    * @return boolean true, if the session was opened, otherwise an exception is thrown
    *
-   * @throws <b>DatabaseException</b> If a connection with the database does not exist or cannot be created
+   * @throws <b>Exception</b> If a connection with the database does not exist or cannot be created
    */
   public function sessionOpen($path = null, $name = null)
   {
     // what database are we using?
     $database = $this->options['database'];
-
-    // get the database and connection
-    $databaseClass = get_class($database);
-    if($databaseClass == 'sfPropelDatabase')
-    {
-      $this->db = Propel::getConnection();
-    }
-    elseif($databaseClass == 'sfDoctrineDatabase')
-    {
-      $this->db = $database->getConnection();
-    }
-    else
-    {
-      $this->db = $database->getResource();
-    }
-    $this->con = $database->getConnection();
+    $this->db = $database;
 
     if (is_null($this->db) && is_null($this->con))
     {
-      throw new sfDatabaseException('Database connection does not exist. Unable to open session.');
+      throw new Exception('Database connection does not exist. Unable to open session.');
     }
 
     return true;
