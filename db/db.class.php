@@ -12,6 +12,8 @@
  *1.单个应用的数据库配置: /appDir/config/db.php 
  *2.多个程序公用的数据库配置文件: /lib/config/db.php 
  *多存在两个配置文件，配置文件将会进行合并，app的配置文件将会覆盖公用配置的相同项目
+ *若定义了RARE_DEBUG变量为true,并且启用了firePHP的话，可以使用firephp看到程序运行的所有的sql语句
+ *并且若使用 了默认的 enableSelectCache,重复的被缓存命中的sql语句使用warn形式出现在firephp中
  *
  *一个数据库配置文件:
  &lt;?php
@@ -33,6 +35,15 @@ class rDB{
      public static $sqls=array();
      public static $pageLabel="p";//分页参数名称
      protected  static $defaultDbName="default";//默认数据库
+     protected static $enableSelectCache=true;//对 select 结果集进行缓存结果 
+     
+     /**
+      * 设置是否启用对select语句的查询缓存
+      * @param boolean $enable
+      */
+     public static function enableSelectCache($enable=true){
+         self::$enableSelectCache=$enable;
+     }
      
      /**
       * 获取一个PDO对象
@@ -139,6 +150,8 @@ class rDB{
         return $sth;
     }
     
+    
+    
     /**
      * 查询出所有的记录
      * @param string $sql
@@ -146,7 +159,7 @@ class rDB{
      * @param string $dbName
      */
     public static function queryAll($sql,$params=null,$dbName=null){
-        return self::execQuery($sql, $params,$dbName)->fetchAll();
+         return self::selectWithCache($sql,$params,$dbName,true);
     }
     /**
      * 执行一条查询sql，sql使用占位符
@@ -166,7 +179,40 @@ class rDB{
     * @param string $dbName  数据库表名
      */
     public static function query($sql,$params=null,$dbName=null){
-      return self::execQuery($sql, $params,$dbName)->fetch();
+        return self::selectWithCache($sql,$params,$dbName,false);
+    }
+    
+    /**
+     * 对select * from table_name where ... 的select 语句进行缓存查询
+     * 即保证对同一个数据库相同的sql、条件只会查询数据库一次. 
+     * @param string $sql
+     * @param string|array $params
+     * @param string $dbName
+     * @param bllean $fetchAll 是否获取全部结果集
+     */
+    protected  static function selectWithCache($sql,$params=null,$dbName=null,$fetchAll=true){
+        $cacheAble=self::$enableSelectCache;
+        //函数调用的不进行缓存 比如  SELECT FOUND_ROWS()
+        if($cacheAble && !preg_match("/\s+from\s+/i", $sql)){
+            $cacheAble=false;
+         }
+        if($cacheAble){
+            static $cache=array();
+            $key=$sql.serialize($params).$dbName;
+            $key=md5($key);
+            if(array_key_exists($key, $cache)){
+                self::_log($sql, $params,"warn");
+                return $cache[$key];
+             }
+        }
+       $sth=self::execQuery($sql, $params,$dbName);
+       $result=$fetchAll?$sth->fetchAll():$sth->fetch();
+        if($cacheAble){
+           if(count($result)>100)return $result;//结果集比较大时也不缓存
+           if(count($cache)>1000)array_shift($cache);//最多缓存1000条结果
+           $cache[$key]=$result;
+        }
+       return $result;
     }
     
     /**
@@ -374,7 +420,7 @@ class rDB{
      * @param string $sql
      * @param array $param
      */    
-    private static function _log($sql,$param){
+    private static function _log($sql,$param,$fbType="info"){
          if(!(defined("RARE_DEBUG") && RARE_DEBUG))return;
          if(class_exists("FB",true)){
            try{
@@ -383,7 +429,11 @@ class rDB{
                 FirePHP::addSkipFile(dirname(__FILE__)."/driver/mysql.class.php");
                 FirePHP::addSkipFile(dirname(__FILE__)."/driver/postgresql.class.php");
                 FirePHP::addSkipFile(dirname(__FILE__)."/driver/sqlite.class.php");
-                FB::info($tmp);    
+                if($fbType=="info"){
+                  FB::info($tmp);    
+                 }else{
+                   FB::warn($tmp);
+                  }
                 unset($tmp);
            }catch(Exception  $e){}
          }
