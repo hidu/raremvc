@@ -49,7 +49,7 @@ class sfPDOSessionStorage extends sfDatabaseSessionStorage
     }
     catch (PDOException $e)
     {
-      throw new sfDatabaseException(sprintf('PDOException was thrown when trying to manipulate session data. Message: %s', $e->getMessage()));
+      throw new Exception(sprintf('PDOException was thrown when trying to manipulate session data. Message: %s', $e->getMessage()));
     }
     
     return true;
@@ -79,7 +79,7 @@ class sfPDOSessionStorage extends sfDatabaseSessionStorage
     }
     catch (PDOException $e)
     {
-      throw new sfDatabaseException(sprintf('PDOException was thrown when trying to manipulate session data. Message: %s', $e->getMessage()));
+      throw new Exception(sprintf('PDOException was thrown when trying to manipulate session data. Message: %s', $e->getMessage()));
     }
 
     return true;
@@ -133,7 +133,7 @@ class sfPDOSessionStorage extends sfDatabaseSessionStorage
     }
     catch (PDOException $e)
     {
-      throw new sfDatabaseException(sprintf('PDOException was thrown when trying to manipulate session data. Message: %s', $e->getMessage()));
+      throw new Exception(sprintf('PDOException was thrown when trying to manipulate session data. Message: %s', $e->getMessage()));
     }
   }
 
@@ -166,7 +166,7 @@ class sfPDOSessionStorage extends sfDatabaseSessionStorage
     }
     catch (PDOException $e)
     {
-      throw new sfDatabaseException(sprintf('PDOException was thrown when trying to manipulate session data. Message: %s', $e->getMessage()));
+      throw new Exception(sprintf('PDOException was thrown when trying to manipulate session data. Message: %s', $e->getMessage()));
     }
 
     return true;
