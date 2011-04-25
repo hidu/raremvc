@@ -68,6 +68,19 @@ class rareRouter{
                      foreach ($actionUrl['_params'] as $k=>$v){
                           $tmp1[strtr($k,array("{"=>'',"}"=>''))]=urldecode(array_shift($matches[0]));
                        }
+                       
+                      //----------------------路由统一使用自定义方法进行确认
+                   //  class myRouter{
+                   //     public static function filterAll($path,$actionName,$param){
+                   //         //@todo 这里去做一些判断 当认为路由正确的时候 返回true 否则false
+                      //      } 
+                      //   }
+                   if(class_exists("myRouter") && method_exists('myRouter', "filterAll")){
+                       $filterAllFn=array('myRouter',"filterAll");
+                       if(false === call_user_func_array($filterAllFn, array($path,$actionName,$tmp1)))continue;
+                      }
+                      //=======================  
+                       
                      //---------------------
                      /*若路由配置中有配置fn(使用自定义还是进行确实地址),则运行相应函数
                      *example:

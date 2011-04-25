@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110419';                 //当前框架版本
+    private $version='1.2 20110425';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -40,7 +40,8 @@ class rareContext{
         define("RARE_APP_NAME", $this->appName);     
         define("RARE_ROOT_DIR", $this->rootDir);     //预定义 程序根目录
         define("RARE_APP_DIR",  $this->appDir);       //预定义 app根目录
-        header("rareMVC:".$this->version);
+        !PROD && header("rareMVC:".$this->version);
+        header_remove('X-Powered-By');
     }
     
     //创建一个rare app实例，在这里会注册类自动装载
@@ -139,11 +140,13 @@ class rareContext{
          }      
     }
     private function _errorPage($title,$msg){
-        ob_clean();
+        ob_end_clean();
+        @ob_clean();
         $html="<!DOCTYPE html><html><head><meta http-equiv='content-type' content='text/html;charset=".rareConfig::get('charset','utf-8')."'>".
                "<title>{$title}</title></head><body><p style='background:#3366cc;color:white;padding:5px;font-weight:bold;'>Error</p>".
-               "<h1>{$title}</h1>{$msg}<br/><br/><a href='".public_path("")."'>Go Home</a><p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
-        die($html);
+               "<h1>{$title}</h1><div  style='color:#000'>{$msg}</div><br/><br/><a href='".public_path("")."'>Go Home</a><p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
+       echo $html;
+       die();
     } 
      /**
       * 当http错误发生时，跳转到错误页面。
@@ -466,7 +469,29 @@ abstract class rareAction{
      * @param string $default  默认值
      */
     public function getRequestParam($key,$default=null){
-        return isset($_REQUEST[$key])?trim($_REQUEST[$key]):$default;
+        return isset($_REQUEST[$key])?$_REQUEST[$key]:$default;
+     }
+     
+    public function _getParam($key,$default=null){
+        return isset($_GET[$key])?$_GET[$key]:$default;
+     }
+     
+    public function _postParam($key,$default=null){
+        return isset($_POST[$key])?$_POST[$key]:$default;
+     }
+     /**
+      * 将变量赋值给模板
+      * @param string $key
+      * @param object $value
+      */
+    public function assign($key,$value=null){
+       if(is_array($key)){
+          foreach ($key as $_k=>$_v){
+            $this->vars[$_k]=$_v;
+            }
+        }else{
+           $this->vars[$key]=$value;
+        }
      }
     /**
      *execute 前执行的方法
