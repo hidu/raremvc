@@ -41,7 +41,8 @@ class rareContext{
         define("RARE_ROOT_DIR", $this->rootDir);     //预定义 程序根目录
         define("RARE_APP_DIR",  $this->appDir);       //预定义 app根目录
         !PROD && header("rareMVC:".$this->version);
-        header_remove('X-Powered-By');
+//        header_remove('X-Powered-By');
+        header("X-Powered-By:");
     }
     
     //创建一个rare app实例，在这里会注册类自动装载
