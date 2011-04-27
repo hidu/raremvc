@@ -74,8 +74,8 @@ class rHtml{
      return self::inputTag('text',$name,$value,$params);
    }
    
-   public static function input_hidden($name,$value){
-       return self::inputTag('hidden',$name,$value);
+   public static function input_hidden($name,$value,$params=""){
+       return self::inputTag('hidden',$name,$value,$params);
    }
    
    public static function input_file($name,$params=""){

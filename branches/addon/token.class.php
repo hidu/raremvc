@@ -18,11 +18,27 @@ class rToken{
    * @param $tokenName
    */
   public static function tokenHiddenInput($tokenName='token'){
-     $token= md5(uniqid(rand(), true));
-     $_SESSION[$tokenName]=$token;
+     $token=self::getToken($tokenName);
      $hidden="<input type='hidden' name='{$tokenName}' value='".$token."'/>";
      
     return self::$writeJs?self::_writeAsJs($hidden):$hidden;
+  }
+  
+  /**
+   * 获取token值
+   * @param string $tokenName
+   */
+  public static function getToken($tokenName='token'){
+      if(isset($_SESSION[':rToken'][$tokenName])){
+          $token=$_SESSION[':rToken'][$tokenName];
+      }else{
+         $token=substr(md5(uniqid(rand(), true)),8,8);
+         $_SESSION[':rToken'][$tokenName]=$token;
+         if(count($_SESSION[':rToken'])>127){//防止恶意打开过多页面.
+             array_shift($_SESSION[':rToken']);
+           }
+      }
+      return $token;
   }
   
   protected  static function _writeAsJs($html){
@@ -50,8 +66,8 @@ class rToken{
    */
   public static function check($tokenName='token',$requestMethod="post"){
     $token=($requestMethod=='post')?(isset($_POST[$tokenName])?$_POST[$tokenName]:null):(isset($_GET[$tokenName])?$_GET[$tokenName]:null);
-    if(empty($token) ||strlen($token)!=32)return false;
-    return isset($_SESSION[$tokenName]) && $token==$_SESSION[$tokenName];
+    if(empty($token) ||strlen($token)!=8)return false;
+    return isset($_SESSION[':rToken'][$tokenName]) && $token==$_SESSION[':rToken'][$tokenName];
   }
   
   /**
@@ -59,6 +75,6 @@ class rToken{
    * @param unknown_type $tokenName
    */
   public static function clear($tokenName='token'){
-     unset($_SESSION[$tokenName]);
+     unset($_SESSION[':rToken'][$tokenName]);
   }
 }
