@@ -192,6 +192,10 @@ class rDB{
      */
     protected  static function selectWithCache($sql,$params=null,$dbName=null,$fetchAll=true){
         $cacheAble=self::$enableSelectCache;
+        if(is_array($params) && isset($params[':nocache'])){
+            $cacheAble=false;
+            unset($params[':nocache']);
+         }
         //函数调用的不进行缓存 比如  SELECT FOUND_ROWS()
         if($cacheAble && !preg_match("/\s+from\s+/i", $sql)){
             $cacheAble=false;

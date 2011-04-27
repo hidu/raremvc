@@ -5,10 +5,29 @@
  *统一的用户SESSION基础类
  */
 class rUser{
-   const USER_ID="user_id";//用户ID
-   const USER_LOGONNAME='user_logonName';//用户登录帐号
-   const USER_REALNAME="user_realName";//用户真实名称、昵称
-   const USER_INFO="user_info";//用户详细信息
+   /**
+    * 用户ID
+    * @var int
+    */
+   const USER_ID="USER_ID";
+   
+   /**
+    * 用户登录帐号
+    * @var string
+    */
+   const USER_LOGONNAME='USER_logonName';
+   
+   /**
+    * 用户真实名称、昵称
+    * @var string
+    */
+   const USER_REALNAME="USER_realName";
+   
+   /**
+    * 用户详细信息,通常是对于用户表的一条信息
+    * @var array
+    */
+   const USER_INFO="USER_INFO";
    
    /**
     *是否登录 
