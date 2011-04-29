@@ -30,7 +30,25 @@ class rHtml{
      return '<textarea name="'.$name.'" '.self::_paramMerge(array('id'=>self::getIDByName($name)),$params,true).">".self::h($value)."</textarea>";
    }
    
-   public static function input_radio($name,$value,$options,$params=""){
+   
+   public static function radio($name,$customValue,$itemValue,$params=""){
+       $_param=array();
+       if($itemValue===true)$itemValue=$customValue;
+       if($customValue==$itemValue)$_param['checked']='true';
+       if(str_endWith($name,"[]")){
+           $_param['id']=self::getIDByName($name)."_".$itemValue;
+        }
+      return self::inputTag('radio',$name,$itemValue,$params,$_param);
+   }
+   
+   /**
+    * 
+    * @param string $name
+    * @param string $value  
+    * @param array $options
+    * @param string|array $params
+    */
+   public static function radio_group($name,$value,$options,$params=""){
        $html="";
        foreach ($options as $_k=>$_v){
            $_param=array();
@@ -41,33 +59,34 @@ class rHtml{
         return $html;
    }
    
-   public static function input_checkbox($name,$value,$options,$params=''){
+   public static function checkbox_group($name,$value,$options,$params=''){
       if(!is_array($options))$options=array($options=>'');
-      if(count($options)==1){
-          list($_k,$_v)=each($options);
+      if(!is_array($value))$value=explode(",",$value);
+      $html="";
+      foreach ($options as $_k=>$_v){
           $_param=array();
-          if($_k==$value)$_param['checked']="checked";
-          return "<label>".self::inputTag('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
-      }else{
-          if(!is_array($value))$value=explode(",",$value);
-          $html="";
-          foreach ($options as $_k=>$_v){
-              $_param=array();
-              if(in_array($_k, $value))$_param['checked']="checked";
-              $_param['id']=self::getIDByName($name)."_".$_k;
-              $html.="<label>".self::inputTag('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
-           }
-          return $html;
-      }
+          if(in_array($_k, $value))$_param['checked']="checked";
+          $_param['id']=self::getIDByName($name)."_".$_k;
+          $html.="<label>".self::inputTag('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
+       }
+      return $html;
    }
    
-   public static function checkbox($name,$value,$itemValue,$params=''){
+   /**
+    * 
+    * @param string $name
+    * @param string $value  用户输入的值，可能是数据库读取的
+    * @param string $itemValue 当前item的值
+    * @param string|array $params
+    */
+   public static function checkbox($name,$customValue,$itemValue,$params=''){
        $_param=array();
-       if($itemValue ===true || $value==$itemValue)$_param['checked']='true';
+       if($itemValue===true)$itemValue=$customValue;
+       if($customValue==$itemValue)$_param['checked']='true';
        if(str_endWith($name,"[]")){
-           $_param['id']=self::getIDByName($name)."_".$value;
+           $_param['id']=self::getIDByName($name)."_".$itemValue;
         }
-       return self::inputTag('checkbox',$name,$value,$params,$_param);
+       return self::inputTag('checkbox',$name,$itemValue,$params,$_param);
    }
    
    public static function input($name,$value="",$params=""){
@@ -78,11 +97,15 @@ class rHtml{
        return self::inputTag('hidden',$name,$value,$params);
    }
    
+   public static function hidden($name,$value,$params=""){
+       return self::inputTag('hidden',$name,$value,$params);
+   }
+   
    public static function input_file($name,$params=""){
       return self::inputTag('file',$name,"",$params);
    }
    
-   public static function input_password($name,$value='',$params=""){
+   public static function password($name,$value='',$params=""){
       return self::inputTag('password',$name,$value,$params);
    }
    
@@ -165,7 +188,13 @@ class rHtml{
             $_param['id']=self::getIDByName($name);
             }
        }
-       $param=self::_paramMerge($param, $_param,$paramMore,true);
+       $param=self::_paramMerge($param, $_param,$paramMore);
+       if(isset($param['class'])){
+         $param['class']="r-".$type." ".$param['class'];
+        }else{
+         $param['class']="r-".$type;
+        }
+        $param=self::_paramMerge($param,true);
      return "<input type=\"{$type}\" value=\"".self::h($value)."\" {$param} />";
    }
    
