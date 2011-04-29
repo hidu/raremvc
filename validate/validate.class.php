@@ -12,6 +12,11 @@ class rValidate{
   private $errorDetails=array();
   
   public function __construct($config){
+      if(is_string($config)){
+          $app=rareContext::getContext();
+          $configPath=$app->getModuleDir().$app->getModuleName()."/config/validate/".$config.".php";
+          $config=require $configPath;
+       }
      if(!is_array($config)){
           throw new Exception("config must be array");
       }
@@ -68,6 +73,11 @@ class rValidate{
       $html.="<li><label for='{$name}'>{$msg}</label></li>";
     }
     return $html."</ul>";
+  }
+  
+  public function getErrorsAsString(){
+    if(!$this->errors)return '';
+     return implode("\n", $this->errors);
   }
   
   /**

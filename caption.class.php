@@ -12,11 +12,17 @@ class rCaption{
      * @param string $caption
      */
     public static function check($caption){
-      return isset($_SESSION[self::$key]) && $caption==strtolower($_SESSION[self::$key]);
+      return isset($_SESSION[self::$key]) && strtoupper($caption)==$_SESSION[self::$key];
     }
     
     public static function clean(){
          unset($_SESSION[self::$key]);
+    }
+    /**
+     *返回当前session中的caption 
+     */
+    public static function getCode(){
+      return isset($_SESSION[self::$key])?$_SESSION[self::$key]:null;
     }
     
     /**
