@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110425';                 //当前框架版本
+    private $version='1.2 20110505';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -41,7 +41,7 @@ class rareContext{
         define("RARE_ROOT_DIR", $this->rootDir);     //预定义 程序根目录
         define("RARE_APP_DIR",  $this->appDir);       //预定义 app根目录
         !PROD && header("rareMVC:".$this->version);
-//        header_remove('X-Powered-By');
+//        header_remove('X-Powered-By');  //使用这个某版本php cgi 不支持
         header("X-Powered-By:");
     }
     
@@ -663,7 +663,7 @@ function public_path($uri,$full=false){
 
 /**
  * 获取一个组件
- * 组件的位置在templates/component/
+ * 组件的位置在 app/component/  或者 /lib/component/
  * @param string $name  组件名称
  * @param array $param  参数
  */
@@ -674,6 +674,9 @@ function fetch($name,$param=null){
        $param=rare_param_merge($tmp['query'], $param);
      }
     $componentFile=rareContext::getContext()->getComponentDir().trim($name,"/").".php";
+    if(!file_exists($componentFile)){
+      $componentFile=rareContext::getContext()->getRootLibDir()."component/".trim($name,"/").".php";
+    }
     return rareView::render($param, $componentFile);
 }
 //参数合并,将
