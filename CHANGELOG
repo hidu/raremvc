@@ -1,3 +1,7 @@
+20110505
+     1.升级component,现在组件支持多个app共用，之前默认只识别 /appName/component/ 目录下的组件，现在会尝试/lib/component/目录。
+       当在/appName/component/ 目录找不到组件再到 /lib/component/ 查找。两个目录下有同名组件，则使用/appName/component/下的。
+  
 20110425
     1.升级路由功能，在之前路由规则可以使用自定义函数确认的基础上添加了使用自定义类myRouter::filterAll来对所有路由地址进行确认
       使用该功能能帮助我们在对大量相似路由判断，如几乎所有url地址中包含全国所有城市的拼音，这是使用该方法可以更加快速的进行路由过滤。
