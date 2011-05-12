@@ -18,18 +18,19 @@ class rToken{
    * @param $tokenName
    */
   public static function tokenHiddenInput($tokenName='token'){
-     $token=self::getToken($tokenName);
+     $token=self::createToken($tokenName);
      $hidden="<input type='hidden' name='{$tokenName}' value='".$token."'/>";
      
     return self::$writeJs?self::_writeAsJs($hidden):$hidden;
   }
   
   /**
-   * 获取token值
+   * 获取一个新的token值
    * @param string $tokenName
+   * @param boolean $new 是否是新创建一个
    */
-  public static function getToken($tokenName='token'){
-      if(isset($_SESSION[':rToken'][$tokenName])){
+  public static function createToken($tokenName='token',$new=false){
+      if(isset($_SESSION[':rToken'][$tokenName]) && !$new){
           $token=$_SESSION[':rToken'][$tokenName];
       }else{
          $token=substr(md5(uniqid(rand(), true)),8,8);
@@ -40,6 +41,14 @@ class rToken{
       }
       return $token;
   }
+  
+  /**
+   * 获取session存储的token值
+   * @param string $tokenName
+   */
+   public static function getToken($tokenName='token'){
+     return isset($_SESSION[':rToken'][$tokenName])?$_SESSION[':rToken'][$tokenName]:null;
+   }
   
   protected  static function _writeAsJs($html){
      $_tmp=array();

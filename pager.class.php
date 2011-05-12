@@ -15,9 +15,10 @@ class rPager{
     
     private $label="p"; //页面 变量 $_GET 参数 
     private $uri;
-    private $startPage; //开始条数
-    private $endPage;   //结束条数
-    private $startNum;  
+    private $startPage; //开始页面
+    private $endPage;   //结束页面
+    private $startNum;
+    private $endNum;  
 
     /**
      * $pageInfo=array('total'=>1000,'size'=>10,"p"=>1);
@@ -53,12 +54,14 @@ class rPager{
       $subLinkNum=intval($this->linkNum/2);
       $this->startPage=max(min($this->page-$subLinkNum,$this->totalPage-$this->linkNum),1);
       $this->endPage=min(max($this->linkNum+1,$this->page+$subLinkNum),$this->totalPage);
+      $this->endNum=min($this->startNum+$this->size,$this->total);
    }
    
    public function __toString(){
       $this->_count();
-      if($this->totalPage<2)return "";
+//      if($this->totalPage<2)return "";
       $html="<div class='rarePager'><ul>";
+      $html.="<li>({$this->startNum}-{$this->endNum}|{$this->total})</li>";
       $html.="<li class='rarePager_first'><a".($this->page>1?(" href='".$this->makeUrl(1)."'"):"")."><span style='font-family:Webdings'>9</span></a></li>";
       $html.="<li class='rarePager_prev'><a".($this->page>1?(" href='".$this->makeUrl($this->page-1))."'":"")."><span style='font-family:Webdings'>7</span></a></li>";
       

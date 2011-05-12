@@ -283,21 +283,21 @@ class sfToolkit
 
   /**
    * Converts string to array
-   *
+   * duwei 20110511 fix for string like  $str="style='width:50px' data-curent=1" as the key has "-" in char
    * @param  string $string  the value to convert to array
-   *
+   * 
    * @return array
    */
   public static function stringToArray($string)
   {
     preg_match_all('/
-      \s*(\w+)              # key                               \\1
+      \s*([\w-]+)              # key                               \\1
       \s*=\s*               # =
       (\'|")?               # values may be included in \' or " \\2
       (.*?)                 # value                             \\3
       (?(2) \\2)            # matching \' or " if needed        \\4
       \s*(?:
-        (?=\w+\s*=) | \s*$  # followed by another key= or the end of the string
+        (?=[\w-]+\s*=) | \s*$  # followed by another key= or the end of the string
       )
     /x', $string, $matches, PREG_SET_ORDER);
 
