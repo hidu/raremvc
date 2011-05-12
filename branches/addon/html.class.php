@@ -35,9 +35,6 @@ class rHtml{
        $_param=array();
        if($itemValue===true)$itemValue=$customValue;
        if($customValue==$itemValue)$_param['checked']='true';
-       if(str_endWith($name,"[]")){
-           $_param['id']=self::getIDByName($name)."_".$itemValue;
-        }
       return self::inputTag('radio',$name,$itemValue,$params,$_param);
    }
    
@@ -49,26 +46,28 @@ class rHtml{
     * @param string|array $params
     */
    public static function radio_group($name,$value,$options,$params=""){
-       $html="";
+       $html="<span class='r_radio_group'>";
        foreach ($options as $_k=>$_v){
            $_param=array();
             $_param['id']=self::getIDByName($name)."_{$_k}";
            if($_k==$value)$_param['checked']="checked";
            $html.="<label>".self::inputTag('radio',$name,$_k,$params,$_param).self::h($_v)."</label>";
         }
+        $html.="</span>";
         return $html;
    }
    
    public static function checkbox_group($name,$value,$options,$params=''){
       if(!is_array($options))$options=array($options=>'');
       if(!is_array($value))$value=explode(",",$value);
-      $html="";
+      $html="<span class='r_checkbox_group'>";
       foreach ($options as $_k=>$_v){
           $_param=array();
           if(in_array($_k, $value))$_param['checked']="checked";
           $_param['id']=self::getIDByName($name)."_".$_k;
           $html.="<label>".self::inputTag('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
        }
+        $html.="</span>";
       return $html;
    }
    
@@ -83,10 +82,7 @@ class rHtml{
        $_param=array();
        if($itemValue===true)$itemValue=$customValue;
        if($customValue==$itemValue)$_param['checked']='true';
-       if(str_endWith($name,"[]")){
-           $_param['id']=self::getIDByName($name)."_".$itemValue;
-        }
-       return self::inputTag('checkbox',$name,$itemValue,$params,$_param);
+       return self::inputTag('checkbox',$name,$itemValue,$_param,$params);
    }
    
    public static function input($name,$value="",$params=""){
@@ -181,19 +177,18 @@ class rHtml{
     
    
    public static function inputTag($type='text',$name='',$value='',$param="",$paramMore=''){
-       $_param=array();
-       if($name){
-          $_param['name']=$name;
-          if(self::$autoID){
-            $_param['id']=self::getIDByName($name);
-            }
-       }
-       $param=self::_paramMerge($param, $_param,$paramMore);
+       $param=self::_paramMerge($param, $paramMore);
        if(isset($param['class'])){
          $param['class']="r-".$type." ".$param['class'];
         }else{
          $param['class']="r-".$type;
         }
+       if($name){
+          $param['name']=$name;
+          if(self::$autoID && !array_key_exists("id", $param) && !str_endWith($name, "[]")){
+            $param['id']=self::getIDByName($name);
+            }
+       }
         $param=self::_paramMerge($param,true);
      return "<input type=\"{$type}\" value=\"".self::h($value)."\" {$param} />";
    }
@@ -212,6 +207,7 @@ class rHtml{
          if($_param===true){
                $str="";
               foreach ($param as $_k=>$_v){
+                    if(is_null($_v))continue;
                     $str.=$_k.'="'.self::h($_v).'" ';
                  }
                return $str;
