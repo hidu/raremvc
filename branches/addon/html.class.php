@@ -34,7 +34,7 @@ class rHtml{
    public static function radio($name,$customValue,$itemValue,$params=""){
        $_param=array();
        if($itemValue===true)$itemValue=$customValue;
-       if($customValue==$itemValue)$_param['checked']='true';
+       if(strcmp($customValue, $itemValue)==0)$_param['checked']='true';
       return self::inputTag('radio',$name,$itemValue,$params,$_param);
    }
    
@@ -49,8 +49,7 @@ class rHtml{
        $html="<span class='r_radio_group'>";
        foreach ($options as $_k=>$_v){
            $_param=array();
-            $_param['id']=self::getIDByName($name)."_{$_k}";
-           if($_k==$value)$_param['checked']="checked";
+           if(strcmp($_k, $value)==0)$_param['checked']="checked";
            $html.="<label>".self::inputTag('radio',$name,$_k,$params,$_param).self::h($_v)."</label>";
         }
         $html.="</span>";
@@ -81,7 +80,7 @@ class rHtml{
    public static function checkbox($name,$customValue,$itemValue,$params=''){
        $_param=array();
        if($itemValue===true)$itemValue=$customValue;
-       if($customValue==$itemValue)$_param['checked']='true';
+       if(strcmp($customValue, $itemValue)==0)$_param['checked']='true';
        return self::inputTag('checkbox',$name,$itemValue,$_param,$params);
    }
    
@@ -185,10 +184,11 @@ class rHtml{
         }
        if($name){
           $param['name']=$name;
-          if(self::$autoID && !array_key_exists("id", $param) && !str_endWith($name, "[]")){
+          if(self::$autoID && !array_key_exists("id", $param) && !str_endWith($name, "]")){
             $param['id']=self::getIDByName($name);
             }
        }
+      
         $param=self::_paramMerge($param,true);
      return "<input type=\"{$type}\" value=\"".self::h($value)."\" {$param} />";
    }
@@ -199,7 +199,7 @@ class rHtml{
          $param=array();
          for($i=0;$i<$numargs;$i++){
             $_param=func_get_arg($i);
-            if($numargs-1==$i && $_param==true)continue;//最后一个参数为true
+            if($numargs-1==$i && $_param===true)continue;//最后一个参数为true,将所有数组按照字符串返回
            if(is_string($_param))$_param=sfToolkit::stringToArray($_param);
            if(!is_array($_param))$_param=array();
            $param=array_merge($param,$_param);
