@@ -1,6 +1,9 @@
 <?php
 /**
  * 表单验证
+ * 可以对该功能进行扩展，只需要新建一个类为 custom_Validate_rule，格式和rValidate_rule一样即可添加新规则
+ * @author duwei
+ * @package rara Addon
  */
 require_once dirname(__FILE__).'/type.class.php';
 require_once dirname(__FILE__).'/rule.class.php';
@@ -9,9 +12,9 @@ class rValidate{
   private $config;
   private $validate=true;
   private $errors=array();
-  private $errorDetails=array();
+  private $formData=array();
   
-  public function __construct($config){
+  public function __construct($config,$data){
       if(is_string($config)){
           $app=rareContext::getContext();
           $configPath=$app->getModuleDir().$app->getModuleName()."/config/validate/".$config.".php";
@@ -21,37 +24,58 @@ class rValidate{
           throw new Exception("config must be array");
       }
       $this->config=$config;
+      $this->validate($data);
   }
   
   /**
    * 进行验证
    * @param array $data 待验证的数据
    */
-  public function validate($data){
+  protected  function validate($data){
     $this->validate=true;
-    foreach ($this->config as $name=>$param){
-      $value=isset($data[$name])?$data[$name]:null;
-      foreach ($param['rule'] as $k=>$v){
-          $fn=$k;//规则名称
-          $_param=array($value);
-         if(is_int($k)){
-            $fn=$v;
-          }else{
-             if(is_array($v)){
-                 $_param=array_merge($_param,$v);
-             }else{
-                 $_param[]=$v;
-               }
-             $_param[]=$data;
-           }
-          if(!call_user_func_array(array('rValidate_rule',$fn), $_param)){
+    $this->formData=array();
+    
+    foreach ($this->config as $name=>$rules){
+      $value=isset($data[$name])?trim($data[$name]):null;
+      $this->formData[$name]=$value;
+      
+     foreach ($rules as $ruleName=>$v){
+           //for $rule['consignee'][rValidate_type::Required]  ="请填写收货人姓名！";
+           if(!is_array($v)){
+                $rules[$ruleName]=array(true,$v);
+             }
+          $this->config[$name]=$rules;
+      }
+      
+      foreach ($rules as $ruleName=>$v){
+           if(isset($this->errors[$name]) && array_key_exists(rValidate_type::Required,$this->errors[$name]))continue;
+             
+           $ruleParam=$v[0];  //array or int|string|....
+           $msg=$v[1];
+           
+           $_param=array($value);
+           $_param[]=$ruleParam;        
+           $_param[]=$data;       //最后一个参数为当前验证的所有的值 for fn like smallThan($value,$to,$all)
+           
+          if(class_exists("custom_Validate_rule",true) && method_exists("custom_Validate_rule", $ruleName)){
+             $validClass=array('custom_validate_rule',$ruleName);
+           }else{
+             $validClass=array('rValidate_rule',$ruleName);
+             }
+          if(!call_user_func_array($validClass, $_param)){
              $this->validate=false;
-             $this->errors[$name]=$param['msg'];
-             $this->errorDetails[$name][$fn]=isset($_param[1])?$_param[1]:'';
+             $this->errors[$name][$ruleName]=str_replace(array("{value}","{length}"),array($value,is_array($value)?count($value):mb_strlen($value)), $msg);
            }
        }
     }
-    return $this->validate;
+  }
+  
+  public function isValidate(){
+     return $this->validate;
+  }
+  
+  public function getFormData(){
+    return $this->formData;
   }
   
   /**
@@ -62,41 +86,37 @@ class rValidate{
     return $this->errors;
   }
   
+  public function addError($name,$error){
+    $this->validate=false;
+    $this->errors[$name][]=$error;
+  }
+  
   /**
    * 获取html格式化的错误详情 使用ul li label包裹
    * @return string 
    */
   public function getErrorsAsHtml(){
     if(!$this->errors)return '';
-    $html="<ul>";
+    $html="<dl>";
     foreach ($this->errors as $name=>$msg){
-      $html.="<li><label for='{$name}'>{$msg}</label></li>";
+      $label=isset($this->config[$name][rValidate_type::Label])?$this->config[$name][rValidate_type::Label][1]:"";
+      $html.="<dt>{$label}</dt>";
+      foreach ($msg as $fn=>$errorMsg){
+        $html.="<dd><label for='{$name}'>{$errorMsg}</label></dd>";
+       }
     }
-    return $html."</ul>";
+    return $html."</dl>";
   }
   
   public function getErrorsAsString(){
     if(!$this->errors)return '';
-     return implode("\n", $this->errors);
+    $msgs=array();
+    foreach ($this->errors as $name=>$msg){
+       $msgs=array_merge($msgs,array_values($msg));
+     }
+     return implode("\n", $msgs);
   }
   
-  /**
-   * 获取错误的详情  字段名称 对应 验证规则数组
-   * 可以知道是那条规则没有通过验证
-  * $errors => Array (1)
-   * (
-  *    [  title  ] => Array (2)
-   *    (
-  *    |    [  0  ] = String(8) "required"
-  *    |    [  1  ] = String(5) "email"
-   *    )
-   * )
-   * @param string $name
-   * @return array
-   */
-  public function getErrorDetail($name=null){
-    return $name?(isset($this->errorDetails[$name])?$this->errorDetails[$name]:array()):$this->errorDetails;
-  }
   
   /**
    * 返回 jQuery Validation Plugin 支持的验证规则
@@ -109,13 +129,9 @@ class rValidate{
   public function getJsRule($json=false){
     $jsRule=array();
     foreach($this->config as $name=>$subConfig){
-        foreach ($subConfig['rule'] as $k=>$v){
-           if(is_int($k)){
-             $jsRule['rules'][$name][$v]=true;
-            }else{
-             $jsRule['rules'][$name][$k]=$v;
-            }
-             $jsRule['messages'][$name]=$subConfig['msg'];
+        foreach ($subConfig as $ruleName=>$param){
+             $jsRule['rules'][$name][$ruleName]=$param[0];
+             $jsRule['messages'][$name]=$param[1];
          }
      }
      

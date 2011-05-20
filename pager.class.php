@@ -6,19 +6,19 @@
  *
  */
 class rPager{
-    private $total;      //总数
-    private $size;       //每页显示数量
-    private $linkNum=10;  //链接数量
-    private $page;       //当前页
+    protected  $total;      //总数
+    protected $size;       //每页显示数量
+    protected $linkNum=10;  //链接数量
+    protected $page;       //当前页
     
-    private $totalPage; //总页数
+    protected $totalPage; //总页数
     
-    private $label="p"; //页面 变量 $_GET 参数 
-    private $uri;
-    private $startPage; //开始页面
-    private $endPage;   //结束页面
-    private $startNum;
-    private $endNum;  
+    protected $label="p"; //页面 变量 $_GET 参数 
+    protected $uri;
+    protected $startPage; //开始页面
+    protected $endPage;   //结束页面
+    protected $startNum;
+    protected $endNum;  
 
     /**
      * $pageInfo=array('total'=>1000,'size'=>10,"p"=>1);
@@ -59,6 +59,7 @@ class rPager{
    
    public function __toString(){
       $this->_count();
+      if($this->total<1)return "";
 //      if($this->totalPage<2)return "";
       $html="<div class='rarePager'><ul>";
       $html.="<li>({$this->startNum}-{$this->endNum}|{$this->total})</li>";

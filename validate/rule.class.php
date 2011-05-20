@@ -209,4 +209,16 @@ class rValidate_rule{
   public static function regex($value,$regex){
     return !(!(preg_match($regex, $value)));
   }
+  
+  public static function any($value){
+     return true;
+  }
+
+  public static function equal($value,$equalValue){
+    return strcmp($value,$equalValue)==0;
+  }
+  
+  public static function label($value){
+    return true;
+  }
 }

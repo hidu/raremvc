@@ -258,7 +258,15 @@ class rDB{
         $pageInfo['page']=$page;
         $pageInfo['size']=$size;
         $pageInfo['total']=$total;
-        return array($list,new rPager($pageInfo));
+
+         //尝试使用自定义的分页类，该类需要和 rPager 有同样的api,该类名是 custom_rPager，可以是继承自 rPager
+         //若没有自定义的pager类则使用默认的 rPager类
+        $pagerClass="custom_rPager";
+        if(!class_exists($pagerClass,true)){
+          $pagerClass="rPager";
+         }
+        
+        return array($list,new $pagerClass($pageInfo));
      }
      
      public static function _runDriver($driverName,$fn,$params){
