@@ -51,6 +51,17 @@ class rUser{
       return self::get(self::USER_LOGONNAME,'');
    }
    
+   /**
+    * 获取真实姓名
+    * @param boolean $fill 当为空是返回登录名
+    * @return string
+    */
+   public static function getRealName($fill=false){
+      return self::get(self::USER_REALNAME,$fill?self::getLogonName():"");
+   }
+   
+   
+   
    public static function set($key,$value){
        $_SESSION[$key]=$value;
    }

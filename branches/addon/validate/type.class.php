@@ -121,5 +121,19 @@ class rValidate_type {
      */
     const Regex='regex';
     
+    /**
+     * 任意的
+     */
+    const Any="any";
+    
+    /**
+     * 值必须相等
+     */
+    const Equal="equal";
+    
+    /**
+     * 用来设置字段的名称
+     */
+    const Label="label";
 }
 ?>
