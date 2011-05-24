@@ -1,3 +1,11 @@
+20110524
+      1.改进rare_currentUri 方法，当传递的参数为空时(如rare_currentUri('p=&orderby='))，或者url地址中包值为空的参数时，将对应的key从参数中移除。
+        即url 不会出现p=&orderby= 之类的参数。
+      2.改进输出css和js时添加资源版本号时判断之前的地址中是否包含参数。
+        js版本号最终地址如下   jquery.js?v=20110524.js
+        css版本号最终地址如下  yui3.css?v=20110524.css
+        之前的版本号没有默认后缀
+        
 20110505
      1.升级component,现在组件支持多个app共用，之前默认只识别 /appName/component/ 目录下的组件，现在会尝试/lib/component/目录。
        当在/appName/component/ 目录找不到组件再到 /lib/component/ 查找。两个目录下有同名组件，则使用/appName/component/下的。
