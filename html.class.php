@@ -33,7 +33,7 @@ class rHtml{
    
    public static function radio($name,$customValue,$itemValue,$params=""){
        $_param=array();
-       if($itemValue===true)$itemValue=$customValue;
+       if($customValue===true)$customValue=$itemValue;
        if(strcmp($customValue, $itemValue)==0)$_param['checked']='true';
       return self::inputTag('radio',$name,$itemValue,$params,$_param);
    }
@@ -73,13 +73,13 @@ class rHtml{
    /**
     * 
     * @param string $name
-    * @param string $value  用户输入的值，可能是数据库读取的
+    * @param string $customValue  用户输入的值，可能是数据库读取的
     * @param string $itemValue 当前item的值
     * @param string|array $params
     */
    public static function checkbox($name,$customValue,$itemValue,$params=''){
        $_param=array();
-       if($itemValue===true)$itemValue=$customValue;
+       if($customValue===true)$customValue=$itemValue;
        if(strcmp($customValue, $itemValue)==0)$_param['checked']='true';
        return self::inputTag('checkbox',$name,$itemValue,$_param,$params);
    }
