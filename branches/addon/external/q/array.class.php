@@ -350,12 +350,27 @@ abstract class qArray
      * @param array $array 要排序的数组
      * @param string $keyname 排序的键
      * @param int $dir 排序方向
+     * @param boolean $emptyLast 将为空的数据放到后面而不是前面
      *
      * @return array 排序后的数组
      */
-    static function sortByCol($array, $keyname, $dir = SORT_ASC)
+    static function sortByCol($array, $keyname, $dir = SORT_ASC,$emptyLast=true)
     {
-        return self::sortByMultiCols($array, array($keyname => $dir));
+        $result= self::sortByMultiCols($array, array($keyname => $dir));
+        if(!$emptyLast)return $result;
+        $notEmpty=array();
+        $empty=array();
+        foreach ($result as $one){
+          if(!isset($one) || !strlen($one[$keyname])){
+              $empty[]=$one;
+          }else{
+                $notEmpty[]=$one;
+            }
+         }
+         unset($result);
+        return array_merge($notEmpty,$empty);
+         
+        
     }
 
     /**
