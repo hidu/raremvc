@@ -93,7 +93,7 @@ class rareRouter{
                      if(isset($actionUrl['fn'])){
                         $fn=explode("::", $actionUrl['fn']);
                         if(class_exists($fn[0],true)){
-                            if(!call_user_func_array($fn, array($path,$actionName,$tmp1)))continue;
+                            if(!call_user_func_array($fn, array($path,$actionName,&$tmp1)))continue;
                         }
                      }
                      //=====================
