@@ -36,7 +36,7 @@ class rValidate{
     $this->formData=array();
     
     foreach ($this->config as $name=>$rules){
-      $value=isset($data[$name])?trim($data[$name]):null;
+      $value=isset($data[$name])?(is_array($data[$name])?$data[$name]:trim($data[$name])):null;
       $this->formData[$name]=$value;
       
      foreach ($rules as $ruleName=>$v){
@@ -47,8 +47,21 @@ class rValidate{
           $this->config[$name]=$rules;
       }
       
+     $hasValue=is_array($value)?count($value):strlen($value);//是否有值  长度大于0
+      
+     //当规则有必填项验证时,进行必填项验证
+     if(array_key_exists(rValidate_type::Required,$rules)){
+        if(!rValidate_rule::required($value)){
+             $this->validate=false;
+             $this->errors[$name][rValidate_type::Required]=$rules[rValidate_type::Required][1];
+         }
+     }else if(!$hasValue){  //当规则无必填项 且值为空时不进行验证
+        continue;
+      }
+      
       foreach ($rules as $ruleName=>$v){
            if(isset($this->errors[$name]) && array_key_exists(rValidate_type::Required,$this->errors[$name]))continue;
+           if($ruleName == rValidate_type::Required)continue;
              
            $ruleParam=$v[0];  //array or int|string|....
            $msg=$v[1];

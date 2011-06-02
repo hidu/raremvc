@@ -405,5 +405,22 @@ abstract class qArray
         eval('array_multisort(' . $sortRule . '$rowset);');
         return $rowset;
     }
+    
+    /**
+     *将给定的数组按照其某项键值，以特定值的出现顺序排序 
+     * @param array $array
+     * @param string $fieldName
+     * @param array $values
+     */
+    public static function sortByColValues($array,$fieldName,$values){
+       $newArray=array();
+       $array=self::toHashmap($array, $fieldName);
+       foreach ($values as $val){
+          if(array_key_exists($val, $array)){
+             $newArray[]=$array[$val];
+          }
+        }
+        return $newArray;
+    }
 }
 

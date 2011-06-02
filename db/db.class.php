@@ -343,9 +343,7 @@ class rDB{
          foreach ($data as $k=>$v){
            if(is_int($k)){   //如  hitNum=hitNum+1，可以是直接的函数
                $tmp[]=$v;
-           }else if(is_numeric($v)){            // 'stateID'=>2
-               $tmp[]="`{$k}`=$v";
-           }else{           // 'title'=>'this is title'
+           }else{           //其他情况全部使用占位符 'title'=>'this is title'
                $tmp[]="`{$k}`=:k_{$k}";
                $param[":k_".$k]=$v;
              }

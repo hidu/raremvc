@@ -90,4 +90,35 @@ class rTookit{
       header_remove('Expires');
       header("Content-Type: text/javascript;charset=".rareConfig::get('charset','UTF-8'));
   }
+  
+  /**
+   * 将字符串按照中英文逗号，换行符进行拆分，返回数组或者 空格链接的字符串
+   * @param string $str
+   * @param boolean $asArray
+   */
+  public static function str2Words($str,$asArray=true){
+     $str=trim(preg_replace(array("/[，,]+/","/\s+/"), " ", $str));
+     if($asArray)return explode(" ", $str);
+     return $str;
+  }
+  
+ public static function thumbImage($srcPath,$distPath,$width,$height){
+       $imageSize=getimagesize($srcPath);
+       $w=$imageSize[0];
+       $h=$imageSize[1];
+       $saveWidth=$width;
+       $saveHeight=$height;
+       
+       switch($imageSize[2]){//取得背景图片的格式
+            case 1:$image = imagecreatefromgif($srcPath);break;
+            case 2:$image = imagecreatefromjpeg($srcPath);break;
+            case 3:$image = imagecreatefrompng($srcPath);break;
+            case 6:$image = imagecreatefromwbmp($srcPath);break;
+            default:return null;//不支持的格式则不做处理
+        }
+       $distImage=imagecreatetruecolor($saveWidth,$saveHeight);
+       imagecopyresampled($distImage,$image,0,0,0,0,$saveWidth,$saveHeight,$w,$h);
+       imagepng($distImage,$distPath);
+       imagedestroy($distImage);
+    }
 }
