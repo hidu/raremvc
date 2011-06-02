@@ -143,6 +143,8 @@ class FB
      */
     public static function send()
     {
+        if(!(defined("RARE_DEBUG") && RARE_DEBUG))return; //duwei
+        
         $instance = FirePHP::getInstance(true);
         $args = func_get_args();
         return call_user_func_array(array($instance,'fb'),$args);

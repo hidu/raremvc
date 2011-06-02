@@ -51,4 +51,13 @@ class rUpload{
          $mimeTypes=self::getImageMimeTypes();
          return array_key_exists($mime, $mimeTypes);
     }
+    
+    public static function checkIsImageByExt($file){
+      $pathInfo=pathinfo($file);
+      if(!isset($pathInfo['extension']))return false;
+      $ext=strtolower($pathInfo['extension']);
+      return in_array($ext, array('jpg','jpeg','png','gif','bmp'));
+    }
+    
+   
 }

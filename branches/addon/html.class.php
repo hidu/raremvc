@@ -130,7 +130,7 @@ class rHtml{
     * @param string $name
     * @param array|string $params
     */
-   public static function input_email($name,$params=''){
+   public static function input_email($name,$value,$params=''){
       return self::inputTag('email',$name,$value,$params);
    }
    
@@ -139,7 +139,7 @@ class rHtml{
     * @param string $name
     * @param mix $params
     */
-   public static function input_search($name,$params=''){
+   public static function input_search($name,$value,$params=''){
       return self::inputTag('search',$name,$value,$params);
    }
    
@@ -148,7 +148,7 @@ class rHtml{
     * @param string $name
     * @param mix $params
     */
-   public static function input_url($name,$params=''){
+   public static function input_url($name,$value,$params=''){
       return self::inputTag('url',$name,$value,$params);
    }
    

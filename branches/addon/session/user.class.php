@@ -78,5 +78,14 @@ class rUser{
        return self::get(RARE_APP_NAME."/".$key,$default);
    }
    
-   
+   /**
+    * 清除指定sessionID的session数据
+    * @param string $sessionID
+    */
+   public static function destoryOtherSession($sessionID,$sessionName=null){
+         if(is_null($sessionName))$sessionName=session_name();
+         if(function_exists("proc_open")){
+             proc_close(proc_open("php ".dirname(__FILE__)."/_destroy.php ".$sessionName." ".$sessionID." &",array(), $foo));
+          }
+   }
 }

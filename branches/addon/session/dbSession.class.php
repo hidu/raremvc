@@ -22,7 +22,6 @@ class rDbSession{
           'db_id_col'   => 'sess_id',
           'db_data_col' => 'sess_data',
           'db_time_col' => 'sess_time',
-          'db_uid_col'  => 'uid',
           'lifetime'  => ini_get('session.gc_maxlifetime'),
         ), $options);
        $this->options=$options;
@@ -90,7 +89,6 @@ class rDbSession{
         $db_data_col = $this->options['db_data_col'];
         $db_id_col   = $this->options['db_id_col'];
         $db_time_col = $this->options['db_time_col'];
-        $db_uid_col = $this->options['db_uid_col'];
 
         $sql = 'SELECT '.$db_data_col.' FROM '.$db_table.' WHERE '.$db_id_col.'=?';
 
@@ -102,7 +100,7 @@ class rDbSession{
         if (count($sessionRows) == 1){
             return $sessionRows[0][0];
         }else{
-            $sql = 'INSERT INTO '.$db_table.'('.$db_id_col.', '.$db_data_col.', '.$db_time_col.','.$db_uid_col.') VALUES (?, ?, ?,"")';
+            $sql = 'INSERT INTO '.$db_table.'('.$db_id_col.', '.$db_data_col.', '.$db_time_col.') VALUES (?, ?, ?)';
 
         $stmt = $this->pdo->prepare($sql);
         $stmt->bindParam(1, $id, PDO::PARAM_STR);
@@ -129,37 +127,4 @@ class rDbSession{
         return true;
     }
     
-     /**
-      * 设置当前session的uid
-     * @param $uid
-      */
-    public function setUid($uid){
-        $id=session_id();
-        $db_table    = $this->options['db_table'];
-        $db_id_col   = $this->options['db_id_col'];
-        $db_time_col = $this->options['db_time_col'];
-        $db_uid_col = $this->options['db_uid_col'];
-
-        $sql = 'UPDATE '.$db_table.' SET '.$db_uid_col.' = ?, '.$db_time_col.' = '.time().' WHERE '.$db_id_col.'= ?';
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(1, $uid, PDO::PARAM_STR);
-        $stmt->bindValue(2, $id, PDO::PARAM_STR);
-        $stmt->execute();
-     }
-    
-  /**
-   * 根据用户id删除session
-   * @param int $uid
-   */
-   public function destroyByUid($uid) {
-        $db_table  = $this->options['db_table'];
-        $db_uid_col = $this->options['db_uid_col'];
-    
-        $sql = 'DELETE FROM '.$db_table.' WHERE '.$db_uid_col.'= ?';
-
-        $stmt = $this->pdo->prepare($sql);
-        $stmt->bindParam(1, $uid, PDO::PARAM_STR);
-        $stmt->execute();
-        return true;
-  }
 }
