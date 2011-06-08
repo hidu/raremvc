@@ -669,11 +669,13 @@ function public_path($uri,$full=false){
  */
 function fetch($name,$param=null){
     $tmp=parse_url($name);
-    $name=$tmp['path'];
+    $name=trim($tmp['path'],"/");
     if(isset($tmp['query'])){
        $param=rare_param_merge($tmp['query'], $param);
      }
-    $componentFile=rareContext::getContext()->getComponentDir().trim($name,"/").".php";
+    _rare_runHook('fetch', array($name,$param));
+     
+    $componentFile=rareContext::getContext()->getComponentDir().$name.".php";
     if(!file_exists($componentFile)){
       $componentFile=rareContext::getContext()->getRootLibDir()."component/".trim($name,"/").".php";
     }
@@ -730,11 +732,11 @@ function jsonReturn($status=1,$info="",$data="",$header=true){
 }
 //字符串是否以指定值结尾
 function str_endWith($str,$subStr){
-    return substr($str, -(strlen($subStr)))==$subStr;
+    return strcmp(substr($str, -(strlen($subStr))),$subStr)==0;
 }
 //字符串是否以指定值开始
 function str_startWith($str,$subStr){
-    return substr($str, 0,(strlen($subStr)))==$subStr;
+    return strcmp(substr($str, 0,(strlen($subStr))),$subStr)==0;
 }
 //内部地址跳转
 function forward($uri){
