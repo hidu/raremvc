@@ -1,3 +1,8 @@
+20110608
+      添加cli.php用来在cli模式下运行程序的模块
+      给fetch方法添加hook功能。
+      str_endWith 和str_startWith 采用strcmp进行比较。
+
 20110524
       1.改进rare_currentUri 方法，当传递的参数为空时(如rare_currentUri('p=&orderby='))，或者url地址中包值为空的参数时，将对应的key从参数中移除。
         即url 不会出现p=&orderby= 之类的参数。
