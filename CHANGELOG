@@ -1,3 +1,5 @@
+20110616
+      给rareAction添加了fetch方法用来获取渲染模版的内容：原来display方法的部分功能。
 20110608
       添加cli.php用来在cli模式下运行程序的模块
       给fetch方法添加hook功能。

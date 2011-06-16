@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110524';                 //当前框架版本
+    private $version='1.2 20110616';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -542,7 +542,22 @@ abstract class rareAction{
     public function display($viewFile=null){
         if($this->isRender)return;
         $this->isRender=true;
-        if(!empty($viewFile) && is_string($viewFile)){
+        $body=$this->fetch($viewFile);
+        $layoutFile=$this->getLayoutFile();
+        if($layoutFile){
+            chdir(dirname($layoutFile));
+            include($layoutFile);
+        }else{
+            echo $body;
+        }
+    }
+    
+    /**
+     *渲染指定模版 并返回内容 
+     * @param $viewFile
+     */
+    public function fetch($viewFile=null){
+       if(!empty($viewFile) && is_string($viewFile)){
             $pathArray=explode("/",$viewFile);
             if(count($pathArray)==1){
                $moduleName=$this->moduleName;
@@ -552,16 +567,9 @@ abstract class rareAction{
               }
             $this->viewFile=$this->context->getModuleDir().$moduleName."/view/".join("/", $pathArray).".php";
         }
-        if(!file_exists($this->viewFile))return;
-        $body=rareView::render($this->vars, $this->viewFile);
-        $layoutFile=$this->getLayoutFile();
-        if($layoutFile){
-            chdir(dirname($layoutFile));
-            include($layoutFile);
-        }else{
-            echo $body;
-        }
-    }
+      if(!file_exists($this->viewFile))return;
+      return rareView::render($this->vars, $this->viewFile);
+     }
 }
 /**
  * 配置操作类，设置、读者指定的配置文件
