@@ -40,6 +40,7 @@ function rcli($indexFile,$uri,$urlPrex='',$method='get'){
       }
      
       $_SERVER['REQUEST_METHOD']=strtoupper($method);
+      chdir(dirname($indexFile));
       include_once $indexFile;
   }
 }
