@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110616';                 //当前框架版本
+    private $version='1.2 20110623';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -681,13 +681,23 @@ function fetch($name,$param=null){
     if(isset($tmp['query'])){
        $param=rare_param_merge($tmp['query'], $param);
      }
-    _rare_runHook('fetch', array($name,$param));
+     /**
+      *若myHook::fetch 有返回值，则 直接返回返回值
+      *用处：如不修改之前的代码 实现 组件添加缓存功能 可以和 下面的 myHook::fetch_render 结合使用
+      */
+    $result=_rare_runHook('fetch', array($name,$param));
+    if($result !=null)return $result;
      
     $componentFile=rareContext::getContext()->getComponentDir().$name.".php";
     if(!file_exists($componentFile)){
       $componentFile=rareContext::getContext()->getRootLibDir()."component/".trim($name,"/").".php";
     }
-    return rareView::render($param, $componentFile);
+    $html=rareView::render($param, $componentFile);
+    
+    $result=_rare_runHook('fetch_render', array($name,$param,$html));
+    if($result !=null)$html=$result;
+    
+    return $html;
 }
 //参数合并,将
 function rare_param_merge(){
@@ -732,11 +742,12 @@ function jsonReturn($status=1,$info="",$data="",$header=true){
   $json['s']=$status;
   $json['i']=$info;
   $json['d']=$data;
-  if($header){
+  if($header && rareConfig::get('json_header',true)){
      header("Content-Type:application/json;charset=".rareConfig::get('charset','utf-8'));
   }
   ob_clean();//clear output:Notice and others
-  die(json_encode($json));
+  echo json_encode($json);
+  die();
 }
 //字符串是否以指定值结尾
 function str_endWith($str,$subStr){
@@ -782,6 +793,9 @@ function rare_currentUri($param="",$full=false){
       return $host.($param?$p['path']."?".$param:$p['path']);
 }
 
+/**
+ * 注意SERVER_NAME 和HTTP_HOST 的区别:port!=80是 如port=81  HTTP_HOST=hongtao3.com:81
+ */
 function rare_httpHost(){
     $host= 'http://'.$_SERVER['SERVER_NAME'];
     if(80 != $_SERVER['SERVER_PORT'] ){
@@ -800,7 +814,7 @@ function _rare_isUrl($url){
 //run user hook function if myHook class exist,it will run auto
 function _rare_runHook($funName,$params){
   if(class_exists("myHook",true) && method_exists("myHook", $funName))
-   call_user_func_array(array('myHook',$funName),$params);
+   return call_user_func_array(array('myHook',$funName),$params);
 }
 
 function rare_go404If($condition=true){
