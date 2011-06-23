@@ -1,5 +1,18 @@
+20110623
+    1.改进 组件调用功能：fetch的hook功能增强。
+     1.1 myHook::fetch($name,$param) 若返回值不为null,则不再执行后面的实际渲染组件模板的功能
+      1.2 添加钩子 myHook::fetch_render($name,$param,$html) 比上面的钩子要多一个参数 $html,此参数为 当前组件渲染后得到的html代码
+       若返回值不为null,组件实际返回该函数的返回值。
+       
+      这两个钩子可以结合一起使用，如给组件添加缓存机制（不修改之前组件的代码）,在 myHook::fetch 中判断是否有缓存，有的话直接返回，没有的话 
+      在 myHook::fetch_render中设置缓存
+    2.改进 jsonReturn 的输出 Content-Type:application/json;的header 添加了配置参数控制 json_header，即在默认配置文件中定义  json_header=false 所有的地方调用
+       jsonReturn都不会输出该header信息。不建议设置 json_header=false。
+       参见 20110413的修改。
+
 20110616
-      给rareAction添加了fetch方法用来获取渲染模版的内容：原来display方法的部分功能。
+     增强 给rareAction添加了fetch方法用来获取渲染模版的内容：原来display方法的部分功能。
+      
 20110608
       添加cli.php用来在cli模式下运行程序的模块
       给fetch方法添加hook功能。
