@@ -1,12 +1,15 @@
 20110623
     1.改进 组件调用功能：fetch的hook功能增强。
      1.1 myHook::fetch($name,$param) 若返回值不为null,则不再执行后面的实际渲染组件模板的功能
-      1.2 添加钩子 myHook::fetch_render($name,$param,$html) 比上面的钩子要多一个参数 $html,此参数为 当前组件渲染后得到的html代码
-       若返回值不为null,组件实际返回该函数的返回值。
+      1.2 添加钩子 myHook::fetch_render($name,$param,$html) 比上面的钩子要多一个参数 $html,
+         此参数为 当前组件渲染后得到的html代码
+         若返回值不为null,组件实际返回该函数的返回值。
        
-      这两个钩子可以结合一起使用，如给组件添加缓存机制（不修改之前组件的代码）,在 myHook::fetch 中判断是否有缓存，有的话直接返回，没有的话 
-      在 myHook::fetch_render中设置缓存
-    2.改进 jsonReturn 的输出 Content-Type:application/json;的header 添加了配置参数控制 json_header，即在默认配置文件中定义  json_header=false 所有的地方调用
+      这两个钩子可以结合一起使用，如给组件添加缓存机制（不修改之前组件的代码）,在 myHook::fetch 
+      中判断是否有缓存，有的话直接返回，没有的话在 myHook::fetch_render中设置缓存
+
+    2.改进 jsonReturn 的输出 Content-Type:application/json;的header 添加了配置参数控制 json_header，
+	即在默认配置文件中定义  json_header=false 所有的地方调用
        jsonReturn都不会输出该header信息。不建议设置 json_header=false。
        参见 20110413的修改。
 
@@ -19,7 +22,8 @@
       str_endWith 和str_startWith 采用strcmp进行比较。
 
 20110524
-      1.改进rare_currentUri 方法，当传递的参数为空时(如rare_currentUri('p=&orderby='))，或者url地址中包值为空的参数时，将对应的key从参数中移除。
+      1.改进rare_currentUri 方法，当传递的参数为空时(如rare_currentUri('p=&orderby='))，
+        或者url地址中包值为空的参数时，将对应的key从参数中移除。
         即url 不会出现p=&orderby= 之类的参数。
       2.改进输出css和js时添加资源版本号时判断之前的地址中是否包含参数。
         js版本号最终地址如下   jquery.js?v=20110524.js
@@ -27,12 +31,16 @@
         之前的版本号没有默认后缀
         
 20110505
-     1.升级component,现在组件支持多个app共用，之前默认只识别 /appName/component/ 目录下的组件，现在会尝试/lib/component/目录。
-       当在/appName/component/ 目录找不到组件再到 /lib/component/ 查找。两个目录下有同名组件，则使用/appName/component/下的。
+     1.升级component,现在组件支持多个app共用，之前默认只识别 /appName/component/ 目录下的组件，
+       现在会尝试/lib/component/目录。
+       当在/appName/component/ 目录找不到组件再到 /lib/component/ 查找。
+        两个目录下有同名组件，则使用/appName/component/下的。
   
 20110425
-    1.升级路由功能，在之前路由规则可以使用自定义函数确认的基础上添加了使用自定义类myRouter::filterAll来对所有路由地址进行确认
-      使用该功能能帮助我们在对大量相似路由判断，如几乎所有url地址中包含全国所有城市的拼音，这是使用该方法可以更加快速的进行路由过滤。
+    1.升级路由功能，在之前路由规则可以使用自定义函数确认的基础上添加了使用自定义类
+     myRouter::filterAll来对所有路由地址进行确认。
+      使用该功能能帮助我们在对大量相似路由判断，如几乎所有url地址中包含全国所有城市的拼音，
+     这时使用该方法可以更加快速的进行路由过滤。
     2.rareAction添加了  _getParam（获取一个get值）、_postParam（获取一个post值）方法
     3.rareAction 添加了assign方法 进行模板赋值
      4.输出错误页面(404,500)时，强制清空之前待输出的内容
