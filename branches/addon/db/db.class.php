@@ -44,6 +44,12 @@ class rDB{
      public static function enableSelectCache($enable=true){
          self::$enableSelectCache=$enable;
      }
+     /**
+      *返回当前的select cache 状态 
+      */
+     public static function isCacheAble(){
+       return self::$enableSelectCache;
+     }
      
      /**
       * 获取一个PDO对象
@@ -434,7 +440,11 @@ class rDB{
          if(!(defined("RARE_DEBUG") && RARE_DEBUG))return;
          if(class_exists("FB",true)){
            try{
-                $tmp=array('sql'=>$sql,'param'=>$param);
+                if($param){
+                   $tmp=array('sql'=>$sql,'param'=>$param);
+                 }else{
+                   $tmp=$sql;
+                    }  
                 FirePHP::addSkipFile(__FILE__);
                 FirePHP::addSkipFile(dirname(__FILE__)."/driver/mysql.class.php");
                 FirePHP::addSkipFile(dirname(__FILE__)."/driver/postgresql.class.php");

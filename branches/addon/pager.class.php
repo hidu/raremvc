@@ -60,9 +60,9 @@ class rPager{
    public function __toString(){
       $this->_count();
       if($this->total<1)return "";
-//      if($this->totalPage<2)return "";
+      if($this->totalPage<2)return "";
       $html="<div class='rarePager'><ul>";
-      $html.="<li>({$this->startNum}-{$this->endNum}|{$this->total})</li>";
+      $html.="<li class='rarePager_info'>({$this->startNum}-{$this->endNum}|{$this->total})</li>";
       $html.="<li class='rarePager_first'><a".($this->page>1?(" href='".$this->makeUrl(1)."'"):"")."><span style='font-family:Webdings'>9</span></a></li>";
       $html.="<li class='rarePager_prev'><a".($this->page>1?(" href='".$this->makeUrl($this->page-1))."'":"")."><span style='font-family:Webdings'>7</span></a></li>";
       

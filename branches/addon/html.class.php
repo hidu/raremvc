@@ -228,5 +228,27 @@ class rHtml{
          }
          return $html."</datalist>";
     }
+    
+    /**
+     * 
+     * @param string $url
+     * @param array $params
+     * @param string $charset
+     */
+    public static function post2Url($url,$params=array(),$charset="utf-8"){
+       @ob_end_clean();
+       @ob_clean();
+       header("Content-Type:text/html; charset=$charset"); 
+       $html="<html><head><meta http-equiv='Content-Type' content='text/html; charset=$charset' /></head>".
+             "<body onload='document.rareformpost2url.submit()'>";
+       $html.="<form action='{$url}' method='post' name='rareformpost2url'>";
+       foreach ($params as $k=>$v){
+          $html.=self::hidden($k, $v);
+        }
+       $html.="</form>";
+       $html.="</body></html>";
+       echo $html;
+       die;
+    }
    
 }
