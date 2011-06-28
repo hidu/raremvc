@@ -19,6 +19,8 @@ class rPager{
     protected $endPage;   //结束页面
     protected $startNum;
     protected $endNum;  
+    
+    protected  $_curLineNum=0;//当前的行号
 
     /**
      * $pageInfo=array('total'=>1000,'size'=>10,"p"=>1);
@@ -41,13 +43,26 @@ class rPager{
      return $this->totalPage;
    }
    
+   /**
+    * 获取当前行号的编号
+    * @param boolean $rev 是否倒计数
+    */
+   public function getLineNum($rev=false){
+      $this->_curLineNum++;
+      return $rev?($this->getTotalNum()-$this->getStartNum()-$this->_curLineNum+2):$this->getStartNum()+$this->_curLineNum-1;
+   }
+   
+   public function getTotalNum(){
+     return $this->total;
+   }
+   
    public function __set($key,$value){
      $this->$key=$value;
      $this->_count();
      return $this;
    }
    
-   private function _count(){
+   protected  function _count(){
       $this->totalPage=ceil($this->total/$this->size);
       if($this->page>$this->totalPage)$this->page=$this->totalPage;
       $this->startNum=($this->page-1)*$this->size+1;
