@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110623';                 //当前框架版本
+    private $version='1.2 20110629';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -358,7 +358,7 @@ class rareView{
      */
     public static function setTitle($title,$clean=false){
         if(!$clean) $title=$title."-".rareConfig::get("title","rare app");
-        rareConfig::set('title', $title);
+        rareConfig::set('title', trim($title,"-"));
     }
     /**
      *添加js 文件
@@ -432,8 +432,11 @@ class rareView{
     public static function include_title(){
         echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=".rareConfig::get('charset','utf-8')."\" />\n";
         echo "<title>".htmlspecialchars(rareConfig::get("title","rare app"))."</title>\n";
-         if($keywords=rareConfig::get('meta.keywords'))echo "<meta name=\"keywords\" content=\"".htmlspecialchars($keywords)."\" />\n";
-         if($description=rareConfig::get('meta.description'))echo "<meta name=\"description\" content=\"".htmlspecialchars($description)."\" />\n";
+       foreach (rareConfig::getAll() as $key=>$value){
+           if(preg_match("/^meta\.(.+)$/", $key,$matches)){
+               echo "<meta name=\"$matches[1]\" content=\"".htmlspecialchars($value)."\" />\n";
+             }
+         }
     }
      //设置meta 的关键词
     public static function setMeta_keywords($keywords){
@@ -451,12 +454,12 @@ class rareView{
 abstract class rareAction{
     protected  $context;
     protected  $layout=null;
-    protected  $layoutForce=false;//是否强制在任何情况下都使用layout
-    public     $vars;
+    protected  $layoutForce=false;//是否强制在任何情况下都使用layout,主要是针对在ajax方式调用是仍然需要使用layout的情况
+    public     $vars;             //赋值给模板的所有的变量   
     protected  $viewFile;
     protected  $moduleName;
     protected  $actionName;
-    protected  $isRender=false;
+    protected  $isRender=false;  //是否进行过模板渲染,display方法调用后设置为true
 
     public function __construct($moduleName,$actionName){
         $this->context=rareContext::getContext();
