@@ -3,6 +3,8 @@
      之前只能输出定义的meta.keywords和meta.description,现在可以输出定义在配置文件中所有以meta.开头的meta信息,
      如可以定义meta.msapplication-tooltip="rare php框架"。
      
+     改进 user_helper可以同时调用多个 user_helper("common,html");使用英文,分割
+     
 20110623
     1.改进 组件调用功能：fetch的hook功能增强。
      1.1 myHook::fetch($name,$param) 若返回值不为null,则不再执行后面的实际渲染组件模板的功能

@@ -720,14 +720,18 @@ function rare_param_merge(){
  */
 function use_helper($helper){
     static $helpers=array();
-    if(in_array($helper, $helpers))return;
-    $helperFile=rareContext::getContext()->getAppLibDir()."helper/".$helper.".php";
-    if(!file_exists($helperFile)){
-        $helperFile=rareContext::getContext()->getRootLibDir()."helper/".$helper.".php";
-        if(!file_exists($helperFile))die("can not find helper ".$helper);
+    $helperNames=explode(",", $helper);
+    foreach ($helperNames as $helper){
+      if(in_array($helper, $helpers))return;
+      $helperFile=rareContext::getContext()->getAppLibDir()."helper/".$helper.".php";
+      if(!file_exists($helperFile)){
+          $helperFile=rareContext::getContext()->getRootLibDir()."helper/".$helper.".php";
+          if(!file_exists($helperFile))die("can not find helper ".$helper);
+      }
+      include $helperFile;
+      $helpers[]=$helper;
     }
-    include $helperFile;
-    $helpers[]=$helper;
+    unset($helperNames);
 }
 //检查目录是否存在，不存在则创建
 function directory($dir){
