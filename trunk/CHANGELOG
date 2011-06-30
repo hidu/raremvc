@@ -1,3 +1,7 @@
+20110630
+     增加 rare_include($filePath,$params=null,$return=false)方法,
+          用于 包含指定的文件 可以用在视图文件中包含 子文件，能够对局部变量进行有效的隔离
+          对视图文件进行拆分时非常有用,可以用来替换默认的 include方法
 20110629
      改进 配置rareView::include_title()输出meta 信息的方式，
      之前只能输出定义的meta.keywords和meta.description,现在可以输出定义在配置文件中所有以meta.开头的meta信息,
