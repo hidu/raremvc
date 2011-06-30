@@ -30,6 +30,7 @@ class rareContext{
     private $version='1.2 20110630';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
+    private $suffix;                                 //地址后缀        
 
     private static $instance;                         //app实例    
         
@@ -104,12 +105,25 @@ class rareContext{
     }
     //解析url地址
     private function parseRequest(){
+        $requestUri=$_SERVER['REQUEST_URI'];
+         ///---------------------------------------------------------------
+         //get and check the suffix
+        $tmp=parse_url($requestUri);
+        preg_match("/\.(.*)$/", $tmp['path'],$matches);
+        $this->suffix=($matches && isset($matches[1]))?$matches[1]:null;
+        rare_go404If($this->suffix==='');
+        $suffix_accept=rareConfig::get('suffix_accept',null);
+        if($suffix_accept){
+            rare_go404If(!in_array($this->suffix, $suffix_accept));
+         }
+         //==================================================================
+        
         $this->webRoot=substr($_SERVER['SCRIPT_NAME'],0,strrpos($_SERVER['SCRIPT_NAME'],"/")+1);
         $pathInfo=pathinfo($_SERVER['SCRIPT_NAME']);
         $this->scriptName=$pathInfo["basename"];
         $this->webRootUrl=rare_httpHost().$this->webRoot;
 
-        $requestUri=$_SERVER['REQUEST_URI'];
+          
         $this->uri=trim(substr($requestUri, strlen($this->webRoot)),"/");
         $scriptNamelen=strlen($this->scriptName);
         if(substr($this->uri, 0,$scriptNamelen)==$this->scriptName){

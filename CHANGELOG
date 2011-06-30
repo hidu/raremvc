@@ -2,6 +2,9 @@
      增加 rare_include($filePath,$params=null,$return=false)方法,
           用于 包含指定的文件 可以用在视图文件中包含 子文件，能够对局部变量进行有效的隔离
           对视图文件进行拆分时非常有用,可以用来替换默认的 include方法
+     增强  默认配置 可以定义 suffix_accept 用来限定允许接受的地址后缀（数组）如array(null,'html','json');
+          若路由配置文件中定义了地址的后缀，则必须请求的地址后缀和定义的后缀必须一致才能路由匹配成功。
+               
 20110629
      改进 配置rareView::include_title()输出meta 信息的方式，
      之前只能输出定义的meta.keywords和meta.description,现在可以输出定义在配置文件中所有以meta.开头的meta信息,
