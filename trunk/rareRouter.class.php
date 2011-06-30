@@ -58,11 +58,20 @@ class rareRouter{
        if(!self::$config)return $uri;
        $tmp=parse_url($uri);
        $path=isset($tmp['path'])?trim($tmp['path'],"/"):"index/index";
-       $path=preg_replace("/\.\w*$/", "", $path);
+       preg_match("/\.(.*)$/", $path,$suffixMatches);
+       $suffix=isset($suffixMatches[1])?$suffixMatches[1]:null;
+       
+       $path=preg_replace("/\..*$/", "", $path);
        foreach (self::$config as $actionName=>$action){
            foreach ($action as $actionUrl){
                if(preg_match_all("#^".$actionUrl['url_reg']."$#",$path,$matches,PREG_SET_ORDER)){
-                     
+                 
+                        //若在路由中定义了 后缀，则 访问地址的后缀必须和定义的一致
+                    if(isset($actionUrl['suffix']) && strlen($actionUrl['suffix']) && $actionUrl['suffix']!=$suffix){
+                          continue;
+                       }
+                          
+                    
                      array_shift($matches[0]);
                      $tmp1=array();
                      foreach ($actionUrl['_params'] as $k=>$v){
