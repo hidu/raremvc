@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110629';                 //当前框架版本
+    private $version='1.2 20110630';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
 
@@ -702,7 +702,15 @@ function fetch($name,$param=null){
     
     return $html;
 }
-//参数合并,将
+/**
+ *参数合并 
+ *@example
+ *  $a="a=1&b=2&c=3";
+ *  $b=array('d'=>4,'a'=>'aaa');
+ *  $c=rare_param_merge($a,$b);
+ *  ---->
+ *  $c=array('a'=>'aaa',$b=>'2','c'=>'3','d'=>4);
+ */
 function rare_param_merge(){
      $numargs = func_num_args();
      $param=array();
@@ -722,7 +730,8 @@ function use_helper($helper){
     static $helpers=array();
     $helperNames=explode(",", $helper);
     foreach ($helperNames as $helper){
-      if(in_array($helper, $helpers))return;
+      $helper=trim($helper);
+      if(empty($helper) || in_array($helper, $helpers))return;
       $helperFile=rareContext::getContext()->getAppLibDir()."helper/".$helper.".php";
       if(!file_exists($helperFile)){
           $helperFile=rareContext::getContext()->getRootLibDir()."helper/".$helper.".php";
@@ -826,4 +835,19 @@ function _rare_runHook($funName,$params){
 
 function rare_go404If($condition=true){
   if($condition)rareContext::getContext()->error404();
+}
+
+/**
+ * 包含指定的文件 可以用在视图文件中包含 子文件,能够对局部变量进行有效的隔离
+ * 该方法是对组件 fetch 的一个补充
+ * @param string $filePath
+ * @param string|array $params 附带的参数 如 a=1&b=2 或者array('a'=>1,'b'=>2)
+ * @param boolean $return 是否将内容返回
+ */
+function rare_include($filePath,$params=null,$return=false){
+  if(!is_array($params))parse_str($params,$params);
+  if($return)return rareView::render($params, $filePath);
+  
+  if($params)extract($params);
+  include $filePath;
 }
