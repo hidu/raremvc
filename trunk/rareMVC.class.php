@@ -338,6 +338,12 @@ class rareContext{
     public function getRequestUri(){
         return $this->uri;
     }
+    /**
+     *返回当前地址的 后缀 
+     */
+    public function getSuffix(){
+      return $this->suffix;
+    }
     
 }
 
@@ -466,6 +472,9 @@ class rareView{
  *动作类
  */
 abstract class rareAction{
+    /**
+     * @var rareContext
+     */
     protected  $context;
     protected  $layout=null;
     protected  $layoutForce=false;//是否强制在任何情况下都使用layout,主要是针对在ajax方式调用是仍然需要使用layout的情况
