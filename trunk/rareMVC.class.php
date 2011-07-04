@@ -345,6 +345,10 @@ class rareContext{
       return $this->suffix;
     }
     
+    public function getFrameworkDir(){
+      return dirname(__FILE__)."/";
+    }
+    
 }
 
 /**
