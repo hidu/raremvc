@@ -1,6 +1,10 @@
 20110704
     改进 类自动加载对文件名做进一步规范：文件名首字母必须是字母或者数字。
 
+20110702
+     增加 rareContext 添加方法getFramewordDir 用于获取框架所有目录
+     
+
 20110630
      增加 rare_include($filePath,$params=null,$return=false)方法,
           用于 包含指定的文件 可以用在视图文件中包含 子文件，能够对局部变量进行有效的隔离
