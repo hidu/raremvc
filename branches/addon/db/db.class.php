@@ -203,7 +203,7 @@ class rDB{
             unset($params[':nocache']);
          }
         //函数调用的不进行缓存 比如  SELECT FOUND_ROWS()
-        if($cacheAble && !preg_match("/\s+from\s+/i", $sql)){
+        if( $cacheAble && preg_match("/\(\s*\)/", $sql) ){
             $cacheAble=false;
          }
         if($cacheAble){
