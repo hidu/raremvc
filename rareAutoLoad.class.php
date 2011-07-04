@@ -160,7 +160,8 @@ class rareAutoLoad
 
     /**
      * 扫描文件夹以及文件
-     * 只有 $this->option['suffix'] 命名的文件才会被扫描到
+     * 只有 $this->option['suffix'] 命名的文件才会被扫描到 文件名首字母必须是字母或者数字
+     * 如 _myClass.class.php 将不被匹配
      * @param $dir
      * @return
      */
@@ -171,7 +172,7 @@ class rareAutoLoad
             if(is_dir($file) && strpos($fileName,'.')!==0){
                 $this->scanDir($file);
             }else{
-                if($this->str_endWith($fileName,$this->option['suffix'])){
+                if(preg_match("#^[A-Za-z0-9].*".preg_quote($this->option['suffix'])."$#", $fileName)){
                     preg_match_all('~^\s*(?:abstract\s+|final\s+)?(?:class|interface)\s+(\w+)~mi', file_get_contents($file), $classes);
                     foreach ($classes[1] as $class){
                         $this->classes[$class] = $file;
