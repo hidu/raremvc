@@ -243,7 +243,7 @@ class rHtml{
              "<body onload='document.rareformpost2url.submit()'>";
        $html.="<form action='{$url}' method='post' name='rareformpost2url'>";
        foreach ($params as $k=>$v){
-          $html.=self::hidden($k, $v);
+          $html.=self::hidden($k, mb_convert_encoding($v, $charset));
         }
        $html.="</form>";
        $html.="</body></html>";
