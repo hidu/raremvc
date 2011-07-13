@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110630';                 //当前框架版本
+    private $version='1.2 20110713';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -96,9 +96,11 @@ class rareContext{
             $_autoloadOption=array('dirs'=>$this->getRootLibDir().",".$this->getAppLibDir(),
                                    'cache'=>$this->getCacheDir()."classAutoLoad"
                                    );
-            if(isset($_autoloadOption['hand']) && $_autoloadOption['hand']){
+            $autoLoadConfigFile=$this->getConfigDir()."autoLoad.php";
+            if(file_exists($autoLoadConfigFile)){
+               $_autoloadOption['hand']=true;
                $_autoloadOption['cache']=$this->getConfigDir()."autoLoad";
-              }
+              }                                     
             $option=array_merge($_autoloadOption,rareConfig::get("class_autoload_option",array()));
             rareAutoLoad::register($option);
         }
@@ -361,15 +363,14 @@ class rareView{
      * @param string $viewFile 模板文件路径
      */
     public static function render($vars,$viewFile){
+        $viewFile=realpath($viewFile);
         $rare_currentPWD = getcwd();
         chdir(dirname($viewFile));
         if(is_string($vars))parse_str($vars,$vars);
         $vars['rare_vars']=$vars;
         if(is_array($vars))extract($vars);
         ob_start();
-//        try{
-          include $viewFile;
-//        }catch(Exception $e){}
+        include $viewFile;
         $content= ob_get_contents();
         ob_end_clean();
         chdir($rare_currentPWD);
@@ -401,6 +402,20 @@ class rareView{
          self::_staticIndex("css", $css,$index);
     }
     /**
+     * 移除已经添加的css文件
+     * @param string $css
+     */
+    public static function removeCss($css){
+         self::_staticIndex("css", $css,-1);
+    }
+    /**
+     * 移除添加的js文件
+     * @param string $js
+     */
+    public static function removeJs($js){
+         self::_staticIndex("js", $css,-1);
+    }
+    /**
      * 添加一个css 文件到head 标签中
      * @param $css
      * @param $index  显示顺序
@@ -413,9 +428,18 @@ class rareView{
            if($index>=count($tmp)){
               $tmp[]=$uri;
             }else{
-              $_tmp=array_slice($tmp, 0,$index);
-              $_tmp[]=$uri;
-              $tmp=array_merge($_tmp,array_slice($tmp, $index));
+               if($index>0){
+                  $_tmp=array_slice($tmp, 0,$index);
+                  $_tmp[]=$uri;
+                  $tmp=array_merge($_tmp,array_slice($tmp, $index));
+                }else{
+                  $uri=str_replace("\*",".+",preg_quote($uri));
+                  foreach ($tmp as $_i=>$_uri){
+                    if(preg_match("#^".$uri."$#", $_uri)){
+                       unset($tmp[$_i]);
+                       }
+                    }   
+                  }
              }
         }else{
            $tmp[]=$uri;
@@ -873,8 +897,7 @@ function rare_go404If($condition=true){
  */
 function rare_include($filePath,$params=null,$return=false){
   if(!is_array($params))parse_str($params,$params);
-  if($return)return rareView::render($params, $filePath);
-  
-  if($params)extract($params);
-  include $filePath;
+  $html=rareView::render($params, $filePath);
+  if($return)return $html; 
+  echo $html; 
 }

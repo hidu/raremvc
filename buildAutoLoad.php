@@ -42,7 +42,11 @@ $phpData.="return array(\n";
 foreach ($classes as $_name=>$_path){
     echo $_name."===>{$_path}\n";
     if($_path){
-      $phpData.="\t'{$_name}'=>\$_rootDir.'/".substr($_path, $_l)."',\n";
+      if(strcasecmp(substr($_path, 0,$_l),$rootDir)==0){
+         $phpData.="\t'{$_name}'=>\$_rootDir.'/".trim(substr($_path, $_l),"/")."',\n";
+      }else{
+         $phpData.="\t'{$_name}'=>'".$_path."',\n";
+      }
     }else{
       $phpData.="\t'{$_name}'=>".$_path.",\n";
     }
