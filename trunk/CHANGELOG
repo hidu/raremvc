@@ -1,3 +1,9 @@
+20110713 
+    改进 类自动加载，文件名或者文件夹名称为.或者_时忽略该文件或者文件夹。
+    改进 class autoload手动构建模式的使用方式，即app的config/autoLoad.php文件存在则认为是手动构建模式；
+         改进使用buildAutoLoad.php
+    添加 rareView::removeJs($uri)和rareView::removeCss($uri),参数$uri可以使用 *匹配所有    
+         
 20110704
     改进 类自动加载对文件名做进一步规范：文件名首字母必须是字母或者数字。
 

@@ -8,8 +8,6 @@
  * $option=array('dirs'=>'/www/lib/share/,/www/lib/api/',//class 从那些目录中查找
  *               'cache'=>'/tmp/111111.php',//class path 缓存文件
  *               ‘suffix’=>'.class.php'   //需要类自动装载的php类文件的后缀
- *                "hand"=>true,   //是否手动更新class 路径文件 ，为false 时 缓存文件写入到指定的cache文件中去，
- *                                      //为true 是需要手动允许 autoLoad.php 文件
  *               );
  * rareAutoLoad::register($option);
  *
@@ -19,7 +17,7 @@
  * 类名 和 文件命名 可以没有关系  如 a.class.php 文件中 可以定义 class b{}
  *
  * @author duwei<duv123@gmail.com>
- *
+ * @since 20110713
  */
 class rareAutoLoad
 {
@@ -166,10 +164,12 @@ class rareAutoLoad
      * @return
      */
     private function scanDir($dir){
+        $_baseName=basename($dir);
+        if(preg_match("/^[_\.]/", $_baseName))return;//忽略以.和_开头的文件和文件夹
         $files=scandir($dir,1);
         foreach($files as $fileName){
             $file=rtrim($dir,DIRECTORY_SEPARATOR).DIRECTORY_SEPARATOR.$fileName;
-            if(is_dir($file) && strpos($fileName,'.')!==0){
+            if(is_dir($file)){
                 $this->scanDir($file);
             }else{
                 if(preg_match("#^[A-Za-z0-9].*".preg_quote($this->option['suffix'])."$#", $fileName)){
