@@ -238,10 +238,10 @@ class rHtml{
     public static function post2Url($url,$params=array(),$charset="utf-8"){
        @ob_end_clean();
        @ob_clean();
-       header("Content-Type:text/html; charset=$charset"); 
-       $html="<html><head><meta http-equiv='Content-Type' content='text/html; charset=$charset' /></head>".
+       header("Content-Type:text/html; charset=utf-8"); 
+       $html="<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8' /></head>".
              "<body onload='document.rareformpost2url.submit()'>";
-       $html.="<form action='{$url}' method='post' name='rareformpost2url'>";
+       $html.="<form action='{$url}' method='post' name='rareformpost2url' accept-charset='{$charset}'>";
        foreach ($params as $k=>$v){
           $html.=self::hidden($k, mb_convert_encoding($v, $charset));
         }
@@ -250,5 +250,32 @@ class rHtml{
        echo $html;
        die;
     }
-   
+    
+    /**
+     * 压缩html 代码 取出换行符，回车符和多余空白
+     * 
+     * 该函数会有几ms的时间消耗，但是压缩为一行的代码兼容性更好（空格符、换行符的表现）
+     * 书写的html代码需要满足以下条件:
+     *   1.不支持pre，否则pre失效
+     *  2.javascript代码中不能使用单行注释
+     *  3.javascript每句完成后添加；
+     * @param string $html
+     */
+   public static function reduceSpace($html){
+      $pattern=array( 
+                      "/\n|\r/",
+                      "/\s+/",
+                      "/>\s+</",
+                      "/\s+</",
+                      "/>\s+/"
+                      );
+      $replacement=array(
+                         "",
+                         " ",
+                         "><",
+                         "<",
+                         ">"
+                         );
+      return preg_replace($pattern, $replacement, $html);
+   } 
 }
