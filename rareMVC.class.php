@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110713';                 //当前框架版本
+    private $version='1.2 20110721';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -142,13 +142,15 @@ class rareContext{
     }
     
     public function error404(){
-        @header('HTTP/1.0 404');
+        @header($_SERVER["SERVER_PROTOCOL"].' 404');
+        @header('Status: 404');
          $this->goError(404);      
          $this->_errorPage("404 Not Found","The requested URL <b>{$_SERVER['REQUEST_URI']}</b> was not found on this server.");
      }
     //500错误
     public function error500($_error=array()){
-        @header('HTTP/1.0 500');
+        @header($_SERVER["SERVER_PROTOCOL"].' 500');
+        @header('Status: 500');
          if(PROD){
            $this->goError(500);
            $this->_errorPage("500 Internal Server Error", "");
