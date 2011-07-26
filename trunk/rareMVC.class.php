@@ -1,6 +1,6 @@
 <?php
 /**
- * rareMVC
+ * rare php framework
  * http://raremvc.googlecode.com
  * http://rare.hongtao3.com
  * 
@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110721';                 //当前框架版本
+    private $version='1.2 20110726';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -238,14 +238,22 @@ class rareContext{
               $customFn="execute".ucfirst(strtolower($_REQUEST[$customMethod]));
              }
           }
-        $restFn="execute".ucfirst(strtolower($_SERVER["REQUEST_METHOD"]));
+        $request_method=strtolower($_SERVER["REQUEST_METHOD"]);
+        $restFn="execute".ucfirst($request_method);
+
+        //fix head method request as get if not define the head mehtod in the action
+        if($request_method=="head" && !method_exists($action, $restFn)){
+          $restFn="executeGet";
+         }
         if($customFn && method_exists($action, $customFn)){
             $result=call_user_func(array($action,$customFn));
         }elseif(method_exists($action, $restFn)){
             $result=call_user_func(array($action,$restFn));
-         }else{
+         }elseif(method_exists($action, 'execute')){
            $result=$action->execute();
-         }
+         }else{
+           $this->error404();
+          }
         if($result!=null && empty($result))return;
         $action->display($result);
     }
@@ -418,8 +426,9 @@ class rareView{
          self::_staticIndex("js", $css,-1);
     }
     /**
-     * 添加一个css 文件到head 标签中
-     * @param $css
+     * 添加一个js,css 文件到head 标签中 或者 删除 index<0为删除
+     * @param string $type 
+     * @param string $uri
      * @param $index  显示顺序
      */
     private static function _staticIndex($type,$uri,$index=null){
@@ -557,7 +566,7 @@ abstract class rareAction{
     /**
      *动作的入口
      */
-    abstract function execute();
+//    abstract function execute();
      
    
     /**

@@ -1,3 +1,9 @@
+20110726
+    动作默认的execute 方法不再是必须的，推荐针对具体的业务，使用executeGet 和 executePost 方法。
+    之前统一使用execute会相应任意的请求方式，升级后，若对应方法不存在，而且execute方法也不存在则返回
+    404错误，之前会返回500错误！
+    针对HEAD请求，若action没有对应的executeHead方法，则使用当作get请求处理！
+    
 20110721
     改进 错误页面如404、500发送时，header 修改为 @header($_SERVER["SERVER_PROTOCOL"].' 500');
     
