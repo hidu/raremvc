@@ -23,7 +23,8 @@ class rCache_etag{
    public static function shutdown(){
          $html=ob_get_contents();
          ob_end_clean();
-         self::checkEtag($html);
+         $etag=md5($html);
+         self::checkEtag($etag);
          echo $html;
    }
    
@@ -34,10 +35,9 @@ class rCache_etag{
     * 检查当前请求指定的html内容的etag是否一致
     * @param string $html
     */
-   public static function checkEtag($html){
+   public static function checkEtag($etag){
         if(!self::isTextResponse())return false;
-        $clientID = isset($_SERVER['HTTP_IF_NONE_MATCH'])?$_SERVER['HTTP_IF_NONE_MATCH']:'';
-         $etag =md5($html);
+         $clientID = isset($_SERVER['HTTP_IF_NONE_MATCH'])?$_SERVER['HTTP_IF_NONE_MATCH']:'';
          header('Cache-Control: public, must-revalidate, max-age=0');
          header('Pragma: Cache');
          header('Etag: '.$etag);
