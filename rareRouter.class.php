@@ -3,10 +3,9 @@
  *rare 路由解析 
  * http://raremvc.googlecode.com
  * http://rare.hongtao3.com
- * 20110324 更新
+ * 20110727 更新
  * @package rare
- * @author duwei
- * @version  $Id: rareRouter.class.php duwei $
+ * @author duwei $Id: rareRouter.class.php 158  2011-06-30 13:04:35Z duwei $ 
  */
 class rareRouter{
    private static $config; 
@@ -86,7 +85,7 @@ class rareRouter{
                       //   }
                    if(class_exists("myRouter") && method_exists('myRouter', "filterAll")){
                        $filterAllFn=array('myRouter',"filterAll");
-                       if(false === call_user_func_array($filterAllFn, array($path,$actionName,$tmp1)))continue;
+                       if(false === call_user_func_array($filterAllFn, array($path,$actionName,&$tmp1)))continue;
                       }
                       //=======================  
                        

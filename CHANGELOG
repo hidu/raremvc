@@ -1,3 +1,6 @@
+20110727
+   改进，路由的 myRouter::filterAll($path,$actionName,$param),第三个参数 $param 使用引用传递
+   
 20110726
     动作默认的execute 方法不再是必须的，推荐针对具体的业务，使用executeGet 和 executePost 方法。
     之前统一使用execute会相应任意的请求方式，升级后，若对应方法不存在，而且execute方法也不存在则返回
