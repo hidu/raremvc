@@ -51,7 +51,7 @@ function rcli($indexFile,$uri,$urlPrex='',$method='get'){
  * php cli.php ../../admin/web/index.php cron/orderTimeout
  * php cli.php ../../admin/web/index.php cron/orderTimeout  http://rare.hongtao3.com/
  */
-if($_SERVER['argv'][0]=='cli.php'){
+if(realpath($_SERVER['argv'][0])==dirname(__FILE__).'/cli.php'){
   if($_SERVER['argc']>2){
      $indexFile=realpath($_SERVER['argv'][1]);
      $uri=$_SERVER['argv'][2];
@@ -62,8 +62,47 @@ if($_SERVER['argv'][0]=='cli.php'){
      print "命令格式:\033[34m php cli.php   入口文件路径  模块地址  url地址前缀\033[0m\n"; 
      print "eg0:\033[32m php cli.php ../../admin/web/index.php cron/orderTimeout\033[0m\n" ;
      print "eg1:\033[32m php cli.php ../../admin/web/index.php cron/orderTimeout http://rare.hongtao3.com/\033[0m\n" ;
-     print "eg1:\033[32m php cli.php ../../admin/web/index.php cron/orderTimeout http://rare.hongtao3.com:8080/appName/\033[0m\n" ;
+     print "eg2:\033[32m php cli.php ../../admin/web/index.php cron/orderTimeout http://rare.hongtao3.com:8080/appName/\033[0m\n" ;
+     print "标准方式:\033[34m 请查看cli.php 源代码的rcli_standard 方法 \033[0m\n"; 
      print "\n";
   }
+}
+
+/**
+ *更加轻量基本的直接运行脚本：提供类注册 
+ * @param $appDir app程序根目录，不是程序根目录
+ * @param $serverInfo 扩展的自定义 $_SERVER 信息
+ * @example
+ *  job1.php 
+ <?php
+    include '../lib/rare/cli.php';//包含当前的这个文件
+    rcli_standard("../front/");//进行类自动加载，程序初始化处理
+   //===========================================================
+   //下面的代码就是具体的业务逻辑了，在普通web方式能正常使用的所有功能都和之前一样使用
+    $user=member::getByUserName('admin');
+    var_dump($user);
+ * 
+ * 
+ */
+function rcli_standard($appDir,$serverInfo=array()){
+  $appDir=rtrim(realpath($appDir),"/")."/";
+  $rootDir=dirname($appDir)."/";
+  $option=array('dirs'=>$appDir."lib/,".$rootDir."lib/",
+                'cache'=>$appDir."cache/cli_autoload");
+  include dirname(__FILE__).'/rareMVC.class.php';
+  include dirname(__FILE__).'/rareAutoLoad.class.php';
+  rareAutoLoad::register($option);
+  $_SERVER['SERVER_NAME']="localhost";
+  $_SERVER['SERVER_PORT']=80;
+  $_SERVER['REQUEST_URI']="/";
+  $_SERVER['SCRIPT_NAME']="/index.php";
+  foreach ($serverInfo as $_k=>$_v){
+     $_SERVER[$_k]=$_v;
+  }
+  
+  /**
+   * 此处只是注册而不进行运行。过滤器，路由解析均不会
+   */
+  rareContext::createApp($appDir);
 }
 

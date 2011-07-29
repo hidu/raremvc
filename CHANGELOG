@@ -1,3 +1,7 @@
+20110729
+   添加rcli_standard方法 于cli.php 中 方便直接运行程序代码（基本是所有的功能）。
+   rareContext中不再修改默认http header.
+   
 20110727
    改进，路由的 myRouter::filterAll($path,$actionName,$param),第三个参数 $param 使用引用传递
    
