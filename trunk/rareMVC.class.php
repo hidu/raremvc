@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110729';                 //当前框架版本
+    private $version='1.2 20110801';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -72,7 +72,8 @@ class rareContext{
     
     private function init(){
         date_default_timezone_set(rareConfig::get('timezone','Asia/Shanghai'));
-        header("Content-Type:text/html; charset=".rareConfig::get('charset','utf-8'));
+        rareConfig::set('charset', rareConfig::get('charset','utf-8'));
+        header("Content-Type:text/html; charset=".rareConfig::get('charset'));
         rareConfig::set('cache_dir',rareConfig::get("cache_dir",$this->getRootDir()."cache/")."app_".$this->getAppName()."/");
         define('RARE_CACHE_DIR', $this->getCacheDir());
     }
@@ -158,7 +159,7 @@ class rareContext{
     private function _errorPage($title,$msg){
         ob_end_clean();
         @ob_clean();
-        $html="<!DOCTYPE html><html><head><meta http-equiv='content-type' content='text/html;charset=".rareConfig::get('charset','utf-8')."'>".
+        $html="<!DOCTYPE html><html><head><meta http-equiv='content-type' content='text/html;charset=".rareConfig::get('charset')."'>".
                "<title>{$title}</title></head><body><p style='background:#3366cc;color:white;padding:5px;font-weight:bold;'>Error</p>".
                "<h1>{$title}</h1><div  style='color:#000'>{$msg}</div><br/><br/><a href='".public_path("")."'>Go Home</a><p style='background:#3366cc;height:4px'>&nbsp;</p></body></html>";
        echo $html;
@@ -486,7 +487,7 @@ class rareView{
     }
 
     public static function include_title(){
-        echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=".rareConfig::get('charset','utf-8')."\" />\n";
+        echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=".rareConfig::get('charset')."\" />\n";
         echo "<title>".htmlspecialchars(rareConfig::get("title","rare app"))."</title>\n";
        foreach (rareConfig::getAll() as $key=>$value){
            if(preg_match("/^meta\.(.+)$/", $key,$matches)){
@@ -818,7 +819,7 @@ function jsonReturn($status=1,$info="",$data="",$header=true){
   $json['i']=$info;
   $json['d']=$data;
   if($header && rareConfig::get('json_header',true)){
-     header("Content-Type:application/json;charset=".rareConfig::get('charset','utf-8'));
+     header("Content-Type:application/json;charset=".rareConfig::get('charset'));
   }
   ob_clean();//clear output:Notice and others
   echo json_encode($json);
@@ -836,7 +837,11 @@ function str_startWith($str,$subStr){
 function forward($uri){
    rareContext::getContext()->executeActtion($uri);die;
  }
-//客户端地址跳转 可以调用callBack函数进行跳转前的验证    
+/**
+ * 
+ * 客户端地址跳转 可以调用callBack函数进行跳转前的验证 
+ * @param string $url
+ */   
 function redirect($url){
     if(!_rare_isUrl($url))$url=url($url);
     _rare_runHook('redirect', array($url));
