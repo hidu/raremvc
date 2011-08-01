@@ -287,36 +287,23 @@ class rHtml{
       return preg_replace($pattern, $replacement, $html);
    } 
    
-   /**
-    * 网址编码转换
-    * @param string $url
-    * @param string $charset
-    */
-   public static function url_convert_encoding($url,$charset){
-     $defaultCharset=rareConfig::get('charset');
-     if($charset==$defaultCharset)return $url;
-     
-     $url_info=parse_url($url);
-     if(!isset($url_info['query']))return $url;
-     
-      parse_str($url_info['query'],$params);
-      foreach ($params as $k=>$v){
-          $params[$k]=mb_convert_encoding($v, $charset,$defaultCharset);
-       }
-      $url=isset($url_info['scheme'])?$url_info['scheme']."://".$url_info['host']:"";
-      $url.=$url_info['path']."?".http_build_query($params);
-      $url.=isset($url_info['fragment'])?"#".$url_info['fragment']:"";
-      return $url;
-   }
    
    /**
     * 将url地址重新进行url_encode
     * @param string $url
+    * @param string $charset 将参数进行编码转换
     */
-   public static function url_encode($url){
+   public static function url_encode($url,$charset=null){
       $url_info=parse_url($url);
       if(!isset($url_info['query']))return $url;
+      
+      $defaultCharset=rareConfig::get('charset');
       parse_str($url_info['query'],$params);
+      if($charset && $charset !=$defaultCharset){
+        foreach ($params as $k=>$v){
+            $params[$k]=mb_convert_encoding($v, $charset,$defaultCharset);
+         }
+      }
       $url=isset($url_info['scheme'])?$url_info['scheme']."://".$url_info['host']:"";
       $url.=$url_info['path']."?".http_build_query($params);
       $url.=isset($url_info['fragment'])?"#".$url_info['fragment']:"";
