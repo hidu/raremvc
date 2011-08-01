@@ -154,7 +154,7 @@ class rHtml{
    
    
    public static function h($value){
-       return htmlspecialchars($value);
+       return htmlspecialchars($value,ENT_QUOTES);
    }
    
    public static function getIDByName($name){
@@ -238,18 +238,26 @@ class rHtml{
     public static function post2Url($url,$params=array(),$charset="utf-8"){
        @ob_end_clean();
        @ob_clean();
+       self::enableAutoID(false);
        header("Content-Type:text/html; charset=utf-8"); 
        $html="<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8' /></head>".
-             "<body onload='document.rareformpost2url.submit()'>";
-       $html.="<form action='{$url}' method='post' name='rareformpost2url' accept-charset='{$charset}'>";
+             "<body onload='document.form1.submit()'>";
+       
+       //fix ie charset
+       $charset4ie=strtoupper($charset)=='utf-8'?"":"<script>if(top.execScript){document.charset=\"$charset\";}</script>";
+       $html.=$charset4ie;
+       
+       $html.="<form action='{$url}' method='post' name='form1' accept-charset='{$charset}'>";
        foreach ($params as $k=>$v){
-          $html.=self::hidden($k, mb_convert_encoding($v, $charset));
+          $html.=self::hidden($k, $v);
         }
        $html.="</form>";
        $html.="</body></html>";
        echo $html;
        die;
     }
+    
+    
     
     /**
      * 压缩html 代码 取出换行符，回车符和多余空白
