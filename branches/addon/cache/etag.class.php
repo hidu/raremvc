@@ -42,7 +42,7 @@ class rCache_etag{
          header('Pragma: Cache');
          header('Etag: '.$etag);
          if ($clientID == $etag) {
-            header('Not Modified', true, 304);
+            header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
             exit;
          }
    }
