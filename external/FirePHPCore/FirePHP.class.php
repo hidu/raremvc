@@ -202,9 +202,9 @@ class FirePHP {
     protected $messageIndex = 1;
     
     
-    public static $skipFiles=array();
+    protected  static $skipFiles=array();
     
-    public static $skipClass=array();
+    protected static $skipClass=array();
     
     /**
      * Options for the library
@@ -248,15 +248,35 @@ class FirePHP {
      */
     protected $logToInsightConsole = null;
     
-    //添加trace的忽略文件
+    /**
+     * 添加trace的忽略文件
+     */
     public static function addSkipFile($file){
+       $file=realpath($file);
         if(!in_array($file, self::$skipFiles))
         self::$skipFiles[]=$file;
     }
     
+    /**
+     * 添加trace的忽略的类
+     * @param string $class
+     */
     public static function addSkipClass($class){
-       if(!in_array($class, self::$skipClass))
-       self::$skipClass[]=$class;
+       $classes=explode(",", $class);
+       foreach ($classes as $class){
+         $class=trim($class);
+         if($class && !in_array($class, self::$skipClass))
+         self::$skipClass[]=$class;
+       }
+    }
+    
+    /**
+     * 判断trace中的一条是否是忽略的
+     * @param string $traceItem
+     */
+    private static function isTraceSkip($traceItem){
+       return (isset($traceItem['class']) && in_array($traceItem['class'],self::$skipClass)) || 
+              (isset($traceItem['file']) && in_array($traceItem['file'], self::$skipFiles)) ;
     }
     
     /**
@@ -917,7 +937,7 @@ class FirePHP {
             if (!$trace) return false;
             for( $i=0 ; $i<sizeof($trace) ; $i++ ) {
                      
-                  if(isset($trace[$i]['class']) && in_array($trace[$i]['class'],self::$skipClass) || in_array($trace[$i]['file'], self::$skipFiles)){
+                  if(self::isTraceSkip($trace[$i])){
                           continue;
                      } 
                     
@@ -969,8 +989,7 @@ class FirePHP {
             if (!isset($meta['file']) || !isset($meta['line'])) {
                 $trace = debug_backtrace();
                 foreach ($trace as $_trace) {
-                      if( (isset($_trace['class']) && in_array($_trace['class'],self::$skipClass)) || 
-                         (isset($_trace['file']) && in_array($_trace['file'], self::$skipFiles)) ) {
+                      if(self::isTraceSkip($_trace)) {
                           continue;
                          } 
                       $meta['file'] = isset($_trace['file'])?$this->_escapeTraceFile($_trace['file']):'';
