@@ -27,11 +27,12 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110801';                 //当前框架版本
+    private $version='1.2 20110803';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
-
+    private $responseCode=200;                       //http response code                 
+    
     private static $instance;                         //app实例    
         
     public function __construct($appDir){
@@ -143,12 +144,14 @@ class rareContext{
     
     public function error404(){
         @header($_SERVER["SERVER_PROTOCOL"].' 404');
+         $this->setResponseCode(404);
          $this->goError(404);      
          $this->_errorPage("404 Not Found","The requested URL <b>{$_SERVER['REQUEST_URI']}</b> was not found on this server.");
      }
     //500错误
     public function error500($_error=array()){
         @header($_SERVER["SERVER_PROTOCOL"].' 500');
+        $this->setResponseCode(500);
          if(PROD){
            $this->goError(500);
            $this->_errorPage("500 Internal Server Error", "");
@@ -293,7 +296,9 @@ class rareContext{
     public function getRootDir(){
          return $this->rootDir;
     }
-    //获取当前app的名称 比如demo
+    /**
+     *获取当前app的名称 比如demo 
+     */
     public function getAppName(){
       return $this->appName;
     }
@@ -357,6 +362,14 @@ class rareContext{
     
     public function getFrameworkDir(){
       return dirname(__FILE__)."/";
+    }
+    
+    public function setResponseCode($code){
+      $this->responseCode=$code;
+    }
+    
+    public function getResponseCode(){
+      return $this->responseCode;
     }
     
 }
@@ -495,11 +508,17 @@ class rareView{
              }
          }
     }
-     //设置meta 的关键词
+     /**
+      * 设置meta 的关键词
+      * @param string $keywords
+      */
     public static function setMeta_keywords($keywords){
         rareConfig::set('meta.keywords', $keywords);   
      }
-     //设置meta的描述
+     /**
+      * 设置meta的描述
+      * @param string $description
+      */
     public static function setMeta_description($description){
         rareConfig::set('meta.description', $description);   
      }
@@ -845,6 +864,7 @@ function forward($uri){
 function redirect($url){
     if(!_rare_isUrl($url))$url=url($url);
     _rare_runHook('redirect', array($url));
+    rareContext::getContext()->setResponseCode(302);
     header("Location: ".$url);die;
 }
 //是否是https
