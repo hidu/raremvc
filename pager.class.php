@@ -76,24 +76,32 @@ class rPager{
       $this->_count();
       if($this->total<1)return "";
       if($this->totalPage<2)return "";
-      $html="<div class='rarePager'><ul>";
-      $html.="<li class='rarePager_info'>({$this->startNum}-{$this->endNum}|{$this->total})</li>";
-      $html.="<li class='rarePager_first'><a".($this->page>1?(" href='".$this->makeUrl(1)."'"):"")."><span style='font-family:Webdings'>9</span></a></li>";
-      $html.="<li class='rarePager_prev'><a".($this->page>1?(" href='".$this->makeUrl($this->page-1))."'":"")."><span style='font-family:Webdings'>7</span></a></li>";
+      $html="<div class='rPager'><ul>";
+      $html.="<li class='info'>({$this->startNum}-{$this->endNum}|{$this->total})</li>";
+      $html.="<li class='first'>".$this->_page_link($this->page>1, 1, "|&lt;&lt;")."</li>";
+      $html.="<li class='prev'>".$this->_page_link($this->page>1, $this->page-1, "&lt;&lt;")."</li>";
       
       for($i=$this->startPage;$i<=$this->endPage;$i++){
           if($i==$this->page){
-             $html .="<li class='rarePager_current' rel='{$this->makeUrl($this->page)}'><a>{$this->page}</a></li>";
+             $html .="<li class='current' rel='{$this->makeUrl($this->page)}'>{$this->page}</li>";
           }else{
              $html .="<li><a href='".$this->makeUrl($i)."'>{$i}</a></li>";
           }
        }
        
-      $html .= "<li class='rarePager_next'><a".($this->page<$this->totalPage?(" href='".$this->makeUrl($this->page+1)."'"):"")."><span style='font-family:Webdings'>8</span></a></li>";
-      $html .= "<li class='rarePager_last'><a".($this->page<$this->totalPage?(" href='".$this->makeUrl($this->totalPage)."'"):"")."><span style='font-family:Webdings'>:</span></a></li>";
+      $html .= "<li class='next'>".$this->_page_link($this->page<$this->totalPage, $this->page+1, "&gt;&gt;")."</li>";
+      $html .= "<li class='last'>".$this->_page_link($this->page<$this->totalPage, $this->totalPage, "&gt;&gt;|")."</li>";
        
       $html.="</ul></div><div style='clear:both'></div>\n";
       return $html;
+   }
+   
+   private function _page_link($isLink,$page,$txt){
+     if($isLink){
+        return "<a href='".$this->makeUrl($page)."'>{$txt}</a>";
+     }else{
+       return $txt;
+     }
    }
    
     
