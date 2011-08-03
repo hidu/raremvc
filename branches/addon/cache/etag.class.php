@@ -33,6 +33,7 @@ class rCache_etag{
    
    /**
     * 检查当前请求指定的html内容的etag是否一致
+    * 需要自己判断当前的http response code 是否是200
     * @param string $html
     */
    public static function checkEtag($etag){
