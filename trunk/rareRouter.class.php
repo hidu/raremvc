@@ -3,7 +3,7 @@
  *rare 路由解析 
  * http://raremvc.googlecode.com
  * http://rare.hongtao3.com
- * 20110727 更新
+ * 20110807 更新
  * @package rare
  * @author duwei $Id: rareRouter.class.php 158  2011-06-30 13:04:35Z duwei $ 
  */
@@ -46,6 +46,7 @@ class rareRouter{
            }
            $config[$actionFullName]=$items;
        }
+//       dump($config);
      self::$config=$config;
    }
   
@@ -117,26 +118,27 @@ class rareRouter{
    
    /**
     * 根据路由规则生成新地址
-    * @param string $actionFullName
-    * @param array $query
+    * @param string $actionFullName 如 index/index
+    * @param array $query    array('articleID'=>11);
     */
    public static function generate($actionFullName,$query){
        if(!self::$config || !isset(self::$config[$actionFullName]))return;
        $config=self::$config[$actionFullName];
        foreach ($config as $action){
-           if(count($action['param'])>count($query))continue;
+           $curQuery=$query;
+           if(count($action['param'])>count($curQuery))continue;
            $isMatch=true;$_params=array();
            foreach ($action['param'] as $k=>$reg){
-               if(!isset($query[$k]) || !preg_match("#^".$reg."$#", $query[$k])){
+               if(!isset($curQuery[$k]) || !preg_match("#^".$reg."$#", $curQuery[$k])){
                     $isMatch=false;
                      break;
                   }
-               $_params["{".$k."}"]=urlencode($query[$k]);
-               unset($query[$k]);
+               $_params["{".$k."}"]=urlencode($curQuery[$k]);
+               unset($curQuery[$k]);
              }
             if(!$isMatch)continue;
             $url=strtr($action['url_param'], $_params);
-          return array($url,$query,isset($action['suffix'])?$action['suffix']:null);
+          return array($url,$curQuery,isset($action['suffix'])?$action['suffix']:null);
        }
    }
 }
