@@ -342,6 +342,7 @@ class rDB{
      * @param string $dbName
      */
     public static function table_update($tableName,$data,$where,$whereParam=null,$dbName=null){
+         if(is_string($data))$data=array($data);
          self::_dataFilter($tableName, $data);
          $sql="update `{$tableName}` set ";
          $tmp=array();
