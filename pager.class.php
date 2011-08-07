@@ -69,7 +69,7 @@ class rPager{
       $subLinkNum=intval($this->linkNum/2);
       $this->startPage=max(min($this->page-$subLinkNum,$this->totalPage-$this->linkNum),1);
       $this->endPage=min(max($this->linkNum+1,$this->page+$subLinkNum),$this->totalPage);
-      $this->endNum=min($this->startNum+$this->size,$this->total);
+      $this->endNum=min($this->startNum+$this->size-1,$this->total);
    }
    
    public function __toString(){
