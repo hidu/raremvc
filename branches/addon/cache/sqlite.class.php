@@ -7,12 +7,13 @@ class rCache_sqlite extends rCache{
     private $db;
     
     /**
-     * @param string $cacheMod 缓存级别 默认为当前全局
+     * @param string $cacheMod 缓存级别 默认为当前全局 root:全局 app：单独app有效
      */
     public function __construct($dbName='cache',$cacheMod='root'){
         $filename=$cacheMod=='app'?RARE_CACHE_DIR:dirname(RARE_CACHE_DIR)."/";
-        
-        $this->db=new PDo("sqlite:".$filename.$dbName.".sqlite");
+        $filename.=$dbName;
+        directory(dirname($filename));
+        $this->db=new PDo("sqlite:".$filename.".sqlite");
         $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
         $q=@$this->db->query("select * from cache limit 1");
         if($q==false){
