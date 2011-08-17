@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110803';                 //当前框架版本
+    private $version='1.2 20110817';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -924,12 +924,23 @@ function rare_go404If($condition=true){
 /**
  * 包含指定的文件 可以用在视图文件中包含 子文件,能够对局部变量进行有效的隔离
  * 该方法是对组件 fetch 的一个补充
+ * @example 
+ *   1. rare_include("sub/header.php");
+ *   2. rare_include("sub/header.php?step=1");
+ *   3. rare_include("sub/header.php","step=1");
+ *   4. rare_include("sub/header.php",array('step'=>1,'ids'=>array(1,2,3)));
  * @param string $filePath
  * @param string|array $params 附带的参数 如 a=1&b=2 或者array('a'=>1,'b'=>2)
  * @param boolean $return 是否将内容返回
  */
 function rare_include($filePath,$params=null,$return=false){
+   $tmp=parse_url($filePath);
+   $filePath=trim($tmp['path'],"/");
+   if(isset($tmp['query'])){
+      $params=rare_param_merge($tmp['query'], $params);
+   }
   if(!is_array($params))parse_str($params,$params);
+  
   $html=rareView::render($params, $filePath);
   if($return)return $html; 
   echo $html; 
