@@ -5,24 +5,33 @@
  */
 class rCache_sqlite extends rCache{
     private $db;
-    
+    private static $dbs;
     /**
      * @param string $cacheMod 缓存级别 默认为当前全局 root:全局 app：单独app有效
      */
     public function __construct($dbName='cache',$cacheMod='root'){
-        $filename=$cacheMod=='app'?RARE_CACHE_DIR:dirname(RARE_CACHE_DIR)."/";
-        $filename.=$dbName;
-        directory(dirname($filename));
-        $this->db=new PDo("sqlite:".$filename.".sqlite");
-        $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-        $q=@$this->db->query("select * from cache limit 1");
-        if($q==false){
-         $this->db->exec("create table cache(id varchar(255),data text,life int,mtime int);CREATE UNIQUE INDEX [cache_unique] ON cache ([id])"); 
+       $key=$dbName."_".$cacheMod;
+       if(isset(self::$dbs[$key])){
+           $this->db=self::$dbs[$key];
+        }else{
+          $filename=$cacheMod=='app'?RARE_CACHE_DIR:dirname(RARE_CACHE_DIR)."/";
+          $filename.=$dbName;
+          directory(dirname($filename));
+          $this->db=new PDo("sqlite:".$filename.".sqlite");
+          $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+          $this->db->exec("PRAGMA synchronous = OFF");
+          $q=@$this->db->query("select * from cache limit 1");
+          if($q==false){
+           $this->db->exec("create table cache(id varchar(255),data text,life int,mtime int);CREATE UNIQUE INDEX [cache_unique] ON cache ([id])"); 
+          }
+          if(mt_rand(0, 100)==50){
+             $this->db->exec("delete from cache where life>0 and life<".time()-1800);
+          }
+          self::$dbs[$key]=$this->db;
         }
-        if(mt_rand(0, 100)==50){
-           $this->db->exec("delete from cache where life>0 and life<".time()-1800);
-        }
-    }   
+    }
+    
+    
   
     public function has($key){
        $sth=$this->db->prepare("select id from cache where id=? and (life>? or life is NULL)");
@@ -40,9 +49,12 @@ class rCache_sqlite extends rCache{
     }
     
     public function set($key, $data,$lifetime=null){
-      if(!is_null($lifetime))$lifetime+=time();
+      if(!is_null($lifetime) && $lifetime>1)$lifetime+=time();
+      $this->db->beginTransaction();
       $sth=$this->db->prepare("insert or replace into cache(id,data,life,mtime) values(?,?,?,?)");
-      return  $sth->execute(array($key,$data,$lifetime,time()));
+      $rt=$sth->execute(array($key,$data,$lifetime,time()));
+      $this->db->commit();
+      return $rt;
     }
     
     public function remove($key){
