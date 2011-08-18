@@ -85,9 +85,9 @@ class rTookit{
    *在动态js的action中调用该方法即可。 
    */
   public static function dynamic_js_header(){
-      header_remove("Pragma");
-      header_remove("Cache-Control");
-      header_remove('Expires');
+      header("Pragma:");
+      header("Cache-Control:");
+      header('Expires:');
       header("Content-Type: text/javascript;charset=".rareConfig::get('charset','UTF-8'));
   }
   
@@ -98,7 +98,10 @@ class rTookit{
    */
   public static function str2Words($str,$asArray=true){
      $str=trim(preg_replace(array("/[，,]+/","/\s+/"), " ", $str));
-     if($asArray)return explode(" ", $str);
+     if($asArray){
+        $str=explode(" ", $str);
+        qArray::removeEmpty($str,true);
+     }
      return $str;
   }
   

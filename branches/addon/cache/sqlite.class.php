@@ -34,7 +34,7 @@ class rCache_sqlite extends rCache{
     
   
     public function has($key){
-       $sth=$this->db->prepare("select id from cache where id=? and (life>? or life is NULL)");
+       $sth=$this->db->prepare("select id from cache where id=? and (life>? or life=0)");
        $sth->execute(array($key,time()));
        $one=$sth->fetch();
        return (boolean)$one;
@@ -49,7 +49,8 @@ class rCache_sqlite extends rCache{
     }
     
     public function set($key, $data,$lifetime=null){
-      if(!is_null($lifetime) && $lifetime>1)$lifetime+=time();
+      if(is_null($lifetime))$lifetime=0;
+      if($lifetime>1)$lifetime+=time();
       $this->db->beginTransaction();
       $sth=$this->db->prepare("insert or replace into cache(id,data,life,mtime) values(?,?,?,?)");
       $rt=$sth->execute(array($key,$data,$lifetime,time()));
