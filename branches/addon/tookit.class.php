@@ -22,13 +22,11 @@ class rTookit{
        return $newstring;
    }
   
-  public static function addslashesDeep($value)
-  {
+  public static function addslashesDeep($value){
     return is_array($value) ? array_map(array('rTookit', 'addslashesDeep'), $value) : addslashes($value);
   }
   
-  public static function stripslashesDeep($value)
-  {
+  public static function stripslashesDeep($value){
     return sfToolkit::stripslashesDeep($value);
   }
   
@@ -112,7 +110,7 @@ class rTookit{
        $saveWidth=$width;
        $saveHeight=$height;
        
-       switch($imageSize[2]){//取得背景图片的格式
+       switch($imageSize[2]){//取得图片的格式
             case 1:$image = imagecreatefromgif($srcPath);break;
             case 2:$image = imagecreatefromjpeg($srcPath);break;
             case 3:$image = imagecreatefrompng($srcPath);break;
@@ -124,4 +122,47 @@ class rTookit{
        imagepng($distImage,$distPath);
        imagedestroy($distImage);
     }
+    
+  /**
+   * url安全的base64_encode +/=会替换为-_~
+   * @param $str
+   */
+    function safe64Encode($str) {
+       return strtr(base64_encode($str), '+/=', '-_~');
+    }
+   /**
+    * 对使用safe64Encode编码处理的字符串decode
+    * @param $str
+    */
+   function safe64Decode($str) {
+      return base64_decode(strtr($str, '-_~', '+/='));
+    }  
+
+   /**
+    * 加密字符串
+    * @param string $str
+    * @param string $key 密钥
+    */ 
+  public static function encrypt($str, $key=null){
+      $block = mcrypt_get_block_size('des', 'ecb');
+      $pad = $block - (strlen($str) % $block);
+      $str .= str_repeat(chr($pad), $pad);
+  
+      $str=mcrypt_encrypt(MCRYPT_DES, $key, $str, MCRYPT_MODE_ECB);
+      $str=self::safe64Encode($str);
+      return $str;
+  }
+  
+  /**
+   * 解密字符串
+   * @param string $str
+   * @param string $key 密钥
+   */
+ public static function decrypt($str, $key=null){  
+      $str=self::safe64Decode($str);
+      $str = mcrypt_decrypt(MCRYPT_DES, $key, $str, MCRYPT_MODE_ECB);
+      $block = mcrypt_get_block_size('des', 'ecb');
+      $pad = ord($str[($len = strlen($str)) - 1]);
+      return substr($str, 0, strlen($str) - $pad);
+  } 
 }
