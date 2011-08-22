@@ -230,7 +230,7 @@ class rHtml{
     }
     
     /**
-     * 
+     * 使用post将数据提交到指定的地址
      * @param string $url
      * @param array $params
      * @param string $charset

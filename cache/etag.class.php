@@ -40,7 +40,7 @@ class rCache_etag{
         if(!self::isTextResponse())return false;
          $clientID = isset($_SERVER['HTTP_IF_NONE_MATCH'])?$_SERVER['HTTP_IF_NONE_MATCH']:'';
          header('Cache-Control: public, must-revalidate, max-age=0');
-         header('Pragma: Cache');
+//         header('Pragma: Cache');
          header('Etag: '.$etag);
          if ($clientID == $etag) {
             header($_SERVER["SERVER_PROTOCOL"]." 304 Not Modified");
