@@ -1,3 +1,5 @@
+20110827
+   修正css version
 20110817
    改进rare_include方法  可以使用rare_include("test.php?a=1");方式传递参数
    

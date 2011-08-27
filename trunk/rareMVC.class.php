@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110817';                 //当前框架版本
+    private $version='1.2 20110827';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -486,7 +486,7 @@ class rareView{
         _rare_runHook("css", array(&$csss));
         $cssVersion=rareConfig::get("cssVersion",null);
         foreach ($csss as $css){
-            $css.=$cssVersion?(strpos($js, "?")?"&":"?")."v=".$cssVersion.".css":"";
+            $css.=$cssVersion?(strpos($css, "?")?"&":"?")."v=".$cssVersion.".css":"";
             echo "<link rel=\"stylesheet\" href=\"{$css}\" type=\"text/css\" media=\"screen\" />\n";
         }
          
