@@ -1,3 +1,11 @@
+20110908
+  改进 过滤器 myFilter::beforeExecute，添加一个参数，即为beforeExecute(rareAction $action)
+       使用该功能，可以在过滤器中对action进行统一的处理，如根据参数设置布局(setLayout)等
+  rareAction： 
+        1. 添加 getModuleName，getActionName方法
+       2. getLayoutFile 由 private 修改为 protected（如：布局文件存放在cache中，由程序动态生成）
+  
+  
 20110827
    修正css version
 20110817

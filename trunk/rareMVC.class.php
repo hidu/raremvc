@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110827';                 //当前框架版本
+    private $version='1.2 20110908';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -216,7 +216,6 @@ class rareContext{
              $this->error404();          
           }
         
-        $this->executeFilter("beforeExecute");//执行具体动作前执行过滤器指定方法
         
         chdir(dirname($actionFile));
             
@@ -227,6 +226,9 @@ class rareContext{
         }
         
         $action = new $actionClass($this->moduleName,$this->actionName);
+        
+        $this->executeFilter("beforeExecute",array($action));//执行具体动作前执行过滤器指定方法
+
         $action->preExecute();
 
         //自定义action方法 若需要使用，可以在config/default.php中定义 $config['customMethod']='method';
@@ -273,7 +275,7 @@ class rareContext{
         return $uriInfo;
     }
     //执行过滤器
-    private function executeFilter($method=''){
+    private function executeFilter($method='',$params=array()){
         if($this->filter ===false)return;
         if($this->filter==null){
             $filterFile=$this->getAppLibDir()."myFilter.class.php";
@@ -285,7 +287,8 @@ class rareContext{
               }
         }
         if(!empty($method) && method_exists($this->filter, $method)){
-            $this->filter->$method();
+//            $this->filter->$method();
+              call_user_func_array(array($this->filter,$method), $params);
         }
     }
 
@@ -383,8 +386,9 @@ class rareView{
      * @param array $vars
      * @param string $viewFile 模板文件路径
      */
-    public static function render($vars,$viewFile){
-        $viewFile=realpath($viewFile);
+    public static function render($vars,$viewFilePath){
+        $viewFile=realpath($viewFilePath);
+        if(!$viewFile)$viewFile=$viewFilePath;
         $rare_currentPWD = getcwd();
         chdir(dirname($viewFile));
         if(is_string($vars))parse_str($vars,$vars);
@@ -487,7 +491,7 @@ class rareView{
         $cssVersion=rareConfig::get("cssVersion",null);
         foreach ($csss as $css){
             $css.=$cssVersion?(strpos($css, "?")?"&":"?")."v=".$cssVersion.".css":"";
-            echo "<link rel=\"stylesheet\" href=\"{$css}\" type=\"text/css\" media=\"screen\" />\n";
+            echo "<link rel=\"stylesheet\" href=\"{$css}\" type=\"text/css\" media=\"all\" />\n";
         }
          
         $jss=_rare_fill_url(rareConfig::get("js",array()));
@@ -545,6 +549,13 @@ abstract class rareAction{
         $this->moduleName=$moduleName;
         $this->actionName=$actionName;
         $this->viewFile=$this->context->getModuleDir().$moduleName."/view/".$actionName.".php";
+    }
+    
+    public function getModuleName(){
+      return $this->moduleName;
+    }
+    public function getActionName($full=false){
+       return $full?$this->moduleName."/".$this->actionName:$this->actionName;
     }
     /**
      * 获取request值
@@ -604,7 +615,7 @@ abstract class rareAction{
     /**
      *获取模板文件的路径
      */
-    private  function getLayoutFile(){
+    protected   function getLayoutFile(){
         if(!$this->layoutForce && (false===$this->layout || rare_isXmlHttpRequest()))return null;
         if(null==$this->layout){
             $layoutFile=$this->context->getLayoutDir().$this->context->getModuleName().".php";
@@ -935,12 +946,11 @@ function rare_go404If($condition=true){
  */
 function rare_include($filePath,$params=null,$return=false){
    $tmp=parse_url($filePath);
-   $filePath=trim($tmp['path'],"/");
+   $filePath=$tmp['path'];
    if(isset($tmp['query'])){
       $params=rare_param_merge($tmp['query'], $params);
    }
   if(!is_array($params))parse_str($params,$params);
-  
   $html=rareView::render($params, $filePath);
   if($return)return $html; 
   echo $html; 
