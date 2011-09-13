@@ -110,7 +110,7 @@ class rTookit{
        $saveWidth=$width;
        $saveHeight=$height;
        
-       switch($imageSize[2]){//取得图片的格式
+       switch($imageSize[2]){//取得背景图片的格式
             case 1:$image = imagecreatefromgif($srcPath);break;
             case 2:$image = imagecreatefromjpeg($srcPath);break;
             case 3:$image = imagecreatefrompng($srcPath);break;

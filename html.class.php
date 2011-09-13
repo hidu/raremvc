@@ -13,6 +13,22 @@ class rHtml{
    public static function enableAutoID($enable){
        self::$autoID=$enable;
    }
+    /**
+    * 检查select radio_group checkbox_group的 选项
+    * 如 选项为 array(3,5,8) 一般期望为 其key 和value同样的值
+    * @param array $options
+    */
+   public static function options($options){
+     $tmp=array_values($options);
+     if($tmp==$options){
+       $tmp=array();
+       foreach ($options as $option){
+          $tmp[$option]=$option;
+        }
+        return $tmp;
+      }
+      return $options;
+   }
     
    public static function select($name,$value,$options,$params=''){
        $html="<select name=\"{$name}\" ".self::_paramMerge($params,array('id'=>self::getIDByName($name)),true).">";
@@ -231,9 +247,9 @@ class rHtml{
     
     /**
      * 使用post将数据提交到指定的地址
-     * @param string $url
-     * @param array $params
-     * @param string $charset
+     * @param string $url  提交的action 地址
+     * @param array $params  提交的参数
+     * @param string $charset 提交目标的编码
      */
     public static function post2Url($url,$params=array(),$charset="utf-8"){
        @ob_end_clean();
