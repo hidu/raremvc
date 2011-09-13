@@ -78,8 +78,8 @@ class rPager{
       if($this->totalPage<2)return "";
       $html="<div class='rPager'><ul>";
       $html.="<li class='info'>({$this->startNum}-{$this->endNum}|{$this->total})</li>";
-      $html.="<li class='first'>".$this->_page_link($this->page>1, 1, "|&lt;&lt;")."</li>";
-      $html.="<li class='prev'>".$this->_page_link($this->page>1, $this->page-1, "&lt;&lt;")."</li>";
+      $html.="<li class='first'>".$this->_page_link($this->page>1, 1, "|&lt;")."</li>";
+      $html.="<li class='prev'>".$this->_page_link($this->page>1, $this->page-1, "&lt;")."</li>";
       
       for($i=$this->startPage;$i<=$this->endPage;$i++){
           if($i==$this->page){
@@ -89,8 +89,8 @@ class rPager{
           }
        }
        
-      $html .= "<li class='next'>".$this->_page_link($this->page<$this->totalPage, $this->page+1, "&gt;&gt;")."</li>";
-      $html .= "<li class='last'>".$this->_page_link($this->page<$this->totalPage, $this->totalPage, "&gt;&gt;|")."</li>";
+      $html .= "<li class='next'>".$this->_page_link($this->page<$this->totalPage, $this->page+1, "&gt;")."</li>";
+      $html .= "<li class='last'>".$this->_page_link($this->page<$this->totalPage, $this->totalPage, "&gt;|")."</li>";
        
       $html.="</ul></div><div style='clear:both'></div>\n";
       return $html;

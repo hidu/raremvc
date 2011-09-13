@@ -196,10 +196,10 @@ abstract class qArray
     static function groupBy($arr, $key_field)
     {
         $ret = array();
-        foreach ($arr as $row) 
+        foreach ($arr as $k=>$row) 
         {
             $key = $row[$key_field];
-            $ret[$key][] = $row;
+            $ret[$key][$k] = $row;
         }
         return $ret;
     }
