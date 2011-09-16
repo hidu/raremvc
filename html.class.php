@@ -275,33 +275,52 @@ class rHtml{
     
     
     
-    /**
+     /**
      * 压缩html 代码 取出换行符，回车符和多余空白
      * 
      * 该函数会有几ms的时间消耗，但是压缩为一行的代码兼容性更好（空格符、换行符的表现）
      * 书写的html代码需要满足以下条件:
-     *   1.不支持pre，否则pre失效
-     *  2.javascript代码中不能使用单行注释
-     *  3.javascript每句完成后添加；
+     *  1.javascript代码中不能使用单行注释
+     *  2.javascript每句完成后添加；
      * @param string $html
+     * @param boolean $pre  是否支持pre标签
      */
-   public static function reduceSpace($html){
-      $pattern=array( 
+   public static function reduceSpace($html,$pre=false){
+     $pattern=array();
+     $replacement=array();
+     if($pre){
+       $matches=array();
+       $pre="#\s?<pre[^>]*?>.*?</pre>\s?#si";
+       preg_match_all($pre, $html, $matches);
+       $preTmp="_".uniqid('pre')."_";
+       $pattern[]=$pre;
+       $replacement[]=$preTmp;
+     }
+     $pattern+=array( 
                       "/\n|\r/",
                       "/\s+/",
                       "/>\s+</",
                       "/\s+</",
                       "/>\s+/"
                       );
-      $replacement=array(
+      $replacement+=array(
                          "",
                          " ",
                          "><",
                          "<",
                          ">"
                          );
-      return preg_replace($pattern, $replacement, $html);
-   } 
+      $html=preg_replace($pattern, $replacement, $html);
+      
+      if($pre && isset($matches[0]) && count($matches[0])){
+        $p2=array();
+        $p2=array_fill(0, count($matches[0]), "/".$preTmp."/");
+        $html=preg_replace($p2, $matches[0], $html,1);
+        unset($p2);
+        unset($matches);
+      }
+      return $html;
+   }
    
    
    /**
