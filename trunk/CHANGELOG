@@ -1,3 +1,6 @@
+20110917
+   action display添加myHook::display($body,$layoutFile);支持可以更加方便的对输出内容进行定制处理
+    
 20110908
   改进 过滤器 myFilter::beforeExecute，添加一个参数，即为beforeExecute(rareAction $action)
        使用该功能，可以在过滤器中对action进行统一的处理，如根据参数设置布局(setLayout)等

@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110908';                 //当前框架版本
+    private $version='1.2 20110917';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -637,6 +637,7 @@ abstract class rareAction{
         $this->isRender=true;
         $body=$this->fetch($viewFile);
         $layoutFile=$this->getLayoutFile();
+        _rare_runHook("display", array(&$body,&$layoutFile));
         if($layoutFile){
             chdir(dirname($layoutFile));
             include($layoutFile);
