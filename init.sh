@@ -6,6 +6,11 @@ echo "============================================"
 echo "=====当前脚本仅仅用来初始化一个APP========="
 echo "=====重复运行会覆盖当前已有文件=============="
 echo "============================================"
+mkdir cache/
+chmod 777 cache
+mkdir lib/
+mkdir front/
+cd front/
 
 mkdir web/
 mkdir layout/ -p
@@ -18,7 +23,7 @@ mkdir config
 
 ### index.php file
 echo "<?php
-include '../`dirname $0`/rareMVC.class.php';
+include '`dirname $0`/rareMVC.class.php';
 rareContext::createApp()->run();">web/index.php
 
 
@@ -31,6 +36,9 @@ class indexAction extends rareAction{
     public function execute(){
     
     }
+    public function executeGet(){
+    
+    }
     public function executePost(){
     
     }
@@ -38,7 +46,24 @@ class indexAction extends rareAction{
 ">module/index/action/index.php
 
 ### index view
-echo "<center>hello is me</center>">module/index/view/index.php
+echo "
+<?php slot_start('slot1'); ?>
+恩 不错，这个会显示在左侧！
+<?php slot_end();?>
+你好，现在的是：<?php echo date('Y-m-d H:i:s'); ?>
+">module/index/view/index.php
+
+
+### demo action
+echo "<?php
+//注意 该action的类名，使用的是包含 moduleName的全称
+class indexDemoAction extends rareAction{
+    //本action只响应 get请求，其他方式的请求 如POST 会抛出404
+    public function executeGet(){
+    
+    }
+}
+">module/index/action/demo.php
 
 ###default filter
 echo "<?php
@@ -46,23 +71,30 @@ echo "<?php
  *app default filter 
  */
 class myFilter{
+    
+    //只会运行一次
    public function doFilter(){
        session_start();
+   }
+   public function beforeExecute(){
+      //任何action之前前都会运行，forward也生效
    }
 }
 ">lib/myFilter.class.php
 
 ### default layout
-echo '<!DOCTYPE html>
+echo "<!DOCTYPE html>
 <html>
 <head>
 <?php rareView::include_title();?>
 <?php rareView::include_js_css()?>
 </head>
 <body>
-<?php echo $body;?>
+<?php echo fetch('component1','time='.date('H:i:s'));?>
+<div style='width:180px;float:left;border:1px solid blue;min-height:400px'><?php echo slot_get('slot1')?></div>
+<div style='margin-left:190px;min-height:400px;border:1px solid blue;'><?php echo \$body;?></div>
 </body>
-</html>'>layout/default.php
+</html>">layout/default.php
 
 
 ###default config
@@ -79,6 +111,8 @@ echo "<?php
 //\$config['title']='rare';                                          //默认的title
 //\$config['meta.keywords']='';                                      //keywords
 //\$config['meta.description']='';                                   //description
+//可以继续定义其他任何meta.xxxxx
+//\$config['rest']=false;                                            //是否启用action的自定义rest
 
 return \$config;
 ">config/default.php
@@ -91,6 +125,14 @@ echo "<?php
 return \$db;
 ">config/db.php
 
+###router config
+echo "<?php
+//数据库配置文件
+\$router=array();
+
+return \$router;
+">config/router.php
+
 
 ###.htaccess
 echo "<IfModule mod_rewrite.c>
@@ -98,3 +140,10 @@ echo "<IfModule mod_rewrite.c>
   RewriteCond %{REQUEST_FILENAME} !-f
   RewriteRule (.*)$ index.php/$1 [L]
 </IfModule>">web/.htaccess
+
+###component
+echo "
+<div style='float:right'>当前时间：<?php echo \$time;?></div>
+<h1><a href='<?php echo url('index') ?>'>rare demo</a></h1>
+">component/component1.php
+
