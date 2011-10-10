@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20110917';                 //当前框架版本
+    private $version='1.2 20111010';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -231,14 +231,14 @@ class rareContext{
 
         $action->preExecute();
 
-        //自定义action方法 若需要使用，可以在config/default.php中定义 $config['customMethod']='method';
+        //自定义action方法 若需要使用，可以在config/default.php中定义 $config['rest']='method';
         //如上定义自定义函数名称通过$_REQUEST['method']来确定，如method=delte 会运行executeDelete方法
-        $customMethod=rareConfig::get('customMethod');
+        $restMethod=rareConfig::get('rest');
         $customFn=false;
-        if($customMethod){
-            if(!is_string($customMethod))$customMethod="method";
-             if(isset($_REQUEST[$customMethod]) && $_REQUEST[$customMethod]){
-              $customFn="execute".ucfirst(strtolower($_REQUEST[$customMethod]));
+        if($restMethod){
+            if(!is_string($restMethod))$restMethod="method";
+             if(isset($_REQUEST[$restMethod]) && $_REQUEST[$restMethod]){
+              $customFn="execute".ucfirst(strtolower($_REQUEST[$restMethod]));
              }
           }
         $request_method=strtolower($_SERVER["REQUEST_METHOD"]);
@@ -381,6 +381,8 @@ class rareContext{
  * 模板相关操作
  */
 class rareView{
+    private static $slots=array();
+    
     /**
      * 将数据渲染到模板中去
      * @param array $vars
@@ -476,16 +478,18 @@ class rareView{
      * 供模板调用的输出css 和js 链接的方法
      */
     public static function include_js_css(){
-        function _rare_fill_url($_uris){
-            if(is_string($_uris))$_uris=explode(",", $_uris);
-            $tmp=array();
-            foreach($_uris as $_uri){
-              $_uri=trim($_uri);
-              if(!$_uri)continue;
-              $tmp[]=_rare_isUrl($_uri)?$_uri:public_path($_uri);
+         if(!function_exists("_rare_fill_url")){
+            function _rare_fill_url($_uris){
+                if(is_string($_uris))$_uris=explode(",", $_uris);
+                $tmp=array();
+                foreach($_uris as $_uri){
+                  $_uri=trim($_uri);
+                  if(!$_uri)continue;
+                  $tmp[]=_rare_isUrl($_uri)?$_uri:public_path($_uri);
+                }
+                return array_unique($tmp);
             }
-            return array_unique($tmp);
-        }
+         }
         $csss=_rare_fill_url(rareConfig::get("css",array()));
         _rare_runHook("css", array(&$csss));
         $cssVersion=rareConfig::get("cssVersion",null);
@@ -502,7 +506,10 @@ class rareView{
             echo "<script type=\"text/javascript\" src=\"{$js}\"></script>\n";
         }
     }
-
+    
+    /**
+     *输出title和meta标签 
+     */
     public static function include_title(){
         echo "<meta http-equiv=\"Content-Type\" content=\"text/html; charset=".rareConfig::get('charset')."\" />\n";
         echo "<title>".htmlspecialchars(rareConfig::get("title","rare app"))."</title>\n";
@@ -526,6 +533,32 @@ class rareView{
     public static function setMeta_description($description){
         rareConfig::set('meta.description', $description);   
      }
+     
+     public static function slot_set($name,$value){
+       self::$slots[$name]=$value;
+     }
+     public static function slot_has($name){
+       return isset(self::$slots[$name]);
+     }
+     
+     public static function slot_get($name){
+       return self::slot_has($name)?self::$slots[$name]:null;
+     }
+     
+     private static $_slot_keys_cache=array();
+     
+     public static function slot_start($name){
+       array_push(self::$_slot_keys_cache,$name);
+       ob_start();
+       ob_implicit_flush(0);
+     }
+     
+     public static function slot_end(){
+       $data = ob_get_clean();
+       $name=array_pop(self::$_slot_keys_cache);
+       self::slot_set($name, $data);
+     }
+     
 }
 
 /**
@@ -708,6 +741,7 @@ class rareConfig{
         self::getAll($configName);
         self::$configs[$configName][$item]=$val;
     }
+    
 }
 
 /**
@@ -955,4 +989,24 @@ function rare_include($filePath,$params=null,$return=false){
   $html=rareView::render($params, $filePath);
   if($return)return $html; 
   echo $html; 
+}
+
+function slot_get($name){
+   return rareView::slot_get($name);
+}
+
+function slot_has($name){
+  return rareView::slot_has($name);
+}
+
+function slot_start($name){
+   return rareView::slot_start($name);
+} 
+
+function slot_end(){
+  return rareView::slot_end();
+}
+
+function slot_set($name,$value){
+  return rareView::slot_set($name, $value);
 }

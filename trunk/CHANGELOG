@@ -1,3 +1,8 @@
+20111010
+   1.添加slot功能：即在layout,view的占位符，以方便不同action有同样的布局（如左右布局）但是，内容都不一样的问题。
+   2.完善init.sh(添加了slot component等的示例)
+   3.action 的rest配置参数由之前的customMethod修改为rest
+   
 20110917
    action display添加myHook::display($body,$layoutFile);支持可以更加方便的对输出内容进行定制处理
     
