@@ -21,32 +21,45 @@ class rareRouter{
        foreach ($config as $actionFullName=>$items){
            $tmp=explode("/", $actionFullName);
            if(is_string($items))$items=array(array('url'=>$items));
+           /**
+            *预处理配置文件：
+            * 处理为如下多维数组
+            * $router['index/index'][]=array();
+            */
            foreach ($items as $k=>$item){
+              //for $router['index/index']=array();
+              if(!is_numeric($k)){
+                  $_tmp=$items;
+                  $items=array($_tmp);
+                  break;
+                }
+              //for $router['index/index']="index-{id}";
                if(is_string($item)){
                     $items[$k]=$item=array("url"=>$item);
                  }
-              $url=$item['url'];
-              $param=isset($item['param'])?$item['param']:array();
-              preg_match_all("/\{\w*\}/", $url,$matches);
-              $matches=$matches[0];
-              $paramsMatch=array();
-              foreach ($matches as $match){
-                  $p=strtr($match,array("{"=>'',"}"=>''));
-                  if(!isset($param[$p])){
-                      $param[$p]=".+";
-                    }
-                 $paramsMatch['{'.$p."}"]="(".$param[$p].")";
-                }
-                
-              $_url=strtr($url, array("{:m}"=>$tmp[0],"{:a}"=>$tmp[1]));
-              $items[$k]['param']=$param;
-              $items[$k]['url_param']=$_url;
-              $items[$k]['url_reg']=strtr($_url,$paramsMatch);
-              $items[$k]['_params']=$paramsMatch;
+            }
+          foreach ($items as $k=>$item){
+             $url=$item['url'];
+             $param=isset($item['param'])?$item['param']:array();
+             preg_match_all("/\{\w*\}/", $url,$matches);
+             $matches=$matches[0];
+             $paramsMatch=array();
+             foreach ($matches as $match){
+               $p=strtr($match,array("{"=>'',"}"=>''));
+               if(!isset($param[$p])){
+                 $param[$p]=".+";
+               }
+               $paramsMatch['{'.$p."}"]="(".$param[$p].")";
+             }
+             
+             $_url=strtr($url, array("{:m}"=>$tmp[0],"{:a}"=>$tmp[1]));
+             $items[$k]['param']=$param;
+             $items[$k]['url_param']=$_url;
+             $items[$k]['url_reg']=strtr($_url,$paramsMatch);
+             $items[$k]['_params']=$paramsMatch;
            }
            $config[$actionFullName]=$items;
        }
-//       dump($config);
      self::$config=$config;
    }
   
@@ -138,6 +151,7 @@ class rareRouter{
              }
             if(!$isMatch)continue;
             $url=strtr($action['url_param'], $_params);
+           
           return array($url,$curQuery,isset($action['suffix'])?$action['suffix']:null);
        }
    }

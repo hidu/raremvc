@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20111010';                 //当前框架版本
+    private $version='1.2 20111011';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -751,6 +751,10 @@ class rareConfig{
  * @param string $suffix
  */
 function url($uri,$suffix="",$full=false){
+     if(is_bool($suffix)){
+       $full=$suffix;
+       $suffix='';
+     }
     $context=rareContext::getContext();
     $urlPrex=public_path("/",$full);
     $script_name=rareConfig::get("script_name","index.php");//默认的index.php文件
