@@ -1,0 +1,171 @@
+20111011
+   1.修正了路由配置如 $config['index/rss']=array("url"=>'rss',"suffix"=>'xml');时suffix无效的问题。
+   2.改进url方法,当第二个参数为boolean时将其赋值给第三个参数 $full
+   
+20111010
+   1.添加slot功能：即在layout,view的占位符，以方便不同action有同样的布局（如左右布局）但是，内容都不一样的问题。
+   2.完善init.sh(添加了slot component等的示例)
+   3.action 的rest配置参数由之前的customMethod修改为rest
+   
+20110917
+   action display添加myHook::display($body,$layoutFile);支持可以更加方便的对输出内容进行定制处理
+    
+20110908
+  改进 过滤器 myFilter::beforeExecute，添加一个参数，即为beforeExecute(rareAction $action)
+       使用该功能，可以在过滤器中对action进行统一的处理，如根据参数设置布局(setLayout)等
+  rareAction： 
+        1. 添加 getModuleName，getActionName方法
+       2. getLayoutFile 由 private 修改为 protected（如：布局文件存放在cache中，由程序动态生成）
+  
+  
+20110827
+   修正css version
+20110817
+   改进rare_include方法  可以使用rare_include("test.php?a=1");方式传递参数
+   
+20110807
+   修正当对同一个模块配置多个路由规则时参数处理不当而导致路由生成失败的问题
+   
+20110803
+  rareContext添加responseCode
+  
+20110729
+   添加rcli_standard方法 于cli.php 中 方便直接运行程序代码（基本是所有的功能）。
+   rareContext中不再修改默认http header.
+   
+20110727
+   改进，路由的 myRouter::filterAll($path,$actionName,$param),第三个参数 $param 使用引用传递
+   
+20110726
+    动作默认的execute 方法不再是必须的，推荐针对具体的业务，使用executeGet 和 executePost 方法。
+    之前统一使用execute会相应任意的请求方式，升级后，若对应方法不存在，而且execute方法也不存在则返回
+    404错误，之前会返回500错误！
+    针对HEAD请求，若action没有对应的executeHead方法，则使用当作get请求处理！
+    
+20110721
+    改进 错误页面如404、500发送时，header 修改为 @header($_SERVER["SERVER_PROTOCOL"].' 500');
+    
+20110713 
+    改进 类自动加载，文件名或者文件夹名称为.或者_时忽略该文件或者文件夹。
+    改进 class autoload手动构建模式的使用方式，即app的config/autoLoad.php文件存在则认为是手动构建模式；
+         改进使用buildAutoLoad.php
+    添加 rareView::removeJs($uri)和rareView::removeCss($uri),参数$uri可以使用 *匹配所有    
+         
+20110704
+    改进 类自动加载对文件名做进一步规范：文件名首字母必须是字母或者数字。
+
+20110702
+     增加 rareContext 添加方法getFramewordDir 用于获取框架所在目录
+     
+
+20110630
+     增加 rare_include($filePath,$params=null,$return=false)方法,
+          用于 包含指定的文件 可以用在视图文件中包含 子文件，能够对局部变量进行有效的隔离
+          对视图文件进行拆分时非常有用,可以用来替换默认的 include方法
+     增强  默认配置 可以定义 suffix_accept 用来限定允许接受的地址后缀（数组）如array(null,'html','json');
+          若路由配置文件中定义了地址的后缀，则必须请求的地址后缀和定义的后缀必须一致才能路由匹配成功。
+               
+20110629
+     改进 配置rareView::include_title()输出meta 信息的方式，
+     之前只能输出定义的meta.keywords和meta.description,现在可以输出定义在配置文件中所有以meta.开头的meta信息,
+     如可以定义meta.msapplication-tooltip="rare php框架"。
+     
+     改进 user_helper可以同时调用多个 user_helper("common,html");使用英文,分割
+     
+20110623
+    1.改进 组件调用功能：fetch的hook功能增强。
+     1.1 myHook::fetch($name,$param) 若返回值不为null,则不再执行后面的实际渲染组件模板的功能
+      1.2 添加钩子 myHook::fetch_render($name,$param,$html) 比上面的钩子要多一个参数 $html,
+         此参数为 当前组件渲染后得到的html代码
+         若返回值不为null,组件实际返回该函数的返回值。
+       
+      这两个钩子可以结合一起使用，如给组件添加缓存机制（不修改之前组件的代码）,在 myHook::fetch 
+      中判断是否有缓存，有的话直接返回，没有的话在 myHook::fetch_render中设置缓存
+
+    2.改进 jsonReturn 的输出 Content-Type:application/json;的header 添加了配置参数控制 json_header，
+	即在默认配置文件中定义  json_header=false 所有的地方调用
+       jsonReturn都不会输出该header信息。不建议设置 json_header=false。
+       参见 20110413的修改。
+
+20110616
+     增强 给rareAction添加了fetch方法用来获取渲染模版的内容：原来display方法的部分功能。
+      
+20110608
+      添加cli.php用来在cli模式下运行程序的模块
+      给fetch方法添加hook功能。
+      str_endWith 和str_startWith 采用strcmp进行比较。
+
+20110524
+      1.改进rare_currentUri 方法，当传递的参数为空时(如rare_currentUri('p=&orderby='))，
+        或者url地址中包值为空的参数时，将对应的key从参数中移除。
+        即url 不会出现p=&orderby= 之类的参数。
+      2.改进输出css和js时添加资源版本号时判断之前的地址中是否包含参数。
+        js版本号最终地址如下   jquery.js?v=20110524.js
+        css版本号最终地址如下  yui3.css?v=20110524.css
+        之前的版本号没有默认后缀
+        
+20110505
+     1.升级component,现在组件支持多个app共用，之前默认只识别 /appName/component/ 目录下的组件，
+       现在会尝试/lib/component/目录。
+       当在/appName/component/ 目录找不到组件再到 /lib/component/ 查找。
+        两个目录下有同名组件，则使用/appName/component/下的。
+  
+20110425
+    1.升级路由功能，在之前路由规则可以使用自定义函数确认的基础上添加了使用自定义类
+     myRouter::filterAll来对所有路由地址进行确认。
+      使用该功能能帮助我们在对大量相似路由判断，如几乎所有url地址中包含全国所有城市的拼音，
+     这时使用该方法可以更加快速的进行路由过滤。
+    2.rareAction添加了  _getParam（获取一个get值）、_postParam（获取一个post值）方法
+    3.rareAction 添加了assign方法 进行模板赋值
+     4.输出错误页面(404,500)时，强制清空之前待输出的内容
+     5.为安全起见 移除header 中的rareMVC 标识，同时移除php的  X-Powered-By标识.
+       
+20110419
+    1.错误页面提示文字外面的pre标签去掉，采用nl2br替换
+    2.对action添加调用自定义方法的功能，
+    在配置文件中定义$config['customMethod']=true;可以启用。
+    在若在$_REQUESR中存在 $_REQUESR['method']="delete";同时存在对于的executeDelete方法，
+    该方法会被调用，而默认的execute以及executePost|executeGet则不会被调用。
+    
+    
+20110413
+   rareView::render不再捕捉异常
+   jsonReturn添加第4个参数(是否输出content-type)
+      当使用ajax的时候，使用jsonReturn 输出放回结果，
+      默认会发送header  Content-Type:application/json;charset=utf-8
+      指定response的格式以获取更好的客户端兼容性和效率。
+      但是当使用ajax上传图片(iframe方式)的时候，如使用了jquery form plugin上传图片，
+      上述header会导致浏览器提示下载文件，这是可以将第四个蚕丝$header=fasle,即可。
+      
+
+20110324
+  1.调整地址解析和注册类自动装载的先后顺序:地址解析置于后面
+  2.路由解析功能增强
+    2.1 之前进行正则匹配时没有添加开始和结束标记，现在已经添加上。(之前路由写法不用修改)
+    2.2 路由解析添加函数确认功能。当用正则表达式匹配后仍然不确定的地址可以使用函数去确认地址是否符合规则。
+        如
+          http://www.example.com/beijing 
+          http://www.example.com/shanghai
+          http://www.example.com/wuhan
+          http://www.example.com/xxxxx
+           .......................
+         这样的地址
+         路由可以这样写
+         $config['index/index'][]=array('url'=>'{city}',
+                              'param'=>array('id'=>'\w+'),
+                              'fn'=>"myUriCheck::city",
+                             );
+         当进行路由解析的时候
+           上述路由规则今回匹配几乎所有的地址
+           <?php
+              class myUriCheck{
+                 public static function city($path,$actionName,$param){
+                   $cities=array();
+                   //get the city list                    
+                   return in_array($param['city'],$cities);
+                 }
+              }
+             ?>                         
+             调用的函数返回true 表示当前路由有效。  
+      
+      note:路由规则的解析是由上而下的，上述路由最好放到最后。                         
