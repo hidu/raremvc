@@ -1,3 +1,7 @@
+20111011
+   1.修正了路由配置如 $config['index/rss']=array("url"=>'rss',"suffix"=>'xml');时suffix无效的问题。
+   2.改进url方法,当第二个参数为boolean时将其赋值给第三个参数 $full
+   
 20111010
    1.添加slot功能：即在layout,view的占位符，以方便不同action有同样的布局（如左右布局）但是，内容都不一样的问题。
    2.完善init.sh(添加了slot component等的示例)
