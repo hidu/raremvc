@@ -27,7 +27,7 @@ class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20111011';                 //当前框架版本
+    private $version='1.2 20111020';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -533,8 +533,18 @@ class rareView{
     public static function setMeta_description($description){
         rareConfig::set('meta.description', $description);   
      }
-     
-     public static function slot_set($name,$value){
+     /**
+      *设置slot的值 
+      * @param string $name
+      * @param string $value
+      * @param int $mod  -1：前置 0:替换  1：追加
+      */
+     public static function slot_set($name,$value,$mod=0){
+       if(1==$mod){
+         $value=self::slot_get($name).$value;
+       }else if(-1==$mod){
+         $value=$value.self::slot_get($name);
+        }
        self::$slots[$name]=$value;
      }
      public static function slot_has($name){
@@ -1011,6 +1021,13 @@ function slot_end(){
   return rareView::slot_end();
 }
 
-function slot_set($name,$value){
+/**
+ * 
+ * @param string $name
+ * @param string $value
+ * @param int $mod 0:替换  1：追加 -1：前置
+ * @see rareView::slot_set
+ */
+function slot_set($name,$value,$mod=0){
   return rareView::slot_set($name, $value);
 }

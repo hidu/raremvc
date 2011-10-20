@@ -1,3 +1,6 @@
+20111020
+   1.slot_set方法添加第三个参数 操作模式：$mod [0:替换  1：追加 -1：前置] 默认是0-替换
+   
 20111011
    1.修正了路由配置如 $config['index/rss']=array("url"=>'rss',"suffix"=>'xml');时suffix无效的问题。
    2.改进url方法,当第二个参数为boolean时将其赋值给第三个参数 $full
