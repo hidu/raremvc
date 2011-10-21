@@ -177,7 +177,7 @@ class rareContext{
      public function goError($code){
            ob_clean();
             $errorUri=rareConfig::get('error'.$code,'error/e'.$code);
-            if(_rare_isUrl($errorUri)){
+            if(rare_isUrl($errorUri)){
                 redirect($errorUri);              
             }else{
                 $tmp=explode("/",$errorUri);
@@ -215,7 +215,6 @@ class rareContext{
         if(!file_exists($actionFile)){
              $this->error404();          
           }
-        
         
         chdir(dirname($actionFile));
             
@@ -291,11 +290,19 @@ class rareContext{
               call_user_func_array(array($this->filter,$method), $params);
         }
     }
-
+    
+    /**
+     *返回当前app所在的根目录
+     * @return string
+     */
     public function getAppDir(){
         return $this->appDir;
     }
     
+    /**
+     * 返回当前完整程序的更目录
+     * @return string
+     */
     public function getRootDir(){
          return $this->rootDir;
     }
@@ -311,11 +318,21 @@ class rareContext{
     public function getRootLibDir(){
          return $this->rootDir."lib/";
     }
-
+    
+    /**
+     * 获取当前的模块名称
+     * @return string
+     */
     public function getModuleName(){
         return $this->moduleName;
     }
-
+   
+    /**
+     * 返回当前动作名称
+     * 如返回  login 或者 user/login
+     * @param boolean $full 是否包括模块名称 默认为false
+     * @return string
+     */
     public function getActionName($full=false){
         return $full?$this->moduleName."/".$this->actionName:$this->actionName;
     }
@@ -337,11 +354,16 @@ class rareContext{
     public function getWebRoot(){
         return $this->webRoot;
     }
-
+    /**
+     *返回入口文件的名称 如 index.php test.php 
+     *@return string 
+     */
     public function getScriptName(){
         return $this->scriptName;
     }
-    //url中是否包含脚本名称 如/rare/index.php/demo 为true
+    /**
+     * url中是否包含脚本名称 如/rare/index.php/demo 为true
+     */
     public function isScriptNameInUrl(){
         return $this->isScriptNameInUrl;
     }
@@ -353,16 +375,27 @@ class rareContext{
     public function getCacheDir(){
         return rareConfig::get("cache_dir");
     }
+    
+    /**
+     *返回当前的请求地址，并非浏览器中的地址。如 
+     *index/index 
+     *index
+     *?test=2
+     *index/demo?test=2
+     * @return string
+     */
     public function getRequestUri(){
         return $this->uri;
     }
     /**
-     *返回当前地址的 后缀 
+     *返回当前地址的 后缀 如 html
      */
     public function getSuffix(){
       return $this->suffix;
     }
-    
+    /**
+     *返回框架所在目录 
+     */
     public function getFrameworkDir(){
       return dirname(__FILE__)."/";
     }
@@ -485,7 +518,7 @@ class rareView{
                 foreach($_uris as $_uri){
                   $_uri=trim($_uri);
                   if(!$_uri)continue;
-                  $tmp[]=_rare_isUrl($_uri)?$_uri:public_path($_uri);
+                  $tmp[]=rare_isUrl($_uri)?$_uri:public_path($_uri);
                 }
                 return array_unique($tmp);
             }
@@ -659,7 +692,7 @@ abstract class rareAction{
      *获取模板文件的路径
      */
     protected   function getLayoutFile(){
-        if(!$this->layoutForce && (false===$this->layout || rare_isXmlHttpRequest()))return null;
+        if(!$this->layoutForce && (false===$this->layout || rare_isAjax()))return null;
         if(null==$this->layout){
             $layoutFile=$this->context->getLayoutDir().$this->context->getModuleName().".php";
             if(!file_exists($layoutFile)){
@@ -795,7 +828,7 @@ function url($uri,$suffix="",$full=false){
     $uri=preg_replace("/\/index$/", "", $uri);
     
     $queryStr=$query?"?".http_build_query($query):"";
-    $suffix=($suffix && $uri && !str_endWith($uri, "/"))?(".".$suffix):"";
+    $suffix=($suffix && $uri && !rare_strEndWith($uri, "/"))?(".".$suffix):"";
     return $urlPrex.$uri.$suffix.$queryStr;
 }
 /**
@@ -881,9 +914,12 @@ function use_helper($helper){
     }
     unset($helperNames);
 }
-//检查目录是否存在，不存在则创建
-function directory($dir){
-    return is_dir($dir) or (directory(dirname($dir)) and mkdir($dir, 0777));
+/**
+ * 检查目录是否存在，不存在则创建
+ * @param string $dir
+ */
+function rare_mkdir($dir){
+    return is_dir($dir) or (rare_mkdir(dirname($dir)) and mkdir($dir, 0777));
 }
 /**
  * 返回json数据 
@@ -904,41 +940,69 @@ function jsonReturn($status=1,$info="",$data="",$header=true){
   echo json_encode($json);
   die();
 }
-//字符串是否以指定值结尾
-function str_endWith($str,$subStr){
+/**
+ * 字符串是否以指定值结尾
+ * @param string $str
+ * @param string $subStr
+ */
+function rare_strEndWith($str,$subStr){
     return strcmp(substr($str, -(strlen($subStr))),$subStr)==0;
 }
-//字符串是否以指定值开始
-function str_startWith($str,$subStr){
+//
+/**
+ * 字符串是否以指定值开始
+ * @param string $str
+ * @param string $subStr
+ */
+function rare_strStartWith($str,$subStr){
     return strcmp(substr($str, 0,(strlen($subStr))),$subStr)==0;
 }
-//内部地址跳转
+/**
+ * 内部地址跳转,客户端的地址不变
+ * 如forward("user/login?t=".time()) 参数t可以在 $_GET中获取到
+ * @param string $uri
+ */
 function forward($uri){
    rareContext::getContext()->executeActtion($uri);die;
  }
 /**
  * 
  * 客户端地址跳转 可以调用callBack函数进行跳转前的验证 
+ * redirect("http://www.hongtao3.com/404.html");
+ * redirect("index/login?t=".time());
  * @param string $url
  */   
 function redirect($url){
-    if(!_rare_isUrl($url))$url=url($url);
+    if(!rare_isUrl($url))$url=url($url);
     _rare_runHook('redirect', array($url));
     rareContext::getContext()->setResponseCode(302);
     header("Location: ".$url);die;
 }
-//是否是https
+/**
+ * 是否是https
+ * @return boolean
+ */
 function rare_isHttps(){
     return ( (isset($_SERVER['HTTPS']) && (strtolower($_SERVER['HTTPS']) == 'on' || $_SERVER['HTTPS'] == 1)) ||
              (isset($_SERVER['HTTP_SSL_HTTPS']) && (strtolower($_SERVER['HTTP_SSL_HTTPS']) == 'on' || $_SERVER['HTTP_SSL_HTTPS'] == 1)) ||
              (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) == 'https')
             );
 }
-//是否是ajax 请求
-function rare_isXmlHttpRequest(){
+/**
+ *是否是ajax 请求 
+ */
+function rare_isAjax(){
     return isset($_SERVER['HTTP_X_REQUESTED_WITH']) && $_SERVER['HTTP_X_REQUESTED_WITH'] == 'XMLHttpRequest';
 }
-//得到当前的url地址,并且可以添加其他的额外的参数
+/**
+ *得到当前的url地址,并且可以添加其他的额外的参数 
+ * @param string $param
+ * @param boolean $full
+ * 当前地址                                                                    结果                     
+ * /      								    ==>  rare_currentUri("a=1") 		       ==>	 /?a=1
+ * /?a=2    									==>  	rare_currentUri("a=1") 		       ==> /?a=1
+ * /?a=3    									==>  	rare_currentUri("a=1&b=2",true) 	==> http://www.hongtao3.com/?a=1&b=2
+ */
 function rare_currentUri($param="",$full=false){
       $host="";
       if($full)$host=rare_httpHost();
@@ -954,29 +1018,48 @@ function rare_currentUri($param="",$full=false){
 }
 
 /**
- * 注意SERVER_NAME 和HTTP_HOST 的区别:port!=80是 如port=81  HTTP_HOST=hongtao3.com:81
+ * 返回主机根目录地址 如 
+ * http://www.hongtao3.com 
+ * http://www.hongtao3.com:81
+ * https://www.hongtao3.com 
+ * https://www.hongtao3.com:444
  */
 function rare_httpHost(){
     $host= 'http://'.$_SERVER['SERVER_NAME'];
     if(80 != $_SERVER['SERVER_PORT'] ){
         if(rare_isHttps()){
             $host = 'https://'.$_SERVER['SERVER_NAME'];
+            if(443 != $_SERVER['SERVER_PORT'] ){
+               $host.=":".$_SERVER['SERVER_PORT'];
+              }
         }else{
             $host.=":".$_SERVER['SERVER_PORT'];
         }
     }
     return $host;
 }
-
-function _rare_isUrl($url){
-  return str_startWith($url, "http://") || str_startWith($url, "https://") || str_startWith($url, "/");
+/**
+ * 判断是否是url地址 如
+ * http://www.hongtao3.com 
+ * https://www.hongtao3.com  
+ * /rare/demo.html 
+ * 均为真
+ * @param string $url
+ */
+function rare_isUrl($url){
+  return rare_strStartWith($url, "http://") || rare_strStartWith($url, "https://") || rare_strStartWith($url, "/");
 }
+
 //run user hook function if myHook class exist,it will run auto
 function _rare_runHook($funName,$params){
   if(class_exists("myHook",true) && method_exists("myHook", $funName))
    return call_user_func_array(array('myHook',$funName),$params);
 }
 
+/**
+ * 根据条件判断是否需要跳转到404页面
+ * @param boolean $condition
+ */
 function rare_go404If($condition=true){
   if($condition)rareContext::getContext()->error404();
 }

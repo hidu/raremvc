@@ -1,3 +1,10 @@
+20111021
+    1.directory 函数重命名为rare_mkdir
+    2.rare_isXmlHttpRequest 重命名为 rare_isAjax
+    3.str_startWith 重命名为 rare_strStartWith
+    4.str_endWith 重命名为 rare_strEndWith
+    
+     
 20111020
    1.slot_set方法添加第三个参数 操作模式：$mod [0:替换  1：追加 -1：前置] 默认是0-替换
    
