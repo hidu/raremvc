@@ -9,7 +9,7 @@ class rCache_sqlite extends rCache{
     /**
      * @param string $cacheMod 缓存级别 默认为当前全局 root:全局 app：单独app有效
      */
-    public function __construct($dbName='cache',$cacheMod='root'){
+    public function __construct($dbName='cache',$cacheMod='app'){
        $key=$dbName."_".$cacheMod;
        if(isset(self::$dbs[$key])){
            $this->db=self::$dbs[$key];

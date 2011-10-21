@@ -7,8 +7,9 @@
  */
 class rCache_file extends rCache{
     protected  $cacheBath;
-    public function __construct(){
-       $this->cacheBath=dirname(RARE_CACHE_DIR)."/file/";
+    protected $subDirName;
+    public function __construct($dbName="",$cacheMod='app'){
+       $this->cacheBath=($cacheMod=='root'?dirname(RARE_CACHE_DIR):RARE_CACHE_DIR)."/file/".($dbName?$dbName."/":"");
     }
     
     public function has($key){
@@ -40,9 +41,8 @@ class rCache_file extends rCache{
     public function remove($key){
        @unlink($this->getCacheFilePath($key));
     }
-    
     public function getCacheFilePath($key){
-        return $this->cacheBath.$key.".php";
+        return $this->cacheBath.$this->subDirName.$key.".php";
     }
 
 }
