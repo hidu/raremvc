@@ -178,7 +178,7 @@ class rHtml{
     }
     
     public static function a($url,$text,$params=''){
-         if(!_rare_isUrl($url) && !str_startWith($url, '#') && !str_startWith($url, "javascript:")){
+         if(!_rare_isUrl($url) && !rare_strStartWith($url, '#') && !rare_strStartWith($url, "javascript:")){
            $url=url($url);
          }
         return '<a href="'.$url.'" '.self::_paramMerge($params,true).">".self::h($text)."</a>";
@@ -200,7 +200,7 @@ class rHtml{
         }
        if($name){
           $param['name']=$name;
-          if(self::$autoID && !array_key_exists("id", $param) && !str_endWith($name, "]")){
+          if(self::$autoID && !array_key_exists("id", $param) && !rare_strEndWith($name, "]")){
             $param['id']=self::getIDByName($name);
             }
        }
