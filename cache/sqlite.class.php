@@ -16,7 +16,7 @@ class rCache_sqlite extends rCache{
         }else{
           $filename=$cacheMod=='app'?RARE_CACHE_DIR:dirname(RARE_CACHE_DIR)."/";
           $filename.=$dbName;
-          directory(dirname($filename));
+          rare_mkdir(dirname($filename));
           $this->db=new PDo("sqlite:".$filename.".sqlite");
           $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
           $this->db->exec("PRAGMA synchronous = OFF");

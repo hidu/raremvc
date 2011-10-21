@@ -32,7 +32,7 @@ class rCache_file extends rCache{
     }
     public function set($key,$data,$lifetime=0){
        $file=$this->getCacheFilePath($key);
-       directory(dirname($file));
+       rare_mkdir(dirname($file));
        if($lifetime)$lifetime+=time();
        file_put_contents($file, "\n//{$lifetime}\n".$data,LOCK_EX);
        clearstatcache();
