@@ -27,14 +27,32 @@ $db[$i]['master']['passwd']="psw";
 $db[$i]['slave']['dsn']="mysql:host=192.168.2.1; port=3306; dbname=myDb";
 $db[$i]['slave']['username']="user";
 $db[$i]['slave']['passwd']="psw";
+
+$i="user";
+$db[$i]['master']['dsn']="mysql:host=127.0.0.1; port=3306; dbname=user";
+$db[$i]['master']['username']="user";
+$db[$i]['master']['passwd']="psw";
+$db[$i]['slave']['dsn']="mysql:host=192.168.2.1; port=3306; dbname=user";
+$db[$i]['slave']['username']="user";
+$db[$i]['slave']['passwd']="psw";
 return $db;
 ?&gt;
 </pre>
+*
+*本数据库封装功能全部提供的是静态方法，是为了在使用时的方便，而且默认每个方法的最后一个参数是需要链接的数据库配置的名称，如上面的myDb,user
+*如 rDB::query("select * from article where id=?", $id,"user");将指定使用配置user
+*在使用过程中，也可以使用rDB::setDefaultDb('user');将默认数据库配置修改，即可以直接使用：
+* rDB::query("select * from article where id=?", $id);
+* 默认情况下，默认数据库配置为配置文件中的第一项数据库配置。
+* 使用rDB::setDefaultDb虽然可以修改默认数据库配置，但是可能会造成代码阅读、维护困难，所以我推荐新建一个类继承rDB，如下：
+* class DBUser extends rDB{
+*   protected  static $defaultDbName="user";
+* }
  */
 class rDB{
      public static $sqls=array();
      public static $pageLabel="p";//分页参数名称
-     protected  static $defaultDbName="default";//默认数据库
+     protected  static $defaultDbName=null;//默认数据库
      protected static $enableSelectCache=true;//对 select 结果集进行缓存结果 
      
      /**
@@ -49,6 +67,18 @@ class rDB{
       */
      public static function isCacheAble(){
        return self::$enableSelectCache;
+     }
+     
+     /**
+      * 修改当前默认的数据库链接名称,以方便后面的查询而不需要提供数据库名称
+      * @param string $dbName
+      */
+     public static function setDefaultDb($dbName){
+       self::$defaultDbName=$dbName;
+     }
+     
+     public static function getDefaultDb(){
+       return self::$defaultDbName;
      }
      
      /**
@@ -72,7 +102,7 @@ class rDB{
          if(!isset($dbhs[$key])){
              $configs=self::getConfigByDbName($dbName);
              $config=isset($configs[$type])?$configs[$type]:null;
-             if(!$config)throw Exception("undefined dbConfig ".$type);
+             if(!$config)throw new Exception("undefined dbConfig ".$type);
              if(!isset($config['encode']))$config['encode']="utf8";
              $dbh=new PDO($config['dsn'], $config['username'], $config['passwd'], array());
              $dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, rareConfig::get('db_fetch_mode',PDO::FETCH_ASSOC));
@@ -88,25 +118,27 @@ class rDB{
      * @param string $dbName
      */
     public  static function getConfigByDbName($dbName=null){
-      static $config=null;
-        if($config==null){
+        static $appConfigs=null;
+        if($appConfigs==null){
            $dbConfig=rareConfig::getAll('db');
-           $config=self::init_config($dbConfig);
-           if(count($config)==1 && !isset($config[self::$defaultDbName])){
-               $_first=each($config);
-               $config[self::$defaultDbName]=$_first['value'];
-            }
+           $appConfigs=self::init_config($dbConfig);
            $rootDbConfigFile=rareContext::getContext()->getRootLibDir()."config/db.php";
            if(file_exists($rootDbConfigFile)){
               $shareConfig=require $rootDbConfigFile;
               if(is_array($shareConfig)){
                   $shareConfig=self::init_config($shareConfig);
-                  $config=array_merge($shareConfig,$config);
+                   foreach($shareConfig as $_key=>$_config){
+                        if(!isset($appConfigs[$_key]))$appConfigs[$_key]=$_config;
+                    }
                 }
             }
         }
-        if($dbName==null)$dbName=self::$defaultDbName;
-       return $config[$dbName];
+       if($dbName==null)$dbName=self::$defaultDbName;
+       if($dbName && isset($appConfigs[$dbName])){
+           return $appConfigs[$dbName];
+        }else{
+           return current($appConfigs);
+         } 
     }
     
     /**
