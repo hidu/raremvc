@@ -13,7 +13,7 @@
  * @param string $method 请求方式 默认get
  * @example
  * include '../../lib/rare/cli.php';
- *  rcli(realpath('../web/index.php'),"cron/orderTimeout","http://yzsp.pujia.com/");
+ *  rcli(realpath('../web/index.php'),"cron/orderTimeout","http://www.hongtao3.com/");
  */
 function rcli($indexFile,$uri,$urlPrex='',$method='get'){
   $pid=pcntl_fork();
