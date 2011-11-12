@@ -178,7 +178,7 @@ class rHtml{
     }
     
     public static function a($url,$text,$params=''){
-         if(!_rare_isUrl($url) && !rare_strStartWith($url, '#') && !rare_strStartWith($url, "javascript:")){
+         if(!rare_isUrl($url) && !rare_strStartWith($url, '#') && !rare_strStartWith($url, "javascript:")){
            $url=url($url);
          }
         return '<a href="'.$url.'" '.self::_paramMerge($params,true).">".self::h($text)."</a>";
