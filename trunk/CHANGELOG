@@ -1,3 +1,7 @@
+20111120
+     1.除了rareAction类外，其他的以rare开头的类全部添加final关键字
+     2.slot_get添加第二个参数$default=null.即为slot_get($name,$default=null);
+     
 20111021
     1.directory 函数重命名为rare_mkdir
     2.rare_isXmlHttpRequest 重命名为 rare_isAjax

@@ -19,7 +19,7 @@
  * @author duwei<duv123@gmail.com>
  * @since 20110713
  */
-class rareAutoLoad
+final  class rareAutoLoad
 {
     private static $instance=null;
     private static $registered=false;

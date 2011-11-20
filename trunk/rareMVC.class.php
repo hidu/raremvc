@@ -13,7 +13,7 @@
  * app 入口类
  */
 !defined("PROD") && define("PROD",0);                //是否是生产环境默认为否,对自定义错误页面等会有影响
-class rareContext{
+final class rareContext{
 
     private $appDir;                                 //当前app所在的目录
     private $rootDir;                                //当前程序的根目录，应该是appDir的上一级目录
@@ -413,7 +413,7 @@ class rareContext{
 /**
  * 模板相关操作
  */
-class rareView{
+final class rareView{
     private static $slots=array();
     
     /**
@@ -584,8 +584,8 @@ class rareView{
        return isset(self::$slots[$name]);
      }
      
-     public static function slot_get($name){
-       return self::slot_has($name)?self::$slots[$name]:null;
+     public static function slot_get($name,$default=null){
+       return self::slot_has($name)?self::$slots[$name]:$default;
      }
      
      private static $_slot_keys_cache=array();
@@ -745,7 +745,7 @@ abstract class rareAction{
  * 配置操作类，设置、读者指定的配置文件
  * @author duwei
  */
-class rareConfig{
+final class rareConfig{
     private  static $configs=array();
     /**
      *  读取某个配置文件
@@ -1088,8 +1088,8 @@ function rare_include($filePath,$params=null,$return=false){
   echo $html; 
 }
 
-function slot_get($name){
-   return rareView::slot_get($name);
+function slot_get($name,$default=''){
+   return rareView::slot_get($name,$default);
 }
 
 function slot_has($name){
