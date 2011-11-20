@@ -7,7 +7,7 @@
  * @package rare
  * @author duwei $Id: rareRouter.class.php 158  2011-06-30 13:04:35Z duwei $ 
  */
-class rareRouter{
+final class rareRouter{
    private static $config; 
    /**
     * 初始化路由规则 
