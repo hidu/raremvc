@@ -134,6 +134,6 @@ class rValidate_type {
     /**
      * 用来设置字段的名称
      */
-    const Label="label";
+    const Info="info";
 }
 ?>

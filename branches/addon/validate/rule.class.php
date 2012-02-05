@@ -218,7 +218,7 @@ class rValidate_rule{
     return strcmp($value,$equalValue)==0;
   }
   
-  public static function label($value){
+  public static function info($value){
     return true;
   }
 }

@@ -5,7 +5,7 @@
  *
  */
 class rCache_request extends rCache{
-      private $cacheData=array();
+      private static $cacheData=array();
       private static $init=null;
    
      /**
@@ -27,7 +27,7 @@ class rCache_request extends rCache{
       */
      public function  getAll()
      {
-       return $this->cacheData;
+       return self::$cacheData;
      }
      /**
       * 添加、设置cache
@@ -38,11 +38,11 @@ class rCache_request extends rCache{
       */
      public function set($key,$value,$time=0)
      {
-       if(count($this->cacheData)>1000)
+       if(count(self::$cacheData)>1000)
        {
-         array_shift($this->cacheData);
+         array_shift(self::$cacheData);
        }
-        $this->cacheData[$key]=$value;
+        self::$cacheData[$key]=$value;
      }
      
      /**
@@ -52,7 +52,7 @@ class rCache_request extends rCache{
       */
      public function has($key)
      {
-        return array_key_exists($key,$this->cacheData);
+        return array_key_exists($key,self::$cacheData);
      }
      
      /**
@@ -62,7 +62,7 @@ class rCache_request extends rCache{
       */
      public function get($key,$default=null)
      {
-        return $this->cacheData[$key];
+        return self::$cacheData[$key];
      }
      
    /**
@@ -71,7 +71,7 @@ class rCache_request extends rCache{
     */
     public function removeAll()
     {
-       $this->cacheData=array();
+       self::$cacheData=array();
      }
      
      /**
@@ -81,6 +81,6 @@ class rCache_request extends rCache{
       */
      public function remove($key)
      {
-        unset($this->cacheData[$key]);
+        unset(self::$cacheData[$key]);
      }
 }
