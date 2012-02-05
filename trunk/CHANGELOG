@@ -1,3 +1,7 @@
+20120205
+    路由配置规则支持缓存选项，即在路由配置文件中添加一项值$router['cache']=123;（注：值123为cache 版本号）即可将路由规则进行缓存。
+    为0时表示缓存永远有效
+   
 20111120
      1.除了rareAction类外，其他的以rare开头的类全部添加final关键字
      2.slot_get添加第二个参数$default=null.即为slot_get($name,$default=null);

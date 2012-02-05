@@ -4,6 +4,9 @@
  * http://raremvc.googlecode.com
  * http://rare.hongtao3.com
  * 20110807 更新
+ * 20120205 更新 
+ *    路由配置规则支持缓存选项，即在路由配置文件中添加一项值$router['cache']=123;（注：值123为cache 版本号）
+ *    为0时表示缓存永远有效
  * @package rare
  * @author duwei $Id: rareRouter.class.php 158  2011-06-30 13:04:35Z duwei $ 
  */
@@ -13,11 +16,34 @@ final class rareRouter{
     * 初始化路由规则 
     */
    public static function init(){
+       $cache_file=rareContext::getContext()->getCacheDir()."router.php";
+       $cache_config=array();
+       if(file_exists($cache_file)){
+         $cache_config=require $cache_file;
+         if(isset($cache_config['cache_version']) && $cache_config['cache_version'] ===0){
+           unset($cache_config['cache_version']);
+           self::$config=$cache_config;
+           return;
+         }
+       }
+     
        $config=rareConfig::getAll("router");
        if(!$config){
          self::$config=false;
          return;
        }
+       $version=null;
+       if(isset($config['cache'])){
+         $version=$config['cache'];
+         unset($config['cache']);
+         if(isset($cache_config['cache_version']) && $cache_config['cache_version'] ===$version){
+            unset($cache_config['cache_version']);
+            self::$config=$cache_config;
+            return;
+         }
+       }
+       
+       
        foreach ($config as $actionFullName=>$items){
            $tmp=explode("/", $actionFullName);
            if(is_string($items))$items=array(array('url'=>$items));
@@ -59,6 +85,12 @@ final class rareRouter{
              $items[$k]['_params']=$paramsMatch;
            }
            $config[$actionFullName]=$items;
+       }
+       if(!is_null($version)){
+         $tmp=$config;
+         $tmp['cache_version']=$version;
+         $cache_data="<?php\n/**\n".date("Y-m-d H:i:s")."\n*/\nreturn ".var_export($tmp,true).";";
+         file_put_contents($cache_file, $cache_data,LOCK_EX);
        }
      self::$config=$config;
    }
