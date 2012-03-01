@@ -27,7 +27,7 @@ final class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20111020';                 //当前框架版本
+    private $version='1.2 20120301';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -39,11 +39,9 @@ final class rareContext{
         $this->appDir=$appDir;
         $this->appName=basename($this->appDir);
         $this->rootDir=dirname($this->appDir)."/";
-        define("RARE_APP_NAME", $this->appName);     
-        define("RARE_ROOT_DIR", $this->rootDir);     //预定义 程序根目录
+        define("RARE_APP_NAME", $this->appName);       
+        define("RARE_ROOT_DIR", $this->rootDir);      //预定义 程序根目录
         define("RARE_APP_DIR",  $this->appDir);       //预定义 app根目录
-//        !PROD && header("rareMVC:".$this->version);
-//        header("X-Powered-By:");
     }
     
     //创建一个rare app实例，在这里会注册类自动装载
@@ -134,6 +132,11 @@ final class rareContext{
             $this->isScriptNameInUrl=true;
         }
         $this->uri=$this->uri?$this->uri:"index/index";
+        /**
+         * 添加过滤器beforeRouter($uri)的方法，以支持在该过滤器中对url地址进行预解析
+         */
+        $this->executeFilter('beforeRouter',array(&$this->uri));
+        
         include_once dirname(__FILE__).'/rareRouter.class.php';
         rareRouter::init();
         $this->uri=rareRouter::parse($this->uri);
