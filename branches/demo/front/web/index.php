@@ -1,3 +1,3 @@
 <?php
-include '../../lib/rare/rareMVC.class.php';
+include '../../lib/rare/framework/rareMVC.class.php';
 rareContext::createApp()->run();
