@@ -5,6 +5,9 @@
 <?php rareView::include_js_css()?>
 </head>
 <body>
+<div style="float:right">
+<a href="<?php echo url('admin')?>">admin</a>
+</div>
 <?php echo fetch('component1','time='.date('H:i:s'));?>
 <div style='width:180px;float:left;border:1px solid blue;min-height:400px'><?php echo slot_get('slot1')?></div>
 <div style='margin-left:190px;min-height:400px;border:1px solid blue;'><?php echo $body;?></div>
