@@ -103,11 +103,16 @@ class rDB{
              $configs=self::getConfigByDbName($dbName);
              $config=isset($configs[$type])?$configs[$type]:null;
              if(!$config)throw new Exception("undefined dbConfig ".$type);
-             if(!isset($config['encode']))$config['encode']="utf8";
+              $_config=array('encode'=>"utf8","username"=>null,"passwd"=>null);
+             foreach ($_config as $_k=>$_v){
+                 if(!isset($config[$_k]))$config[$_k]=$_v;
+               }
              $dbh=new PDO($config['dsn'], $config['username'], $config['passwd'], array());
              $dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, rareConfig::get('db_fetch_mode',PDO::FETCH_ASSOC));
              $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
-             $dbh->exec("SET NAMES {$config['encode']}");
+             if(preg_match("/^mysql:/i", $config['dsn'])){
+                $dbh->exec("SET NAMES {$config['encode']}");
+               }
              $dbhs[$key]=$dbh;
          }
          return $dbhs[$key];
