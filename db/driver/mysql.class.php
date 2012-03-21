@@ -16,7 +16,7 @@ class rdb_driver_mysql{
    }
    
    public static function getTableDesc($tableName,$dbName=null,$type='slave'){
-      $pdo=self::getPdo($dbName,'slave');
+      $pdo=rDB::getPdo($dbName,'slave');
       $result=$pdo->query("desc $tableName")->fetchAll();
       $desc=array();
       foreach ($result as $field){
