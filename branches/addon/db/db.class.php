@@ -289,10 +289,7 @@ class rDB{
         $page=isset($_GET[self::$pageLabel])?(int)$_GET[self::$pageLabel]:1;
         $page=$page>0? $page:1;
         $sql=trim($sql);
-        $pdo=self::getPdo($dbName,'slave');
-        $driver_name=strtolower($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-        
-        $result=self::_runDriver($driver_name, 'listPage',array($sql,$params,$size,$dbName,$page) );
+        $result=self::runDriver('listPage',array($sql,$params,$size,$dbName,$page),'slave',$dbName);
         if($result===false){
              throw new Exception('no driver for'.$driver_name);
           }
@@ -312,12 +309,20 @@ class rDB{
         return array($list,new $pagerClass($pageInfo));
      }
      
-     public static function _runDriver($driverName,$fn,$params){
+     protected  static function _runDriver($driverName,$fn,$params){
         $class='rdb_driver_'.strtolower($driverName);
        if(class_exists($class,true) && method_exists($class, $fn)){
           return call_user_func_array(array($class,$fn), $params);
+        }else{
+           throw new Exception('no driver for '.$driverName.":\t".$fn);
         }
         return false;
+     }
+     
+     public static function runDriver($fn,$params,$type='slave',$dbName=null){
+        $pdo=self::getPdo($dbName,$type);
+        $driver_name=strtolower($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+        return self::_runDriver($driver_name, $fn, $params);
      }
      
     /**
@@ -365,6 +370,7 @@ class rDB{
      */
     public static function table_insert($tableName,$data,$dbName=null){
          self::_dataFilter($tableName, $data);
+         if(empty($data))return false;
          $sql="insert into `{$tableName}`(".join(",", array_keys($data)).") values(".rtrim(str_repeat("?,", count($data)),",").")";
          return self::insert($sql, array_values($data)); 
     }
@@ -508,13 +514,12 @@ class rDB{
          $cache=new rCache_object();
          $key="db_table_desc/".$dbName;
          if(!$cache->has($key)){
-             $pdo=self::getPdo($dbName,'slave');
-             $result=$pdo->query("show tables")->fetchAll();
+             $result=self::getAllTables();
              $tables=array();
              foreach ($result as $row){
                 $row=each($row);
-                $_desc=$pdo->query("desc `{$row['value']}`")->fetchAll();
-                $tables[$row['value']]=qArray::getCols($_desc, 'Field');
+                $_desc=self::getTableDesc($row['value']);
+                $tables[$row['value']]=qArray::getCols($_desc, 'name');
               }
               $cache->set($key, $tables);
          }else{
@@ -534,5 +539,25 @@ class rDB{
          foreach ($data as $k=>$v){
            if(!in_array($k, $desc) && !is_int($k))unset($data[$k]);
           }
+    }
+    /**
+     * 获取所有的表
+     * @param string $dbName
+     * @param string $type
+     * @return array
+     */
+    public static function getAllTables($dbName=null,$type='slave'){
+        return self::runDriver('getAllTables',array($dbName,$type));
+    }
+    
+    /**
+     * 获取表所有的字段以及类型
+     * @param string $tableName
+     * @param string $dbName
+     * @param string $type
+     * @return array
+     */
+    public static function getTableDesc($tableName,$dbName=null,$type='slave'){
+       return self::runDriver('getTableDesc',array($tableName,$dbName,$type));
     }
 }

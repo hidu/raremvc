@@ -8,5 +8,33 @@ class rdb_driver_sqlite{
         $sql2=preg_replace("/select*\s+from/i", "SELECT count(*) FROM ", $sql);
         $total=(int)rDB::execQuery($sql2,array(),$dbName)->fetchColumn();
         return array($list,$total);
-   } 
+   }
+    
+    public static function getAllTables($dbName=null,$type='slave'){
+       $pdo=rDB::getPdo($dbName,$type);
+       return $pdo->query("select name from sqlite_master where type='table'")->fetchAll();
+   }
+   
+   /**
+    * 
+    |    |    [  cid  ] = String(1) "0"
+    |    |    [  name  ] = String(2) "id"
+    |    |    [  type  ] = String(3) "int"
+    |    |    [  notnull  ] = String(1) "0"
+    |    |    [  dflt_value  ] = NULL(0) NULL
+    |    |    [  pk  ] = String(1) "0"
+    * 
+    * @param string $tableName
+    * @param string $dbName
+    * @param string $type
+    */
+   public static function getTableDesc($tableName,$dbName=null,$type='slave'){
+      $pdo=rDB::getPdo($dbName,$type);
+      $result= $pdo->query("PRAGMA table_info($tableName)")->fetchAll();
+      $desc=array();
+      foreach ($result as $field){
+        $desc[$field['name']]=array('name'=>$field['name'],'type'=>$field['type']);
+       }
+      return $desc;
+   }
 }
