@@ -1,6 +1,6 @@
 <?php
-//数据库配置文件
+//路由配置文件
 $router=array();
-
+$router['index/view'][]=array('url'=>'{articleid}','param'=>array('articleid'=>'\d+'));
 return $router;
 

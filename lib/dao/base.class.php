@@ -1,12 +1,17 @@
 <?php
 abstract class dao_base{
    protected $tableName=null;
+   protected $keyField=null;
    
    public function getOneByField($fieldName,$fieldValue){
       $sql="select * from {$this->tableName} where {$fieldName}=?";
       return rDB::query($sql,$fieldValue);
    }
    
+   public function getByKey($keyValue){
+     if(is_null($this->keyField))throw new Exception('no key field!');
+     return $this->getOneByField($this->keyField, $keyValue);
+   }
    
    public function deleteByField($fieldName,$fieldValue){
      return rdb::table_delete($this->tableName, "{$fieldName}=?",$fieldValue);
@@ -18,5 +23,25 @@ abstract class dao_base{
    
    public function add($data){
       return rDB::table_insert($this->tableName, $data);
+   }
+   
+   public function save($data){
+      if(is_null($this->keyField))throw new Exception('no key field!');
+      $key=isset($data[$this->keyField])?$data[$this->keyField]:null;
+      if(!empty($key)){
+         $rt=$this->updateByField($this->keyField, $key, $data);
+         if(false !== $rt){
+            return $this->getByKey($key);
+         }
+      }
+      $lastId=$this->add($data);
+      if($lastId){
+         return $this->getByKey($lastId);
+      }
+      return false;
+   }
+   
+   public function getListPage($sqlMore="",$sqlParams=array(),$pageSize=10){
+    return rDB::listPage("select * from {$this->tableName} where 1 {$sqlMore}",$sqlParams,$pageSize);
    }
 }

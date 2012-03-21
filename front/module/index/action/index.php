@@ -7,7 +7,9 @@ class indexAction extends rareAction{
     
     }
     public function executeGet(){
-    
+       $articleDao=service_daoFactory::getArticleDao();
+       $listPagt=$articleDao->getListPage();
+       $this->assign('listPage',$listPagt);
     }
     public function executePost(){
     
