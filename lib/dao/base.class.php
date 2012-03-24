@@ -41,6 +41,13 @@ abstract class dao_base{
       return false;
    }
    
+   public function query($sql,$params=null){
+     return rDB::query($sql,$params=null);
+   }
+   public function queryAll($sql,$params=null){
+     return rDB::queryAll($sql,$params=null);
+   }
+   
    public function getListPage($sqlMore="",$sqlParams=array(),$pageSize=10){
     return rDB::listPage("select * from {$this->tableName} where 1 {$sqlMore}",$sqlParams,$pageSize);
    }

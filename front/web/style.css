@@ -1,3 +1,36 @@
 @CHARSET "UTF-8";
-html,body,div{margin: 0;padding: 0}
-body{margin:5px}
+/*rest*/
+body,div,dl,dt,dd,ul,ol,li,h1,h2,h3,h4,h5,h6,pre,code,form,fieldset,legend,input,textarea,p,blockquote,th,td{margin:0;padding:0;}table{border-collapse:collapse;border-spacing:0;}fieldset,img{border:0;}address,caption,cite,code,dfn,em,strong,th,var{font-style:normal;font-weight:normal;}li{list-style:none;}caption,th{text-align:left;}h1,h2,h3,h4,h5,h6{font-size:100%;font-weight:normal;}q:before,q:after{content:'';}abbr,acronym{border:0;font-variant:normal;}sup{vertical-align:text-top;}sub{vertical-align:text-bottom;}input,textarea,select{font-family:inherit;font-size:inherit;font-weight:inherit;}input,textarea,select{*font-size:100%;}legend{color:#000;}
+
+body{background: #e9f3ff ; font-size: 14px;line-height: 22px; }
+a{text-decoration:none;color:#0049CE}
+a:HOVER{color: #f79333}
+img{margin-bottom:-3px}
+
+#top-nav{height:32px;margin-top:-32px;}
+#header{height:70px;margin-bottom:10px;}
+#header h1{color: #fff;font-size:36px;display: inline-block;padding-top: 25px;height: 46px;padding-left:20px}
+#header h1 a{color: #000;}
+.wrap{margin:0 auto}
+
+#headBar{height:22px}
+#headBar a{font-weight:bold;margin-right:10px;color:#000}
+
+#bd{background:url('img/bg-wrapper.jpg') no-repeat;}
+#content{min-height:400px;margin:5px; margin-bottom: 20px;text-align: left;background: #fff;padding:10px;border-radius:10px}
+#aside{width:255px;position: absolute;top:90px;}
+#center{margin-left: 260px;}
+
+.cpanel{background:#ffffff;border-radius:10px;margin-bottom: 10px;border:1px solid #75B8ED;}
+.cpanel_title{background:#75B8ED;padding: 3px 0 3px 10px;border-radius:10px 10px 0 0;color:#000;}
+.cpanel_content{padding: 10px;font-size:13px}
+
+.left{float: left}
+.right{float: right;}
+.edit_form{padding: 30px;}
+#index_article_list{min-height:400px;padding:20px}
+#index_article_list .title{font-size:18px;border-bottom:1px dashed gray;padding-bottom:5px;text-align: left;margin-top:20px}
+#index_article_list .title a{}
+#index_article_list .postTime {color:gray}
+#index_article_list .seeFull{margin: 10px}
+#index_article_list .seeFull a{color:blue}

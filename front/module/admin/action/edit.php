@@ -1,8 +1,11 @@
 <?php
 class editAction extends rareAction{
   public function executeGet(){
-     $articleID=$this->_getParam('articleID');
-     $article=array('title'=>'','body'=>'');
+     $articleID=$this->_getParam('articleid');
+     $article=service_daoFactory::getArticleDao()->getByKey($articleID);
+     if(!$article){
+       $article=array('title'=>'','body'=>'','articleid'=>'');
+     }
      $this->assign('article',$article);
   }
   
@@ -14,7 +17,7 @@ class editAction extends rareAction{
       rHtml::js_alertGo($e->getMessage(), -1);
     }
     if(!$new)rHtml::js_alertGo("save fail!try again!", -1);
-    redirect(url("?articleid=".$new['articleid']));
+     rHtml::js_alertGo("save success!", url("?articleid=".$new['articleid']));
   }
 
 }
