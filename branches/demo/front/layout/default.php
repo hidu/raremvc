@@ -5,11 +5,22 @@
 <?php rareView::include_js_css()?>
 </head>
 <body>
-<div style="float:right">
-<a href="<?php echo url('admin')?>">admin</a>
+<div id="top-nav"></div>
+<div class="wrap" id="bd">
+  <div id="header">
+    <h1><a href="<?php echo url('index')?>">demo</a></h1>
+  </div>
+  <div  id="content">
+    <div class="cpanel" id="center">
+    <div class="cpanel_title" id="headBar"><div class="left"><a href="<?php echo url('index')?>">首页</a></div></div>
+    <?php echo $body;?>
+    </div>
+    <div id="aside">
+     <?php echo fetch('last');?>
+     <?php echo slot_get('aside')?>
+    </div>
+  </div>
 </div>
-<?php echo fetch('component1','time='.date('H:i:s'));?>
-<div style='width:180px;float:left;border:1px solid blue;min-height:400px'><?php echo slot_get('slot1')?></div>
-<div style='margin-left:190px;min-height:400px;border:1px solid blue;'><?php echo $body;?></div>
+<div id="footer" class="wrap">rare demo</div>
 </body>
 </html>

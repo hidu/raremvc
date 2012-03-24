@@ -1,4 +1,8 @@
-<form method="post">
+<form method="post" class="edit_form">
+<?php if($article['articleid']){?>
+<a href="<?php echo url("index/view?articleid=".$article['articleid'])?>">查看文章</a>
+<?php }?>
+<?php echo rHtml::hidden('a[articleid]', $article['articleid']);?>
 <table>
 <tr>
 <th>title:</th>
@@ -14,4 +18,5 @@
 <?php echo rHtml::submit("保存");?>
 </td>
 </tr>
+</table>
 </form>
