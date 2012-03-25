@@ -6,6 +6,8 @@ class editAction extends rareAction{
      if(!$article){
        $article=array('title'=>'','body'=>'','articleid'=>'');
      }
+     $cates=service_category::getAllPair();
+     $this->assign('cates',$cates);
      $this->assign('article',$article);
   }
   

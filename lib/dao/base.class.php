@@ -4,8 +4,7 @@ abstract class dao_base{
    protected $keyField=null;
    
    public function getOneByField($fieldName,$fieldValue){
-      $sql="select * from {$this->tableName} where {$fieldName}=?";
-      return rDB::query($sql,$fieldValue);
+     return $this->query($fieldName."=?",$fieldValue);
    }
    
    public function getByKey($keyValue){
@@ -46,14 +45,25 @@ abstract class dao_base{
       return false;
    }
    
-   public function query($sql,$params=null){
-     return rDB::query($sql,$params=null);
+   public function query($where,$params=null){
+     $sql="select * from {$this->tableName}";
+     if(!empty($where))$sql.=" where ".$where;
+     return rDB::query($sql,$params);
    }
-   public function queryAll($sql,$params=null){
-     return rDB::queryAll($sql,$params=null);
+   public function queryAll($where="",$params=null){
+     $sql="select * from {$this->tableName}";
+     if(!empty($where))$sql.=" where ".$where;
+     return rDB::queryAll($sql,$params);
    }
    
-   public function getListPage($sqlMore="",$sqlParams=array(),$pageSize=10){
-    return rDB::listPage("select * from {$this->tableName} where 1 {$sqlMore}",$sqlParams,$pageSize);
+   public function queryAllPairs($keyField,$valueField,$where='',$whereParams=array()){
+      $all=$this->queryAll($where,$whereParams);
+       return qArray::toHashmap($all, $keyField,$valueField);
+   }
+   
+   public function getListPage($where="",$sqlParams=array(),$pageSize=10){
+     $sql="select * from {$this->tableName}";
+     if(!empty($where))$sql.=" where ".$where;
+    return rDB::listPage($sql,$sqlParams,$pageSize);
    }
 }
