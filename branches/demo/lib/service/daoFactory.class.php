@@ -16,4 +16,11 @@ class service_daoFactory{
      
       return self::getInstance('dao_article');
    }
+   
+   /**
+    *@return dao_category 
+    */
+   public static function getCateDao(){
+      return self::getInstance("dao_category");
+   }
 }

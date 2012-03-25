@@ -12,7 +12,7 @@ $config=array();
 //$config['meta.keywords']='';                                      //keywords
 //$config['meta.description']='';                                   //description
 //可以继续定义其他任何meta.xxxxx
-//$config['rest']=false;                                            //是否启用action的自定义rest
+$config['rest']=true;                                            //是否启用action的自定义rest
 $config['css']="style.css";
 return $config;
 

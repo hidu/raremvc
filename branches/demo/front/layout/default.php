@@ -12,7 +12,9 @@
   </div>
   <div  id="content">
     <div class="cpanel" id="center">
-    <div class="cpanel_title" id="headBar"><div class="left"><a href="<?php echo url('index')?>">首页</a></div></div>
+    <div class="cpanel_title" id="headBar">
+       <div class="left"><a href="<?php echo url('index')?>">首页</a><?php echo slot_get('nav_left');?></div>
+   </div>
     <?php echo $body;?>
     </div>
     <div id="aside">
