@@ -14,8 +14,8 @@ class service_article{
    }
    
    public static function getLast($num){
-       $sql="select * from article order by mtime desc limit {$num}";
-       return service_daoFactory::getArticleDao()->queryAll($sql);
+       $where="1  order by mtime desc limit {$num}";
+       return service_daoFactory::getArticleDao()->queryAll($where);
    }
 
 }

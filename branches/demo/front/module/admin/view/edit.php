@@ -9,6 +9,12 @@
 <td><?php echo rHtml::input('a[title]',$article['title']);?></td>
 </tr>
 <tr>
+<th>分类：</th>
+<td><?php echo rHtml::select('a[cateid]', $article['cateid'], $cates);?>
+<a href="<?php echo url('admin/cate')?>">管理</a>
+</td>
+</tr>
+<tr>
 <th>body:</th>
 <td><?php echo rHtml::textArea('a[body]',$article['body'],"style='width:400px;height:200px'");?></td>
 </tr>

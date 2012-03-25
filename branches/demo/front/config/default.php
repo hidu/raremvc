@@ -1,4 +1,6 @@
 <?php
+define('RARE_DEBUG', true);
+
 //rare 程序默认的配置文件
 $config=array();
 //$config['no_script_name']=true;                                   // 是否启用url地址重写，隐藏入口文件，默认为true
