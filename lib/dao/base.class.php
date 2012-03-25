@@ -25,6 +25,11 @@ abstract class dao_base{
       return rDB::table_insert($this->tableName, $data);
    }
    
+   public function deleteByKey($keyValue){
+     if(is_null($this->keyField))throw new Exception('no key field!');
+     return $this->deleteByField($this->keyField, $keyValue);
+   }
+   
    public function save($data){
       if(is_null($this->keyField))throw new Exception('no key field!');
       $key=isset($data[$this->keyField])?$data[$this->keyField]:null;
