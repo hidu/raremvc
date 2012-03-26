@@ -87,7 +87,7 @@ class rValidate{
   public  function validate($data){
     $this->validate=true;
     $this->formData=array();
-    print_r($this->config);
+    //print_r($this->config);
     
     foreach ($this->config as $name=>$rules){
       $value=isset($data[$name])?(is_array($data[$name])?$data[$name]:trim($data[$name])):null;
