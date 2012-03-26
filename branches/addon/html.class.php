@@ -186,7 +186,7 @@ class rHtml{
     
     public static function js_alertGo($message,$url){
         $go=is_int($url)?"history.go($url)":"location.href='{$url}'";
-        echo'<script>'.(strlen($message)?'alert("'.self::h($message).'");':'').$go.';</script>';
+        echo'<script>'.(strlen($message)?'alert("'.self::h(str_replace("\n"," ",$message)).'");':'').$go.';</script>';
         die;
     }
     
