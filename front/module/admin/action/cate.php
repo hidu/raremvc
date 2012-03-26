@@ -12,6 +12,11 @@ class cateAction extends rareAction{
    public function executeEdit(){
       $cate=$this->_postParam('c');
       if(empty($cate))redirect('admin/cate');
+
+     $validate=new rValidate('cate');
+     if(!$validate->validate($cate)){
+       rHtml::js_alertGo(str_replace("\n","",$validate->getErrorsAsString()),-1);
+     }
       try{
       $new=service_daoFactory::getCateDao()->save($cate);
       }catch (Exception $e){

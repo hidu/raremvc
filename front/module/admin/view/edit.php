@@ -6,7 +6,11 @@
 <table>
 <tr>
 <th>title:</th>
-<td><?php echo rHtml::input('a[title]',$article['title']);?></td>
+<td><?php echo rHtml::input('a[title]',$article['title'],"style='width:400px'");?></td>
+</tr>
+<tr>
+<th>pinyin:</th>
+<td><?php echo rHtml::input('a[pinyin]',$article['pinyin'],"style='width:400px'");?></td>
 </tr>
 <tr>
 <th>分类：</th>
@@ -16,7 +20,7 @@
 </tr>
 <tr>
 <th>body:</th>
-<td><?php echo rHtml::textArea('a[body]',$article['body'],"style='width:400px;height:200px'");?></td>
+<td><?php echo rHtml::textArea('a[body]',$article['body'],"style='width:600px;height:200px'");?></td>
 </tr>
 <tr>
 <th></th>
