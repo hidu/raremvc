@@ -2,9 +2,9 @@
 class editAction extends rareAction{
   public function executeGet(){
      $articleID=$this->_getParam('articleid');
-     $article=service_daoFactory::getArticleDao()->getByKey($articleID);
+     $article=service_article::getArticle($articleID);
      if(!$article){
-       $article=array('title'=>'','body'=>'','articleid'=>'');
+       $article=array('title'=>'','body'=>'','articleid'=>'','cateid'=>'','pinyin'=>'');
      }
      $cates=service_category::getAllPair();
      $this->assign('cates',$cates);

@@ -16,9 +16,9 @@ img{margin-bottom:-3px}
 #headBar{height:22px}
 #headBar a{font-weight:bold;margin-right:10px;color:#000}
 
-#bd{background:url('img/bg-wrapper.jpg') no-repeat;}
 #content{min-height:400px;margin:5px; margin-bottom: 20px;text-align: left;background: #fff;padding:10px;border-radius:10px}
 #aside{width:255px;position: absolute;top:90px;}
+#aside li{height: 22px;line-height: 22px;overflow: hidden;}
 #center{margin-left: 260px;}
 
 .cpanel{background:#ffffff;border-radius:10px;margin-bottom: 10px;border:1px solid #75B8ED;}
@@ -37,3 +37,9 @@ img{margin-bottom:-3px}
 
 .ul-1{height: 24px;margin: 5px}
 .ul-1 li{float: left;padding: 2px 10px 0;min-width: 80px}
+
+.rPager{height:25px;}
+.rPager ul{float:right;padding: 0 !important;margin: 0 !important;border: none !important;}
+.rPager ul li {float: left;line-height: 20px;margin: 5px;list-style: none !important;height: 20px}
+.rPager ul li.current {color: black;font-weight: bold;}
+.rPager ul li a {padding: 3px 2px;height: 14px;line-height: 14px;text-decoration: none;}

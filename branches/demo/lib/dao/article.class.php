@@ -14,4 +14,11 @@ class dao_article extends dao_base{
      $data['ctime']=$data['mtime']=time();
      return parent::add($data);
   }
+  public function save($data){
+    if(empty($data[$this->keyField])){
+       $data['ctime']=$data['mtime']=time();
+       unset($data[$this->keyField]);
+    }
+    return parent::save($data);
+  }
 }

@@ -1,6 +1,7 @@
 <ul class="ul-1">
 <li>cateid</li>
 <li>cateName</li>
+<li>pinyin</li>
 <li></li>
 </ul>
  <?php foreach ($listPage[0] as $one){?>
@@ -11,6 +12,7 @@
  <?php echo rHtml::hidden('method', 'edit');?>
  <?php echo rHtml::hidden('c[cateid]',$one['cateid'])?> 
  <?php echo rHtml::input('c[catename]',$one['catename'],"style='width:70px'")?>
+ <?php echo rHtml::input('c[pinyin]',$one['pinyin'],"style='width:70px'")?>
  <?php echo rHtml::submit('保存');?>
  </form>
   </li>
@@ -25,7 +27,8 @@
 <?php }?>
 <br/>
 <form method="post">
- 添加：<?php echo rHtml::hidden('method', 'edit');?>
- <?php echo rHtml::input('c[catename]','',"style='width:70px'")?>
- <?php echo rHtml::submit('保存');?>
+<?php echo rHtml::hidden('method', 'edit');?>
+ 名称：<?php echo rHtml::input('c[catename]','',"style='width:70px'")?>
+ 拼音：<?php echo rHtml::input('c[pinyin]',"","style='width:70px'")?>
+ <?php echo rHtml::submit('添加');?>
 </form>
