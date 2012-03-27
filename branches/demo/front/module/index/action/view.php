@@ -12,6 +12,8 @@ class viewAction extends rareAction{
     $slot.=h($article['title']);
     slot_set('nav_left', $slot);
     
+    rareView::setTitle($article['title']);
+    
     $this->assign('article',$article);
   }
 }

@@ -11,6 +11,8 @@ class indexAction extends rareAction{
        $articleDao=service_daoFactory::getArticleDao();
        $where="";
        $param=array();
+       rareView::setTitle('home');
+      
        if($cateid){
          $where.=" cateid=:cateid";
          $param['cateid']=$cateid;

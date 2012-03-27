@@ -19,6 +19,7 @@ img{margin-bottom:-3px}
 #content{min-height:400px;margin:5px; margin-bottom: 20px;text-align: left;background: #fff;padding:10px;border-radius:10px}
 #aside{width:255px;position: absolute;top:90px;}
 #aside li{height: 22px;line-height: 22px;overflow: hidden;}
+#aside li.cur a{font-weight: bold;}
 #center{margin-left: 260px;}
 
 .cpanel{background:#ffffff;border-radius:10px;margin-bottom: 10px;border:1px solid #75B8ED;}
@@ -43,3 +44,6 @@ img{margin-bottom:-3px}
 .rPager ul li {float: left;line-height: 20px;margin: 5px;list-style: none !important;height: 20px}
 .rPager ul li.current {color: black;font-weight: bold;}
 .rPager ul li a {padding: 3px 2px;height: 14px;line-height: 14px;text-decoration: none;}
+
+#article_view{margin: 15px}
+#article_view h2{font-size: 18px;font-weight: bold;margin-top: 10px;}

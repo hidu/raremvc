@@ -5,6 +5,7 @@ class myRouter{
       $cate=service_category::getByPinyin($pinyin);
       if(!$cate)return false;
       $param['cateid']=$cate['cateid'];
+      rareView::setTitle($cate['catename']);
       return true;
    }
 }

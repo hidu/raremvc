@@ -10,7 +10,7 @@ $config=array();
 //$config['suffix']='html';                                         //默认的url后缀
 //$config['timezone']='Asia/Shanghai';                              //默认的时区      
 //$config['charset']='utf-8';                                       //默认的字符编码
-//$config['title']='rare';                                          //默认的title
+$config['title']='rare';                                          //默认的title
 //$config['meta.keywords']='';                                      //keywords
 //$config['meta.description']='';                                   //description
 //可以继续定义其他任何meta.xxxxx
