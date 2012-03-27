@@ -1,5 +1,5 @@
 <?php
-class editAction extends rareAction{
+class articleAction extends rareAction{
   public function executeGet(){
      $articleID=$this->_getParam('articleid');
      $article=service_article::getArticle($articleID);

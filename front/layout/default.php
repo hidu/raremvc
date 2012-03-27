@@ -16,7 +16,7 @@
        <div class="left"><a href="<?php echo url('index')?>">首页</a><?php echo slot_get('nav_left');?></div>
        <div class="right">
          <a href="<?php echo url('admin/cate')?>">cate</a>
-         <a href="<?php echo url('admin/edit')?>">post</a>
+         <a href="<?php echo url('admin/article')?>">post</a>
        </div>
    </div>
     <?php echo $body;?>
@@ -28,6 +28,6 @@
     </div>
   </div>
 </div>
-<div id="footer" class="wrap">rare demo</div>
+<div id="footer" class="wrap" style="text-align:center">rare demo</div>
 </body>
 </html>
