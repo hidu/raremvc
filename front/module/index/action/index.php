@@ -17,7 +17,8 @@ class indexAction extends rareAction{
          $where.=" cateid=:cateid";
          $param['cateid']=$cateid;
        }
-       $listPagt=$articleDao->getListPage($where,$param);
+       $where.=(empty($where)?"1":"")." order by mtime desc";
+       $listPagt=$articleDao->getListPage($where,$param,3);
        $this->assign('listPage',$listPagt);
     }
     public function executePost(){
