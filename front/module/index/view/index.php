@@ -9,6 +9,18 @@
  </div>
 </div>
 <?php }?>
-</div>
 
 <div><?php echo $listPage[1];?></div>
+
+</div>
+
+<?php if(isset($_GET['ajax'])){ ?>
+<?php rareView::addJs("https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js");?>
+<script>
+	$('#index_article_list .rPager a').click(function(){
+		var url=$(this).attr('href');
+		$('#index_article_list').parent('div').load(url);
+		return false;
+    });
+</script>
+<?php } ?>
