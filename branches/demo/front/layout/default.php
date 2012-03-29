@@ -3,6 +3,7 @@
 <head>
 <?php rareView::include_title();?>
 <?php rareView::include_js_css()?>
+<?php echo slot_get('header');?>
 </head>
 <body>
 <div id="top-nav"></div>

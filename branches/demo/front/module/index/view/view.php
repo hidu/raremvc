@@ -3,6 +3,6 @@
 <a  href="<?php echo url('admin/article?articleid='.$article['articleid']) ?>">edit</a>
 </center>
 <div>
-<?php echo $article['body']?>
+<?php echo nl2br($article['body']);?>
 </div>
 </div>
