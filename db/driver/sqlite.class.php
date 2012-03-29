@@ -5,8 +5,8 @@ class rdb_driver_sqlite{
         $limit= $start.','.$size;
         $sqlLimit=$sql." LIMIT ".$limit;
         $list=rDB::queryAll($sqlLimit, $params,$dbName);
-        $sql2=preg_replace("/select*\s+from/i", "SELECT count(*) FROM ", $sql);
-        $total=(int)rDB::execQuery($sql2,array(),$dbName)->fetchColumn();
+        $sql2=preg_replace("#^select\s+\*\s+from#i", "SELECT count(*) FROM ", $sql);
+        $total=(int)rDB::execQuery($sql2,$params,$dbName)->fetchColumn();
         return array($list,$total);
    }
     
