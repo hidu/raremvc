@@ -10,11 +10,15 @@ class service_category{
    
    public static function getAll(){
      $all= self::getDao()->queryAll();
-     return qArray::toHashmap($all, 'cateid');
+     $list=array();
+     foreach ($all as $one){
+       $list[$one['cateid']]=$one;
+     }
+     return $list;
    }
    
    public static function getCate($cateid){
-     return self::getDao()->getByKey($cateid);
+     return self::getDao()->getOneByKey($cateid);
    }
    
    public static function getByPinyin($pinyin){
