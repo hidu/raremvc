@@ -23,7 +23,7 @@ abstract class rDao_base{
   }
   
   private function _checkKeyField(){
-    if(is_null($this->keyField))throw new Exception('no key field!');
+    if(is_null($this->key_field))throw new Exception('no key field!');
   }
   
   protected function onUpdate(&$data,&$where,&$params){
@@ -44,7 +44,7 @@ abstract class rDao_base{
   }
   
   public function getOneByField($fieldName,$fieldValue){
-    return $this->query($fieldName."=?",$fieldValue);
+    return $this->query("where ".$fieldName."=?",$fieldValue);
   }
    
    public function update($data,$where,$params){
@@ -72,7 +72,7 @@ abstract class rDao_base{
    }
 
    public function deleteByField($fieldName,$fieldValue){
-     return $this->delete($fieldName."=?", $fieldValue);
+     return $this->delete("delete ".$fieldName."=?", $fieldValue);
    }
    
    public function insert($data){
