@@ -83,7 +83,7 @@ class rPager{
       
       for($i=$this->startPage;$i<=$this->endPage;$i++){
           if($i==$this->page){
-             $html .="<li class='current' rel='{$this->makeUrl($this->page)}'>{$this->page}</li>";
+             $html .="<li class='current' rel='{$this->makeUrl($this->page)}'><a class='nolink'>{$this->page}</a></li>";
           }else{
              $html .="<li><a href='".$this->makeUrl($i)."'>{$i}</a></li>";
           }
@@ -100,7 +100,7 @@ class rPager{
      if($isLink){
         return "<a href='".$this->makeUrl($page)."'>{$txt}</a>";
      }else{
-       return $txt;
+       return "<a class='nolink'>".$txt."</a>";
      }
    }
    
@@ -113,7 +113,12 @@ class rPager{
             parse_str($tmp['query'],$query);
          }
         $query[$this->label]=max($p,1);
-        $prep=(empty($tmp['path'])?'':$tmp['path'])."?".http_build_query($query);
+        $tmp['path']=empty($tmp['path'])?'':$tmp['path'];
+        if(class_exists("myHook",true) && method_exists("myHook", "pagerMakeUrl")){
+           $prep=call_user_func_array(array('myHook',"pagerMakeUrl"),array($tmp['path'],$query));
+        }else{
+           $prep=$tmp['path']."?".http_build_query($query);
+         }
        return $prep;
    }
    

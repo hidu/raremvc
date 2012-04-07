@@ -5,13 +5,24 @@
  * html表单输出工具类
  */
 class rHtml{
+  
    private static $autoID=true;
+   
+   private static $autoClass=true;
    /**
     * 是否允许自动添加id字段
     * @param boolean $enable
     */
    public static function enableAutoID($enable){
        self::$autoID=$enable;
+   }
+   /**
+    * 是否允许自动添加统一的class
+    * 如input-text添加r-text
+    * @param boolean $autoClass
+    */
+   public static function enableAutoClass($autoClass){
+       self::$autoClass=$autoClass;
    }
     /**
     * 检查select radio_group checkbox_group的 选项
@@ -31,11 +42,12 @@ class rHtml{
    }
     
    public static function select($name,$value,$options,$params=''){
-       $html="<select name=\"{$name}\" ".self::_paramMerge($params,array('id'=>self::getIDByName($name)),true).">";
+       $params=self::_paramMergeWithClass(array(), $params,$name,'select');
+       $html="<select ".self::_paramMerge($params,true).">";
        if(!is_array($value))$value=explode(",", $value);
        $value=array_flip($value);
        foreach ($options as $_k=>$_v){
-           $html.="<option value=\"".self::h($_k)."\" ".(array_key_exists($_k, $value)?'selected="selected"':"").">".self::h($_v)."</option>";
+           $html.="<option value=\"".self::h($_k)."\"".(array_key_exists($_k, $value)?' selected="selected"':"").">".self::h($_v)."</option>";
         }
         return $html."</select>";
    }
@@ -43,7 +55,8 @@ class rHtml{
   
    
    public static function textArea($name,$value='',$params=''){
-     return '<textarea name="'.$name.'" '.self::_paramMerge(array('id'=>self::getIDByName($name)),$params,true).">".self::h($value)."</textarea>";
+     $params=self::_paramMergeWithClass(array(), $params,$name,'textarea');
+     return '<textarea '.self::_paramMerge($params,true).">".self::h($value)."</textarea>";
    }
    
    
@@ -62,10 +75,11 @@ class rHtml{
     * @param string|array $params
     */
    public static function radio_group($name,$value,$options,$params=""){
-       $html="<span class='r_radio_group'>";
+       $html="<span class='r-radio-group'>";
        foreach ($options as $_k=>$_v){
            $_param=array();
            if(strcmp($_k, $value)==0)$_param['checked']="checked";
+           $_param['id']='';
            $html.="<label>".self::inputTag('radio',$name,$_k,$params,$_param).self::h($_v)."</label>";
         }
         $html.="</span>";
@@ -75,11 +89,16 @@ class rHtml{
    public static function checkbox_group($name,$value,$options,$params=''){
       if(!is_array($options))$options=array($options=>'');
       if(!is_array($value))$value=explode(",",$value);
-      $html="<span class='r_checkbox_group'>";
+      $html="<span class='r-checkbox-group'>";
+      $params=self::_paramMerge($params);
       foreach ($options as $_k=>$_v){
           $_param=array();
           if(in_array($_k, $value))$_param['checked']="checked";
-          $_param['id']=self::getIDByName($name)."_".$_k;
+          if($params['id']){
+             $_param['id']=$params['id']."_".$_k;
+           }else if(self::$autoID){
+             $_param['id']=self::getIDByName($name)."_".$_k;
+           }
           $html.="<label>".self::inputTag('checkbox',$name,$_k,$params,$_param)."{$_v}</label>";
        }
         $html.="</span>";
@@ -121,7 +140,7 @@ class rHtml{
    }
    
    public static function input_image($src,$params=""){
-      return self::inputTag("image",'',$label,$params,array('src'=>$src)); 
+      return self::inputTag("image",'','',$params,array('src'=>$src)); 
    }
    
    public static function input_button($label,$params=""){
@@ -181,7 +200,7 @@ class rHtml{
          if(!rare_isUrl($url) && !rare_strStartWith($url, '#') && !rare_strStartWith($url, "javascript:")){
            $url=url($url);
          }
-        return '<a href="'.$url.'" '.self::_paramMerge($params,true).">".self::h($text)."</a>";
+        return '<a href="'.self::h($url).'"'.self::_paramMerge($params,true).">".self::h($text)."</a>";
     }
     
     public static function js_alertGo($message,$url){
@@ -190,23 +209,33 @@ class rHtml{
         die;
     }
     
-   
-   public static function inputTag($type='text',$name='',$value='',$param="",$paramMore=''){
-       $param=self::_paramMerge($param, $paramMore);
-       if(isset($param['class'])){
-         $param['class']="r-".$type." ".$param['class'];
-        }else{
-         $param['class']="r-".$type;
-        }
-       if($name){
+    /**
+     * 
+     * @param mixed $params1
+     * @param mixed $params2
+     * @param string $name
+     * @param string $type
+     * @return array
+     */
+    private static function _paramMergeWithClass($params1,$params2,$name,$type){
+       $param=self::_paramMerge($params1, $params2);
+       if(self::$autoClass){
+          $param['class']="r-".$type.(isset($param['class'])?" ".$param['class']:"");
+         }
+        
+      if($name){
           $param['name']=$name;
           if(self::$autoID && !array_key_exists("id", $param) && !rare_strEndWith($name, "]")){
-            $param['id']=self::getIDByName($name);
+             $param['id']=self::getIDByName($name);
             }
-       }
-      
-        $param=self::_paramMerge($param,true);
-     return "<input type=\"{$type}\" value=\"".self::h($value)."\" {$param} />";
+        }
+        return $param;
+     }
+   
+   public static function inputTag($type='text',$name='',$value='',$param="",$paramMore=''){
+        $param=self::_paramMergeWithClass($param, $paramMore, $name,$type);
+        $paramStr=self::_paramMerge($param,true);
+     return "<input type=\"{$type}\" value=\"".self::h($value)."\"{$paramStr}/>";
    }
    
     
@@ -223,10 +252,10 @@ class rHtml{
          if($_param===true){
                $str="";
               foreach ($param as $_k=>$_v){
-                    if(is_null($_v))continue;
+                    if(is_null($_v) || !strlen($_v))continue;
                     $str.=$_k.'="'.self::h($_v).'" ';
                  }
-               return $str;
+               return $str?" ".trim($str):"";
           }
        return $param;
     }
@@ -255,6 +284,7 @@ class rHtml{
        @ob_end_clean();
        @ob_clean();
        self::enableAutoID(false);
+       self::enableAutoClass(false);
        header("Content-Type:text/html; charset=utf-8"); 
        $html="<html><head><meta http-equiv='Content-Type' content='text/html; charset=utf-8' /></head>".
              "<body onload='document.form1.submit()'>";
@@ -344,4 +374,16 @@ class rHtml{
       $url.=isset($url_info['fragment'])?"#".$url_info['fragment']:"";
       return $url;
    }
+   
+   public static function button_link($text,$url,$confirm=null,$params=null){
+     if(!rare_isUrl($url)){
+       $url=url($url);
+      }
+      if(!empty($confirm)){
+         $confirm="if(!confirm('".addslashes($confirm)."'))return false;";
+       }
+       $_param=self::_paramMerge(array('onclick'=>$confirm."location.href='".$url."'","class"=>'r-button-link'),$params);
+       return self::input_button($text,$_param);
+   }
+   
 }
