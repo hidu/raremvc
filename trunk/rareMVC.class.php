@@ -27,7 +27,7 @@ final class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20120301';                 //当前框架版本
+    private $version='1.2 20120407';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -101,6 +101,9 @@ final class rareContext{
                $_autoloadOption['cache']=$this->getConfigDir()."autoLoad";
               }                                     
             $option=array_merge($_autoloadOption,rareConfig::get("class_autoload_option",array()));
+            if(isset($option['dir_more'])){
+              $option['dirs'].=",".$option['dir_more'];
+              }
             rareAutoLoad::register($option);
         }
     }
@@ -702,7 +705,11 @@ abstract class rareAction{
                 $layoutFile=$this->context->getLayoutDir()."default.php";
               }
         }else{
+          if(rare_strStartWith($this->layout, ":")){  //用于适配一个自定义的布局文件的路径
+            $layoutFile=substr($this->layout, 1);
+          }else{
             $layoutFile=$this->context->getLayoutDir().$this->layout.".php";
+           }
         }
         return $layoutFile;
     }
@@ -714,7 +721,11 @@ abstract class rareAction{
     public function display($viewFile=null){
         if($this->isRender)return;
         $this->isRender=true;
-        $body=$this->fetch($viewFile);
+        if($viewFile && rare_strStartWith($viewFile, ":")){
+          $body=substr($viewFile, 1);
+        }else{
+          $body=$this->fetch($viewFile);
+        }
         $layoutFile=$this->getLayoutFile();
         _rare_runHook("display", array(&$body,&$layoutFile));
         if($layoutFile){
