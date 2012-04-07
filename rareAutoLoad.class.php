@@ -140,7 +140,7 @@ final  class rareAutoLoad
         
         $dirs=array_unique($dirs);
         foreach($dirs as $dir){
-            if(!$dir || !file_exists($dir))continue;
+            if(!$dir || !file_exists($dir) || !is_dir($dir))continue;
             $this->scanDir($dir);
         }
         $this->saveCache();

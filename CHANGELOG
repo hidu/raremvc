@@ -1,3 +1,9 @@
+20120407
+   1.布局文件支持完整的路径，在action中可以这样使用
+       $this->setLayout(":/opt/htdocs/rare_demo/other_layout.php");
+     即以:号开头。
+   2.action返回值支持其他任意以:号开头的字符串作为渲染后的内容。
+    
 20120301
    添加过滤器myFilter::beforeRouter(&$uri)的方法，以支持在该过滤器中对url地址进行预解析
    可以使用该功能来满足一些复杂的路由解析功能
