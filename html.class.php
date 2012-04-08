@@ -225,7 +225,7 @@ class rHtml{
         
       if($name){
           $param['name']=$name;
-          if(self::$autoID && !array_key_exists("id", $param) && !rare_strEndWith($name, "]")){
+          if(self::$autoID && !array_key_exists("id", $param)){
              $param['id']=self::getIDByName($name);
             }
         }
