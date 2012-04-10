@@ -6,7 +6,7 @@
  */
 class rHtml{
   
-   private static $autoID=true;
+   private static $autoID=false;
    
    private static $autoClass=true;
    /**
@@ -269,7 +269,7 @@ class rHtml{
         if(is_string($values))$values=explode(",", $values);
         $html='<datalist id="'.$id.'">';
         foreach ($values as $val){
-            $html.='<option value="'.self::h($val).">";
+            $html.='<option value="'.self::h($val).'">';
          }
          return $html."</datalist>";
     }

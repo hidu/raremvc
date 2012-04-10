@@ -33,7 +33,7 @@ class rdb_driver_sqlite{
       $result= $pdo->query("PRAGMA table_info($tableName)")->fetchAll();
       $desc=array();
       foreach ($result as $field){
-        $desc[$field['name']]=array('name'=>$field['name'],'type'=>$field['type']);
+        $desc[$field['name']]=array('name'=>$field['name'],'type'=>$field['type'],'default'=>$field['dflt_value']);
        }
       return $desc;
    }
