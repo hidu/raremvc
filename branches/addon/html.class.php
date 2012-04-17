@@ -382,7 +382,11 @@ class rHtml{
       if(!empty($confirm)){
          $confirm="if(!confirm('".addslashes($confirm)."'))return false;";
        }
-       $_param=self::_paramMerge(array('onclick'=>$confirm."location.href='".$url."'","class"=>'r-button-link'),$params);
+       $p=array('onclick'=>$confirm."location.href='".$url."'");
+       if(self::$autoClass){
+         $p['class']='r-button-link';
+       }
+       $_param=self::_paramMerge($p,$params);
        return self::input_button($text,$_param);
    }
    
