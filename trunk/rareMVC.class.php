@@ -27,7 +27,7 @@ final class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20120407';                 //当前框架版本
+    private $version='1.2 20120417';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -122,7 +122,7 @@ final class rareContext{
          }
          //==================================================================
         
-        $this->webRoot=substr($_SERVER['SCRIPT_NAME'],0,strrpos($_SERVER['SCRIPT_NAME'],"/")+1);
+        $this->webRoot=rareConfig::get("webroot",substr($_SERVER['SCRIPT_NAME'],0,strrpos($_SERVER['SCRIPT_NAME'],"/")+1));
         $pathInfo=pathinfo($_SERVER['SCRIPT_NAME']);
         $this->scriptName=$pathInfo["basename"];
         $this->webRootUrl=rare_httpHost().$this->webRoot;
@@ -262,7 +262,7 @@ final class rareContext{
          }else{
            $this->error404();
           }
-        if($result!=null && empty($result))return;
+        if(($result!==null && empty($result)))return;
         $action->display($result);
     }
     //将当前的url解析为action 方便识别的数组格式
@@ -292,7 +292,6 @@ final class rareContext{
               }
         }
         if(!empty($method) && method_exists($this->filter, $method)){
-//            $this->filter->$method();
               call_user_func_array(array($this->filter,$method), $params);
         }
     }
@@ -586,6 +585,7 @@ final class rareView{
         }
        self::$slots[$name]=$value;
      }
+     
      public static function slot_has($name){
        return isset(self::$slots[$name]);
      }
@@ -645,15 +645,17 @@ abstract class rareAction{
      * @param string $default  默认值
      */
     public function getRequestParam($key,$default=null){
-        return isset($_REQUEST[$key])?$_REQUEST[$key]:$default;
+        $v=isset($_REQUEST[$key])?trim($_REQUEST[$key]):null;
+        return $v==""?$default:$v;
      }
      
     public function _getParam($key,$default=null){
-        return isset($_GET[$key])?$_GET[$key]:$default;
+        $v=isset($_GET[$key])?trim($_GET[$key]):null;
+        return $v==""?$default:$v;
      }
-     
     public function _postParam($key,$default=null){
-        return isset($_POST[$key])?$_POST[$key]:$default;
+        $v=isset($_POST[$key])?trim($_POST[$key]):null;
+        return $v==""?$default:$v;
      }
      /**
       * 将变量赋值给模板
@@ -716,6 +718,7 @@ abstract class rareAction{
 
     /**
      * 渲染模板
+     * 若$viewFile以:开头，这将：后面的内容作为body的内容。
      * @param $viewFile
      */
     public function display($viewFile=null){
@@ -1013,9 +1016,9 @@ function rare_isAjax(){
  * @param string $param
  * @param boolean $full
  * 当前地址                                                                    结果                     
- * /      								    ==>  rare_currentUri("a=1") 		       ==>	 /?a=1
- * /?a=2    									==>  	rare_currentUri("a=1") 		       ==> /?a=1
- * /?a=3    									==>  	rare_currentUri("a=1&b=2",true) 	==> http://www.hongtao3.com/?a=1&b=2
+ * /      				==>  rare_currentUri("a=1") 		       ==>	 /?a=1
+ * /?a=2    			==>  rare_currentUri("a=1") 		       ==> /?a=1
+ * /?a=3    			==>  rare_currentUri("a=1&b=2",true)    	==> http://www.hongtao3.com/?a=1&b=2
  */
 function rare_currentUri($param="",$full=false){
       $host="";

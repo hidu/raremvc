@@ -1,3 +1,9 @@
+20120417
+   1.action中$this->_getParam($key); 默认会对值进行trim操作。
+   2.action返回值为false的时候不进行模板渲染
+   3.添加 rareAutoLoad::registMapping用于类注册
+   4.支持在配置文件中定义webroot(目前已知在使用lighttpd时可能需要配置，其他webserver不需要配置)
+   
 20120407
    1.布局文件支持完整的路径，在action中可以这样使用
        $this->setLayout(":/opt/htdocs/rare_demo/other_layout.php");

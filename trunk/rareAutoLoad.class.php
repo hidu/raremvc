@@ -26,6 +26,7 @@ final  class rareAutoLoad
      
     private $cacheFile=null;
     private $classes=array();//对应class 类名 和对应文件路径
+    private static $mapping=array();
     private $option;
      
     private $hand=false;//是否手动运行该脚本进行class路径扫描,
@@ -85,6 +86,9 @@ final  class rareAutoLoad
      */
     public function autoload($class){
         if(class_exists($class, false) || interface_exists($class, false)) return true;
+        if(rareAutoLoad::$mapping){
+           $this->classes=array_merge($this->classes,rareAutoLoad::$mapping);
+        }
         if ($this->classes && isset($this->classes[$class]) ){
             $file=$this->classes[$class];
             if(!$file)return false;
@@ -108,6 +112,15 @@ final  class rareAutoLoad
         }
         return false;
     }
+    
+    /**
+     * 注册 类名与文件路径对应关系
+     * @param array $pathMapping 
+     */
+    public static function registMapping($pathMapping){
+        self::$mapping=array_merge(self::$mapping,$pathMapping);
+     }
+    
     /**
      * 获取类名列表
      * @return
