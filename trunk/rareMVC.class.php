@@ -27,7 +27,7 @@ final class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20120417';                 //当前框架版本
+    private $version='1.2 20120424';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -645,17 +645,21 @@ abstract class rareAction{
      * @param string $default  默认值
      */
     public function getRequestParam($key,$default=null){
-        $v=isset($_REQUEST[$key])?trim($_REQUEST[$key]):null;
-        return $v==""?$default:$v;
+        return empty($_REQUEST[$key])?$default:$_REQUEST[$key];
+     }
+    public function getGetParam($key,$default=null){
+        return $this->_getParam($key,$default);
+     }
+     
+    public function getPostParam($key,$default=null){
+        return $this->_postParam($key,$default);
      }
      
     public function _getParam($key,$default=null){
-        $v=isset($_GET[$key])?trim($_GET[$key]):null;
-        return $v==""?$default:$v;
+        return empty($_GET[$key])?$default:$_GET[$key];
      }
     public function _postParam($key,$default=null){
-        $v=isset($_POST[$key])?trim($_POST[$key]):null;
-        return $v==""?$default:$v;
+        return empty($_POST[$key])?$default:$_POST[$key];
      }
      /**
       * 将变量赋值给模板
@@ -775,10 +779,16 @@ final class rareConfig{
         $file=rareContext::getContext()->getAppDir()."config/".$configName.".php";
         $config=array();
         if(file_exists($file)){
-            $config=require $file;
+            $config=self::requireFile($file);
         }
         self::$configs[$configName]=$config;
         return $config;
+    }
+    public static function requireFile($file){
+       if(file_exists($file)){
+            return require $file;
+        }
+        return null;
     }
      
     /**
@@ -1042,18 +1052,7 @@ function rare_currentUri($param="",$full=false){
  * https://www.hongtao3.com:444
  */
 function rare_httpHost(){
-    $host= 'http://'.$_SERVER['SERVER_NAME'];
-    if(80 != $_SERVER['SERVER_PORT'] ){
-        if(rare_isHttps()){
-            $host = 'https://'.$_SERVER['SERVER_NAME'];
-            if(443 != $_SERVER['SERVER_PORT'] ){
-               $host.=":".$_SERVER['SERVER_PORT'];
-              }
-        }else{
-            $host.=":".$_SERVER['SERVER_PORT'];
-        }
-    }
-    return $host;
+    return (rare_isHttps()?'https://':"http://").$_SERVER['HTTP_HOST'];
 }
 /**
  * 判断是否是url地址 如

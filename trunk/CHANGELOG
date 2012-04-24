@@ -1,3 +1,5 @@
+20120424
+   1.fix rare_httpHost
 20120417
    1.action中$this->_getParam($key); 默认会对值进行trim操作。
    2.action返回值为false的时候不进行模板渲染
