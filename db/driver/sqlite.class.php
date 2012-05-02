@@ -1,18 +1,27 @@
 <?php
 class rdb_driver_sqlite{
-       public static function listPage($sql,$params=array(),$size=10,$dbName=null,$page=1){
+     public static function setEncode($encode,$pdo){
+        $pdo->exec("PRAGMA encoding = '$encode';");
+     }
+  
+       public static function listPage($sql,$params=array(),$size=10,$page=1,$pdo=null){
         $start= $size*($page-1);
         $limit= $start.','.$size;
         $sqlLimit=$sql." LIMIT ".$limit;
-        $list=rDB::queryAll($sqlLimit, $params,$dbName);
+        $list=$pdo->query($sqlLimit)->fetchAll();
+        
         $sql2=preg_replace("#^select\s+.*\sfrom\s#i", "SELECT count(*) FROM ", $sql);
-        $total=(int)rDB::execQuery($sql2,$params,$dbName)->fetchColumn();
+        $total=(int)$pdo->query($sql2)->fetchColumn();
         return array($list,$total);
    }
     
-    public static function getAllTables($dbName=null,$type='slave'){
-       $pdo=rDB::getPdo($dbName,$type);
-       return $pdo->query("select name from sqlite_master where type='table'")->fetchAll();
+    public static function getAllTables($pdo){
+       $all= $pdo->query("select name from sqlite_master where type='table'")->fetchAll();
+       $tables=array();
+       foreach ($all as $row){
+         $tables[]=$row['name'];
+        }
+       return $tables;
    }
    
    /**
@@ -28,8 +37,7 @@ class rdb_driver_sqlite{
     * @param string $dbName
     * @param string $type
     */
-   public static function getTableDesc($tableName,$dbName=null,$type='slave'){
-      $pdo=rDB::getPdo($dbName,$type);
+   public static function getTableDesc($tableName,$pdo){
       $result= $pdo->query("PRAGMA table_info($tableName)")->fetchAll();
       $desc=array();
       foreach ($result as $field){
