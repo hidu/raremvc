@@ -1,22 +1,38 @@
 <?php
 class rdb_driver_mysql{
-   public static function listPage($sql,$params=array(),$size=10,$dbName=null,$page=1){
+   public static function setEncode($encode,$pdo){
+     $pdo->exec("SET NAMES $encode");
+   }
+  
+  /**
+   * 
+   * @param String $sql
+   * @param array $params
+   * @param int $size
+   * @param int $page
+   * @param PDO $pdo
+   */
+   public static function listPage($sql,$params=array(),$size=10,$page=1,$pdo=null){
         $start= $size*($page-1);
         $limit= $start.','.$size;
         $sql=preg_replace("/^select/i", "SELECT SQL_CALC_FOUND_ROWS ", $sql)." LIMIT ".$limit;
-        $list=rDB::queryAll($sql, $params,$dbName);
+        $list=$pdo->query($sql)->fetchAll();
         $sql2='SELECT FOUND_ROWS()';
-        $total=(int)rDB::execQuery($sql2,array(),$dbName)->fetchColumn();
+        $total=(int)$pdo->query($sql2)->fetchColumn();
         return array($list,$total);
    } 
    
-   public static function getAllTables($dbName=null,$type='slave'){
-       $pdo=rDB::getPdo($dbName,$type);
-       return $pdo->query("show tables")->fetchAll();
+   public static function getAllTables($pdo){
+       $all=$pdo->query("show tables")->fetchAll();
+       $tables=array();
+       foreach ($all as $row){
+           $tmp=array_values($row);
+           $tables[]=$tmp[0];
+        }
+       return $tables;
    }
    
-   public static function getTableDesc($tableName,$dbName=null,$type='slave'){
-      $pdo=rDB::getPdo($dbName,'slave');
+   public static function getTableDesc($tableName,$pdo){
       $result=$pdo->query("desc $tableName")->fetchAll();
       $desc=array();
       foreach ($result as $field){

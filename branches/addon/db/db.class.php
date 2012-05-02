@@ -110,9 +110,9 @@ class rDB{
              $dbh=new PDO($config['dsn'], $config['username'], $config['passwd'], array());
              $dbh->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, rareConfig::get('db_fetch_mode',PDO::FETCH_ASSOC));
              $dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION); 
-             if(preg_match("/^mysql:/i", $config['dsn'])){
-                $dbh->exec("SET NAMES {$config['encode']}");
-               }
+
+             self::runDriver("setEncode", array($config['encode']),$dbh);
+             
              $dbhs[$key]=$dbh;
          }
          return $dbhs[$key];
@@ -289,7 +289,7 @@ class rDB{
         $page=isset($_GET[self::$pageLabel])?(int)$_GET[self::$pageLabel]:1;
         $page=$page>0? $page:1;
         $sql=trim($sql);
-        $result=self::runDriver('listPage',array($sql,$params,$size,$dbName,$page),'slave',$dbName);
+        $result=self::runDriver('listPage',array($sql,$params,$size,$page),self::getPdo($dbName));
         if($result===false){
              throw new Exception('no driver for'.$driver_name);
           }
@@ -309,20 +309,16 @@ class rDB{
         return array($list,new $pagerClass($pageInfo));
      }
      
-     protected  static function _runDriver($driverName,$fn,$params){
-        $class='rdb_driver_'.strtolower($driverName);
-       if(class_exists($class,true) && method_exists($class, $fn)){
-          return call_user_func_array(array($class,$fn), $params);
-        }else{
+     protected  static function runDriver($fn,$params,$pdo){
+         $driver_name=strtolower($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
+         $class='rdb_driver_'.strtolower($driver_name);
+         if(class_exists($class,true) && method_exists($class, $fn)){
+            $params[]=$pdo;
+            return call_user_func_array(array($class,$fn), $params);
+          }else{
            throw new Exception('no driver for '.$driverName.":\t".$fn);
-        }
+          }
         return false;
-     }
-     
-     public static function runDriver($fn,$params,$type='slave',$dbName=null){
-        $pdo=self::getPdo($dbName,$type);
-        $driver_name=strtolower($pdo->getAttribute(PDO::ATTR_DRIVER_NAME));
-        return self::_runDriver($driver_name, $fn, $params);
      }
      
     /**
@@ -547,7 +543,7 @@ class rDB{
      * @return array
      */
     public static function getAllTables($dbName=null,$type='slave'){
-        return self::runDriver('getAllTables',array($dbName,$type));
+        return self::runDriver('getAllTables',null,self::getPdo($dbName,$type));
     }
     
     /**
@@ -558,6 +554,6 @@ class rDB{
      * @return array
      */
     public static function getTableDesc($tableName,$dbName=null,$type='slave'){
-       return self::runDriver('getTableDesc',array($tableName,$dbName,$type));
+       return self::runDriver('getTableDesc',array($tableName),self::getPdo($dbName,$type));
     }
 }

@@ -92,7 +92,7 @@ class rPager{
       $html .= "<li class='next'>".$this->_page_link($this->page<$this->totalPage, $this->page+1, "&gt;")."</li>";
       $html .= "<li class='last'>".$this->_page_link($this->page<$this->totalPage, $this->totalPage, "&gt;|")."</li>";
        
-      $html.="</ul></div>\n";
+      $html.="</ul></div><div style='clear:both'></div>\n";
       return $html;
    }
    

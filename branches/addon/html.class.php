@@ -94,7 +94,7 @@ class rHtml{
       foreach ($options as $_k=>$_v){
           $_param=array();
           if(in_array($_k, $value))$_param['checked']="checked";
-          if($params['id']){
+          if(!empty($params['id']) && $params['id']){
              $_param['id']=$params['id']."_".$_k;
            }else if(self::$autoID){
              $_param['id']=self::getIDByName($name)."_".$_k;
