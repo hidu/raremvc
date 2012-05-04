@@ -9,7 +9,7 @@ class rCache_file extends rCache{
     protected  $cacheBath;
     protected $subDirName;
     public function __construct($dbName="",$cacheMod='app'){
-       $this->cacheBath=($cacheMod=='root'?dirname(RARE_CACHE_DIR):RARE_CACHE_DIR)."/file/".($dbName?$dbName."/":"");
+       $this->cacheBath=$this->getCacheDirByMod($cacheMod)."/file/".($dbName?$dbName."/":"");
     }
     
     public function has($key){
@@ -25,11 +25,13 @@ class rCache_file extends rCache{
          $life=(int)str_replace("//", "", $lifeLine);
          return !$life || $life>=time();
     }
+    
     public function get($key,$default=null){
          $data=file_get_contents($this->getCacheFilePath($key));
          $data=substr($data,strpos($data, "\n",strpos($data,"\n")+1)+1);
          return $data===false?$default:$data;
     }
+    
     public function set($key,$data,$lifetime=0){
        $file=$this->getCacheFilePath($key);
        rare_mkdir(dirname($file));
