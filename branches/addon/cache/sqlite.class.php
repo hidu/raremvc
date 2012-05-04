@@ -7,15 +7,14 @@ class rCache_sqlite extends rCache{
     private $db;
     private static $dbs;
     /**
-     * @param string $cacheMod 缓存级别 默认为当前全局 root:全局 app：单独app有效
+     * @param string $cacheMod 缓存级别 默认为当前全局 root:全局 app：单独app有效 其他则
      */
     public function __construct($dbName='cache',$cacheMod='app'){
-       $key=$dbName."_".$cacheMod;
+       $key=md5($dbName."_".$cacheMod);
        if(isset(self::$dbs[$key])){
            $this->db=self::$dbs[$key];
         }else{
-          $filename=$cacheMod=='app'?RARE_CACHE_DIR:dirname(RARE_CACHE_DIR)."/";
-          $filename.=$dbName;
+          $filename=$this->getCacheDirByMod($cacheMod).$dbName;
           rare_mkdir(dirname($filename));
           $this->db=new PDo("sqlite:".$filename.".sqlite");
           $this->db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
@@ -25,13 +24,17 @@ class rCache_sqlite extends rCache{
            $this->db->exec("create table cache(id varchar(255),data text,life int,mtime int);CREATE UNIQUE INDEX [cache_unique] ON cache ([id])"); 
           }
           if(mt_rand(0, 100)==50){
-             $this->db->exec("delete from cache where life>0 and life<".time()-1800);
+             $this->gc();
           }
           self::$dbs[$key]=$this->db;
         }
     }
     
-    
+    public function gc(){
+        $this->db->exec("delete from cache where life>0 and life<".time()-1800);
+        $this->db->exec("VACUUM");
+        return true;
+    }
   
     public function has($key){
        $sth=$this->db->prepare("select id from cache where id=? and (life>? or life=0)");
@@ -64,7 +67,9 @@ class rCache_sqlite extends rCache{
     }
     
     public function removeAll(){
-      return $sth=$this->db->exec("delete from cache");
+      $rt=$sth=$this->db->exec("delete from cache");
+      $this->db->exec("VACUUM");
+      return $rt;
     }
     
     public function getBackend(){
