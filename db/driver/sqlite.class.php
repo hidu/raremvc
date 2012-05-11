@@ -8,7 +8,7 @@ class rdb_driver_sqlite{
         $start= $size*($page-1);
         $limit= $start.','.$size;
         $sqlLimit=$sql." LIMIT ".$limit;
-        $list=$pdo->query($sqlLimit)->fetchAll();
+        $list=rDB::queryAll($sql,$params,$pdo);
         
         $sql2=preg_replace("#^select\s+.*\sfrom\s#i", "SELECT count(*) FROM ", $sql);
         $total=(int)$pdo->query($sql2)->fetchColumn();
