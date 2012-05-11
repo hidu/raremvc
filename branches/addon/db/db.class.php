@@ -235,7 +235,7 @@ class rDB{
      */
     protected  static function selectWithCache($sql,$params=null,$dbName=null,$fetchAll=true){
         $cacheAble=self::$enableSelectCache;
-        if(is_array($params) && isset($params[':nocache'])){
+        if(is_array($params) && isset($params[':nocache']) || is_object($dbName)){
             $cacheAble=false;
             unset($params[':nocache']);
          }
