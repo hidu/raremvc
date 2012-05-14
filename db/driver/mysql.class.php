@@ -16,7 +16,7 @@ class rdb_driver_mysql{
         $start= $size*($page-1);
         $limit= $start.','.$size;
         $sql=preg_replace("/^select/i", "SELECT SQL_CALC_FOUND_ROWS ", $sql)." LIMIT ".$limit;
-        $list=$pdo->query($sql)->fetchAll();
+        $list=rDB::queryAll($sql,$params,$pdo);
         $sql2='SELECT FOUND_ROWS()';
         $total=(int)$pdo->query($sql2)->fetchColumn();
         return array($list,$total);
