@@ -1,3 +1,6 @@
+20120606
+    修正 parseActionUri解析uri地址的参数包含参数有有url地址会出错的问题。
+    
 20120424
    1.fix rare_httpHost
 20120417
