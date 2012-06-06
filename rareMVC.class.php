@@ -27,7 +27,7 @@ final class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20120424';                 //当前框架版本
+    private $version='1.2 20120606';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -265,12 +265,18 @@ final class rareContext{
         if(($result!==null && empty($result)))return;
         $action->display($result);
     }
-    //将当前的url解析为action 方便识别的数组格式
+    /**
+     * 将当前的uri解析为action 方便识别的数组格式
+     * @param string $uri 如index/demo?a=1&b=2
+     * @return array
+     */
     public function parseActionUri($uri){
-        $tmp=parse_url($uri);
+        //This function  parse_url doesn't work with relative URLs. 
+         //所以当 $uri=index/demo?url=http://example.com/hello.php?id=2  的时候会出错 补全为完整的地址可以避免错误
+        $tmp=parse_url("http://127.0.0.1/".$uri);
         if(empty($tmp['path']))$tmp['path']='index';
         $tmp['path']=preg_replace("/\.\w*$/", "", $tmp['path']);
-        $path=explode("/",$tmp['path']);
+        $path=explode("/",trim($tmp['path'],"/"));
         if(empty($path[1]))$path[1]='index';
         $uriInfo=array();
         $uriInfo['m']=$path[0]=="~"?$this->moduleName:$path[0];
