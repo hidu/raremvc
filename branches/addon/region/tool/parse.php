@@ -41,16 +41,25 @@ foreach ($list as $row){
 export_file("city.php",$cities);
 
 $counties=array();
+
+$last_countyId=0;
+$i=0;
 foreach ($list as $row){
     $line=preg_split("/\s+/", trim($row));
     if(substr($line[0], 4,2)!="00" && $line[1]!="市辖区"){
         $pid=substr($line[0],0,2)."0000";
+        $cur_countyId=$line[0];
         if(in_array($pid, $zhixiashi)){
-            $cid=substr($line[0],0,2)."1000";
+            $cid=substr($line[0],0,2)."0100";
+            if($last_countyId && substr($last_countyId, 0,4)!=substr($cur_countyId, 0,4)){
+              $cur_countyId=(substr($line[0],0,2)."0150")+$i++;
+            }
         }else{
             $cid=substr($line[0],0,4)."00";
+            $i=0;
         }
-         $counties[$cid][$line[0]]=mb_strlen($line[1])>6?preg_replace("/(县|市)$/","",$line[1]):$line[1];
+         $last_countyId=$cur_countyId;
+        $counties[$cid][$cur_countyId]=mb_strlen($line[1])>6?preg_replace("/(县|市)$/","",$line[1]):$line[1];
     }
 }
 export_file("county.php",$counties);
