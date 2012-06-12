@@ -104,4 +104,33 @@ class rRegion{
     public static function getProvinceIdByCountyId($countyId){
         return  substr($countyId."", 0,2)."0000";
     }
+    
+    public static $regionJsUrl=null;
+    
+    public static function widget($provinceID,$cityId,$countyId,$tagName=null,$required=true){
+      $required?($required="required"):($required="");
+     if(!$tagName)$tagName=array('proviceId','cityId','countyId');
+      $provinces=array(''=>'请选择')+self::getAllProvince();
+      $cities=array(''=>'请选择')+self::getCitiesByProvinceId($provinceID);
+      $counties=array(''=>'请选择')+self::getCountiesByCityId($cityId);
+      $id=uniqid('region');
+      $html="<span id='{$id}' class='rwidget_region'>".
+               "<span>".rHtml::select($tagName[0], $provinceID, $provinces)."</span>".
+               "<span>".rHtml::select($tagName[1], $cityId, $cities)."</span>".
+               "<span>".rHtml::select($tagName[2], $countyId, $counties)."</span>".
+            "<script>
+            (function(){
+                   var ws=$('#{$id} select');
+                   function init(){
+                     jf.relation(ws.get(0),ws.get(1),region.city,'请选择');
+                     jf.relation(ws.get(1),ws.get(2),region.county,'请选择');
+                      }
+                  if(typeof region=='undefined'){
+                       $.getScript('".self::$regionJsUrl."',init);
+                  }else{init();};
+               })();
+             </script>
+            </span>";
+      return rHtml::reduceSpace($html);
+    }
 }
