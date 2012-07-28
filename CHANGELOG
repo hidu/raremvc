@@ -1,3 +1,6 @@
+20120728
+    修正 parseActionUri解析 ?a=b 错误的问题。0606升级所致
+    
 20120606
     修正 parseActionUri解析uri地址的参数包含参数有有url地址会出错的问题。
     
