@@ -27,7 +27,7 @@ final class rareContext{
     private $scriptName;                             //入口脚本名称 如index.php
     private $isScriptNameInUrl=false;                //url中是否包含入口文件
     private $appName;                                //当前app的名称
-    private $version='1.2 20120728';                 //当前框架版本
+    private $version='1.2 20120925';                 //当前框架版本
     private $cacheDir="";                            //cache目录
     private $filter=null;                            //过滤器
     private $suffix;                                 //地址后缀        
@@ -59,14 +59,19 @@ final class rareContext{
     public static function getContext(){
         return self::$instance;
     }
-    //运行程序，解析url地址、执行过滤器、执行动作方法等
-    public function run(){
-        $this->regShutdown();
+    /**
+     * 运行程序，解析url地址、执行过滤器、执行动作方法等
+     * @param boolean $isCli 是否在cli模式下初始化app
+     */
+    public function run($isCli=false){
+        !$isCli && $this->regShutdown();
         $this->init();
         $this->regAutoLoad();
         $this->parseRequest();
-        $this->executeFilter("doFilter");
-        $this->executeActtion($this->uri);
+        if(!$isCli){
+            $this->executeFilter("doFilter");
+            $this->executeActtion($this->uri);
+        }
     }
     
     private function init(){
@@ -651,7 +656,7 @@ abstract class rareAction{
      * @param string $default  默认值
      */
     public function getRequestParam($key,$default=null){
-        return empty($_REQUEST[$key])?$default:$_REQUEST[$key];
+        return !isset($_REQUEST[$key])?$default:$_REQUEST[$key];
      }
     public function getGetParam($key,$default=null){
         return $this->_getParam($key,$default);
@@ -662,10 +667,10 @@ abstract class rareAction{
      }
      
     public function _getParam($key,$default=null){
-        return empty($_GET[$key])?$default:$_GET[$key];
+        return !isset($_GET[$key])?$default:$_GET[$key];
      }
     public function _postParam($key,$default=null){
-        return empty($_POST[$key])?$default:$_POST[$key];
+        return !isset($_POST[$key])?$default:$_POST[$key];
      }
      /**
       * 将变量赋值给模板
