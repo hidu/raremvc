@@ -40,6 +40,10 @@ class rValidate_rule{
   public static function url($value){
      return preg_match("/^(http|https|ftp):\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)+)/i",$value);
   }
+  
+  public static function url_simple($value){
+     return preg_match("/^(http|https|ftp):\/\/(([A-Z0-9][A-Z0-9_-]*)(\.[A-Z0-9][A-Z0-9_-]*)*)/i",$value);
+  }
   /**
    * iso 格式的日期 eg 2008-08-08  
    * @param $value

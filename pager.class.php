@@ -19,8 +19,12 @@ class rPager{
     protected $endPage;   //结束页面
     protected $startNum;
     protected $endNum;  
+    protected $cleanParam=true;//是否清除为空的参数
     
     protected  $_curLineNum=0;//当前的行号
+    protected $pn_allow=array();
+    protected $pn_jsfn="rpager_pn";
+    
 
     /**
      * $pageInfo=array('total'=>1000,'size'=>10,"p"=>1);
@@ -41,6 +45,11 @@ class rPager{
    
    public function getTotalPage(){
      return $this->totalPage;
+   }
+   
+   public function setPs($size_arr,$jsFn=null){
+     $this->pn_allow=$size_arr;
+     if($jsFn)$this->pn_jsfn=$jsFn;
    }
    
    /**
@@ -91,10 +100,26 @@ class rPager{
        
       $html .= "<li class='next'>".$this->_page_link($this->page<$this->totalPage, $this->page+1, "&gt;")."</li>";
       $html .= "<li class='last'>".$this->_page_link($this->page<$this->totalPage, $this->totalPage, "&gt;|")."</li>";
-       
+      if($this->pn_allow){
+         $html.="<li class='size'>".$this->_showPageSizeChoose()."</li>";
+       }
       $html.="</ul></div><div style='clear:both'></div>\n";
       return $html;
    }
+   private function _showPageSizeChoose(){
+     if(!in_array($this->size, $this->pn_allow)){
+       $this->pn_allow[]=$this->size;
+     }
+     asort($this->pn_allow);
+     $_url=$this->makeUrl(1,array("n"));
+     $_url.=strpos($_url,"?")!==false?"&n=":"?n=";
+     $html="<select onchange=\"var u='{$_url}'+this.value;if(typeof {$this->pn_jsfn}=='function'){{$this->pn_jsfn}(u)}else{location.href=u}\">";
+     foreach ($this->pn_allow as $pn){
+         $html.="<option value='{$pn}' ".($pn==$this->size?"selected='selected'":"").">{$pn}</option>";
+      }
+     $html.="</select>";
+     return $html;
+   } 
    
    private function _page_link($isLink,$page,$txt){
      if($isLink){
@@ -105,7 +130,7 @@ class rPager{
    }
    
     
-   protected function makeUrl($p){
+   protected function makeUrl($p,$clearParams=array()){
         $uri = empty($this->uri) ?$_SERVER['REQUEST_URI'] :$this->uri;
         $tmp=parse_url($uri);
         $query=array();
@@ -113,6 +138,16 @@ class rPager{
             parse_str($tmp['query'],$query);
          }
         $query[$this->label]=max($p,1);
+           if($this->cleanParam){
+               foreach ($query as $_k=>$_v){
+                   if($_v==""){
+                       unset($query[$_k]); 
+                      }  
+                 }   
+            }
+         foreach ($clearParams as $_p){
+           if(isset($query[$_p]))unset($query[$_p]);
+          }
         $tmp['path']=empty($tmp['path'])?'':$tmp['path'];
         if(class_exists("myHook",true) && method_exists("myHook", "pagerMakeUrl")){
            $prep=call_user_func_array(array('myHook',"pagerMakeUrl"),array($tmp['path'],$query));
