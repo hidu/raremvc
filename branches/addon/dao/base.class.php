@@ -72,7 +72,7 @@ abstract class rDao_base{
    }
 
    public function deleteByField($fieldName,$fieldValue){
-     return $this->delete("delete ".$fieldName."=?", $fieldValue);
+     return $this->delete($fieldName."=?", $fieldValue);
    }
    
    public function insert($data){
@@ -124,6 +124,10 @@ abstract class rDao_base{
      return rDB::queryAll($sql,$params,$this->dbConfigName);
    }
    
+   public function queryAllBySql($sql,$params=null){
+       return rDB::queryAll($sql,$params,$this->dbConfigName);
+   }
+   
    /**
     * @param string $keyField
     * @param srting $valueField
@@ -153,6 +157,10 @@ abstract class rDao_base{
     return rDB::listPage($sql,$params,$pageSize,$this->dbConfigName);
    }
    
+   public function getListPageBySql($sql,$params=null,$pageSize=10){
+    return rDB::listPage($sql,$params,$pageSize,$this->dbConfigName);
+   }
+   
    
    public function count($where=null,$params=null){
      $one=$this->query($where,$params,"count(*) as count");
@@ -170,5 +178,13 @@ abstract class rDao_base{
      $one=$this->query($where,$params,"min({$fieldName}) as min");
      return isset($one['min'])?$one['min']:null;
    }
+   public function avg($fieldName=null,$where=null,$params=null){
+     if(empty($fieldName))$fieldName=$this->key_field;
+     $one=$this->query($where,$params,"avg({$fieldName}) as avg");
+     return isset($one['avg'])?$one['avg']:null;
+   }
 
+   public function getTableFields(){
+       return rDB::getTableFileds($this->table_name,$this->dbConfigName);
+   }
 }

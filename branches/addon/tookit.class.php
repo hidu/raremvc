@@ -16,10 +16,14 @@ class rTookit{
       return self::cutStr($html,$length);
    }
    
-   public static function cutStr($str,$length=50){
+   public static function cutStr($str,$length=50,$reverse=false){
        preg_match_all("/./us", $str, $ar);
-       $newstring = join("", array_slice($ar[0], 0, $length));
-       return $newstring;
+       if(!$reverse){
+           return join("", array_slice($ar[0], 0, $length));
+        }
+       $len=count($ar[0]);
+       $start=max(0,$len-$length);
+       return join("", array_slice($ar[0], $start,$length));
    }
   
   public static function addslashesDeep($value){

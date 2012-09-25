@@ -515,10 +515,9 @@ class rDB{
          if(!$cache->has($key)){
              $result=self::getAllTables();
              $tables=array();
-             foreach ($result as $row){
-                $row=each($row);
-                $_desc=self::getTableDesc($row['value']);
-                $tables[$row['value']]=qArray::getCols($_desc, 'name');
+             foreach ($result as $tabName){
+                $_desc=self::getTableDesc($tabName);
+                $tables[$tabName]=qArray::getCols($_desc, 'name');
               }
               $cache->set($key, $tables);
          }else{
