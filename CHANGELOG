@@ -1,3 +1,6 @@
+20120925
+    getGetParam,getRequestParam 使用isset判断不再使用empty判断
+    
 20120728
     修正 parseActionUri解析 ?a=b 错误的问题。0606升级所致
     
