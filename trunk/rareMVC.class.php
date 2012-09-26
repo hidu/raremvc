@@ -35,7 +35,7 @@ final class rareContext{
     
     private static $instance;                         //app实例    
         
-    public function __construct($appDir){
+    private function __construct($appDir){
         $this->appDir=$appDir;
         $this->appName=basename($this->appDir);
         $this->rootDir=dirname($this->appDir)."/";
@@ -46,6 +46,7 @@ final class rareContext{
     
     //创建一个rare app实例，在这里会注册类自动装载
     public static function createApp($appDir=''){
+        if(self::$instance)return self::$instance;
         if(!$appDir){
             $trace=debug_backtrace(true);
             $appDir=dirname(dirname($trace[0]['file']))."/";
