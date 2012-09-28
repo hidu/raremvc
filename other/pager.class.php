@@ -19,7 +19,7 @@ class rPager{
     protected $endPage;   //结束页面
     protected $startNum;
     protected $endNum;  
-    protected $cleanParam=true;//是否清除为空的参数
+    public $cleanParam=false;//是否清除为空的参数
     
     protected  $_curLineNum=0;//当前的行号
     protected $pn_allow=array();
@@ -138,13 +138,13 @@ class rPager{
             parse_str($tmp['query'],$query);
          }
         $query[$this->label]=max($p,1);
-           if($this->cleanParam){
+        if($this->cleanParam){
                foreach ($query as $_k=>$_v){
                    if($_v==""){
                        unset($query[$_k]); 
                       }  
                  }   
-            }
+          }
          foreach ($clearParams as $_p){
            if(isset($query[$_p]))unset($query[$_p]);
           }

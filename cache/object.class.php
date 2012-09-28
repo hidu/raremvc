@@ -10,7 +10,7 @@ class rCache_object extends rCache{
     */
    private $handle;
    
-    public function __construct($dbName='object',$cacheMod='app'){
+    public function __construct($dbName='cache',$cacheMod='app'){
       if(in_array('sqlite', pdo_drivers())){
          $this->handle=new rCache_sqlite($dbName,$cacheMod);
       }else{
