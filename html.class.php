@@ -313,18 +313,22 @@ class rHtml{
      *  1.javascript代码中不能使用单行注释
      *  2.javascript每句完成后添加；
      * @param string $html
-     * @param boolean $pre  是否支持pre标签
+     * @param boolean $allSpec  是否支持pre、textarea标签
      */
-   public static function reduceSpace($html,$pre=false){
+   public static function reduceSpace($html,$allSpec=false){
      $pattern=array();
      $replacement=array();
-     if($pre){
-       $matches=array();
-       $pre="#\s?<pre[^>]*?>.*?</pre>\s?#si";
-       preg_match_all($pre, $html, $matches);
-       $preTmp="_".uniqid('pre')."_";
-       $pattern[]=$pre;
-       $replacement[]=$preTmp;
+     $spec_tags=array("pre","textarea");
+     $st=array();
+     if($allSpec){
+       foreach ($spec_tags as $tag){
+         $rule="#\s?<{$tag}[^>]*?>.*?</{$tag}\s*>\s?#si";
+         preg_match_all($rule, $html, $_matches);
+         $tmpStr="_".uniqid($tag)."_";
+         $pattern[]=$rule;
+         $replacement[]=$tmpStr;
+         $st[$tag]=array('matches'=>$_matches,"pattern"=>$rule,"replace"=>$tmpStr);
+       }
      }
      $pattern+=array( 
                       "/\n|\r/",
@@ -342,12 +346,14 @@ class rHtml{
                          );
       $html=preg_replace($pattern, $replacement, $html);
       
-      if($pre && isset($matches[0]) && count($matches[0])){
-        $p2=array();
-        $p2=array_fill(0, count($matches[0]), "/".$preTmp."/");
-        $html=preg_replace($p2, $matches[0], $html,1);
-        unset($p2);
-        unset($matches);
+      if($allSpec){
+        foreach ($st as $tag=>$info){
+            if(!$info['matches']||!$info['matches'][0])continue;
+            $p2=array();
+            $p2=array_fill(0, count($info['matches'][0]), "/".$info['replace']."/");
+            $html=preg_replace($p2, $info['matches'][0], $html,1);
+         }
+         unset($st);
       }
       return $html;
    }
