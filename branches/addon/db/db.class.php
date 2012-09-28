@@ -511,19 +511,15 @@ class rDB{
     public static function getTableFileds($tableName,$dbName=null){
         if(!$dbName)$dbName=self::$defaultDbName;
          $cache=new rCache_object();
-         $key="db_table_desc/".$dbName;
+         $key="rdb_table_desc/".$dbName."/".$tableName;
          if(!$cache->has($key)){
-             $result=self::getAllTables();
-             $tables=array();
-             foreach ($result as $tabName){
-                $_desc=self::getTableDesc($tabName);
-                $tables[$tabName]=qArray::getCols($_desc, 'name');
-              }
-              $cache->set($key, $tables);
+                $_desc=self::getTableDesc($tableName);
+                $fields=qArray::getCols($_desc, 'name');
+                $cache->set($key, $fields);
+                return $fields;
          }else{
-             $tables=$cache->get($key);
+            return $cache->get($key);
          }
-        return $tables[$tableName];
     }
     
     /**
