@@ -329,15 +329,16 @@ class rHtml{
          $replacement[]=$tmpStr;
          $st[$tag]=array('matches'=>$_matches,"pattern"=>$rule,"replace"=>$tmpStr);
        }
+       $html=preg_replace($pattern, $replacement, $html);
      }
-     $pattern+=array( 
+     $pattern=array( 
                       "/\n|\r/",
                       "/\s+/",
                       "/>\s+</",
                       "/\s+</",
                       "/>\s+/"
                       );
-      $replacement+=array(
+      $replacement=array(
                          "",
                          " ",
                          "><",
