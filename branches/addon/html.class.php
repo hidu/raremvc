@@ -322,7 +322,7 @@ class rHtml{
      $st=array();
      if($allSpec){
        foreach ($spec_tags as $tag){
-         $rule="#\s?<{$tag}[^>]*?>.*?</{$tag}\s*>\s?#si";
+         $rule="#\s?<{$tag}[^>]*?>.*</{$tag}\s*>\s?#si";
          preg_match_all($rule, $html, $_matches);
          $tmpStr="_".uniqid($tag)."_";
          $pattern[]=$rule;
