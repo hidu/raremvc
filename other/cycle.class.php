@@ -22,7 +22,7 @@ class rCycle{
     }
     
     private static  function isItemCurrect($str,$val){
-        if($str=="*")return true;
+        if($str=="*" || $str==$val)return true;
         if(preg_match("/^\*\/(\d+)$/", $str,$matches)){
             return $val%$matches[1]==0;
         }
