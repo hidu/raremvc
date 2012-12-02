@@ -38,6 +38,30 @@ class array_test extends PHPUnit_Framework_TestCase{
       $this->assertEquals($a1, array_keys($result));
       $result= rArray::filter($this->arr, "名字=rArray数组");
       $this->assertEquals(array(6), array_keys($result));
+      
+      $result=rArray::filter($this->arr, " id in ('1',2)");
+      $this->assertEquals(2, count($result));
+      $this->assertEquals(1, $result[0]['id']);
+      $this->assertEquals(2, $result[1]['id']);
+      
+      $result=rArray::filter($this->arr, " id not in ('1',2, 3) and name not in(ddd,eee)");
+//       print_r($result);
+      $this->assertEquals(2, count($result));
+      $this->assertEquals(4, $result[3]['id']);
+      $this->assertEquals(5, $result[4]['i']);
+      
+      $result=rArray::filter($this->arr, "名字 in( rArray数组)");
+      $this->assertEquals($this->arr[6], $result[6]);
+      $this->assertEquals(1, count($result));
+      
+      $result=rArray::filter($this->arr, "名字 in ( \"rArray数组\")");
+      $this->assertEquals($this->arr[6], $result[6]);
+      $this->assertEquals(1, count($result));
+      
+      $result=rArray::filter($this->arr, "名字 in( 'rArray数组')");
+      $this->assertEquals($this->arr[6], $result[6]);
+      $this->assertEquals(1, count($result));
+      
 //      preg_match_all("/(\S+)\s?=\s?(\S+)\s/", " 名字1.1 = rArray asdasd",$matches);
 //      preg_match_all("/\s(\S+?)\s*([>=<]={0,2})\s*[\"']?(.+?)[\"']?\s/", " 名字1.1 = rArray asdasd",$matches);
 //      print_r($matches);
@@ -52,7 +76,7 @@ class array_test extends PHPUnit_Framework_TestCase{
                 array('id'=>5,'pid'=>1),
                 );
        $result= rArray::toTree($arr, "id", 'pid','children');
-       var_export($result);
+//        var_export($result);
        $this->assertEquals(2, count($result));
        $this->assertEquals(4, $result[0]['children'][0]['children'][0]['id']);
        $this->assertEquals(2, $result[1]['id']);
