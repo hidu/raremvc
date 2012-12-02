@@ -293,7 +293,11 @@ Array(
       $result=array_filter($arr,$function);
      return $result;
    }
-   
+   /**
+    * 处理比较操作
+    * @param array $matches
+    * @return string
+    */
    private static function _filter_callback_1($matches){
 //        print_r($matches);
        $name='$a["'.str_replace(".", '"]["', $matches[1]).'"]';
@@ -301,6 +305,11 @@ Array(
        $val=is_numeric($matches[3])?$matches[3]:'"'.$matches[3].'"';
        return " \n(isset(".$name.") && ".$name.$s.$val.") \n ";
    }
+   /**
+    * 处理in,not in操作
+    * @param array $matches
+    * @return string
+    */
    private static function _filter_callback_2($matches){
 //        print_r($matches);
        $name='$a["'.str_replace(".", '"]["', $matches[1]).'"]';
