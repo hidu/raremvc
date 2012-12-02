@@ -98,7 +98,7 @@ class rArray{
     * 获取多维数组的一行数据
     * @param array $arr
     * @param string $rowName 如“0.name”
-    * @param string $type 结果类型
+    * @param string $type 结果类型 所有的settype方法支持的类型
     * @return Ambigous <unknown, NULL>
     */
    public static function getRow($arr,$rowName,$type=null){
@@ -285,17 +285,95 @@ Array(
     * @return array
     */
    public static function filter($arr,$cond){
-      $cond=preg_replace("/[\(\)]/"," \\0 ", $cond)." ";
-      $cond_str= preg_replace_callback("/\s([\w\.]+?)\s*([>=<]={0,2})\s*[\"']?(.+?)[\"']?\s/", array('self','_filter_callback'), $cond);
+      $cond=" ".preg_replace("/[\(\)]/"," \\0 ", $cond)." ";
+      $cond_str= preg_replace_callback("/\s(\S+?)\s*([>=<]={0,2})\s*[\"']?(.+?)[\"']?\s/", array('self','_filter_callback'), $cond);
+// print_r($cond_str);die;
       $function=create_function('$a', "return (".$cond_str.");");
       $result=array_filter($arr,$function);
      return $result;
    }
    
    private static function _filter_callback($matches){
+//        print_r($matches);
        $name='$a["'.str_replace(".", '"]["', $matches[1]).'"]';
        $s=$matches[2]=="="?"==":$matches[2];
        $val=is_numeric($matches[3])?$matches[3]:'"'.$matches[3].'"';
-       return " ".$name.$s.$val." ";
+       return " \n(isset(".$name.") && ".$name.$s.$val.") \n ";
    }
+   
+   /**
+    * 将二维数组转换为属性结构
+    * @example
+    * <pre>
+*         $arr=array(
+            array('id'=>1,'pid'=>0),
+            array('id'=>2,'pid'=>0),
+            array('id'=>3,'pid'=>1),
+            array('id'=>4,'pid'=>3),
+            array('id'=>5,'pid'=>1),
+            );
+     $result= self::toTree($arr, "id", 'pid','children');
+     结果为:
+     array (0 =>array (
+                    'id' => 1,
+                    'pid' => 0,
+                    'children' => 
+                            array (
+                              0 => 
+                              array (
+                                'id' => 3,
+                                'pid' => 1,
+                                'children' =>  array (
+                                     0 => array ('id' => 4,'pid' => 3, 'children' => array (),),
+                                ),
+                              ),
+                              1 =>  array ('id' => 5,'pid' => 1, 'children' => array (),),
+                            ),
+                  ),
+              1 => array ( 'id' => 2,'pid' => 0,'children' => array (),
+              ))
+    * </pre>
+    * @param array $arr
+    * @param string $idField  id字段名称
+    * @param string $parentIdField 父id字段名称
+    * @param string $childField 子节点名称
+    * @return array
+    */
+   public static function toTree($arr,$idField,$parentIdField,$childField='children'){
+       if(!is_array($arr))return array();
+       $map_index=self::toHash($arr, $idField,$parentIdField);
+       $result=array();
+       $index=0;
+       $childrens=array();
+       foreach ($map_index as $id=>$parentid){
+           if(!isset($map_index[$parentid])){
+              $result[]=$arr[$index]; 
+           }else{
+              $childrens[$id]=$arr[$index];
+           }
+           $index++;
+       }
+       foreach ($result as $i=>$row){
+           $row[$childField]=self::_getAllChildren($childrens, $idField, $parentIdField,$childField,$row[$idField]);
+           $result[$i]=$row;
+       }
+       return $result;
+   }
+   
+   private static function _getAllChildren(&$arr,$idField,$parentIdField,$childField,$idValue){
+       $map=self::toGroup($arr, $parentIdField);
+       if(isset($map[$idValue])){
+           $cs=$map[$idValue];
+           foreach($cs as $i=>$v){
+               unset($arr[$v[$idField]]);
+           }
+           foreach ($cs as &$sub){
+               $sub[$childField]=self::_getAllChildren($arr, $idField, $parentIdField, $childField, $sub[$idField]);
+           }
+           return $cs;
+       }else{
+           return array();
+       }
+   }
+   
 }
