@@ -236,7 +236,7 @@ class rArray{
   'c'=>array('a'=>2,'b'=>"dd",'c'=>array('d'=>'1')),
   'e'=>array('a'=>20,'b'=>"aa"),
 );
-Shopping_Array::orderBy($arr, "b desc");
+self::orderBy($arr, "b desc");
 结果为：
 Array(
   'c'=>array('a'=>2,'b'=>"dd",'c'=>array('d'=>'1')),
@@ -246,7 +246,7 @@ Array(
 )
     * </pre>
     * @param array $arr 待排序的数组
-    * @param 排序条件 $cond 如 font color=red>updateTime desc,uid asc,more.updateTime desc</font>
+    * @param 排序条件 $cond 如 <font color=red>updateTime desc,uid asc,more.updateTime desc</font>
     */
    public static function orderBy(&$arr,$cond){
     if(!is_array($arr))return false;
