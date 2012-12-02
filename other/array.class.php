@@ -281,24 +281,38 @@ Array(
        $result= rArray::filter($arr, $cond);
        </pre>
     * @param array $arr
-    * @param string $cond 筛选条件 如 <font color=red>(id>=1 and id<2) and name=aaa or id.0=a or id==4</font>
+    * @param string $cond 筛选条件,支持>=<、in、not in筛选 如 <font color=red>(id>=1 and id<2) and name=aaa or id.0=a or id==4 or id in (1)</font>
     * @return array
     */
    public static function filter($arr,$cond){
       $cond=" ".preg_replace("/[\(\)]/"," \\0 ", $cond)." ";
-      $cond_str= preg_replace_callback("/\s(\S+?)\s*([>=<]={0,2})\s*[\"']?(.+?)[\"']?\s/", array('self','_filter_callback'), $cond);
+      $cond_str= preg_replace_callback("/\s(\S+?)\s*([>=<]={0,2})\s*[\"']?(.+?)[\"']?\s/", array('self','_filter_callback_1'), $cond);
+      $cond_str= preg_replace_callback("/\s(\S+?)\s*((\snot\s+)?in)\s*\((.+?)\)\s/", array('self','_filter_callback_2'), $cond_str);
 // print_r($cond_str);die;
       $function=create_function('$a', "return (".$cond_str.");");
       $result=array_filter($arr,$function);
      return $result;
    }
    
-   private static function _filter_callback($matches){
+   private static function _filter_callback_1($matches){
 //        print_r($matches);
        $name='$a["'.str_replace(".", '"]["', $matches[1]).'"]';
        $s=$matches[2]=="="?"==":$matches[2];
        $val=is_numeric($matches[3])?$matches[3]:'"'.$matches[3].'"';
        return " \n(isset(".$name.") && ".$name.$s.$val.") \n ";
+   }
+   private static function _filter_callback_2($matches){
+//        print_r($matches);
+       $name='$a["'.str_replace(".", '"]["', $matches[1]).'"]';
+       $type=trim(preg_replace("/\s+/"," ",$matches[2]));
+       $s=$type=="not in"?"!in_array(":"in_array(";
+       $vs=explode(",", $matches[4]);
+       foreach ($vs as &$v){
+           $v=preg_replace("/^[\"']|[\"']$/", "", trim($v));
+       }
+       $vs_str=preg_replace("/([\n\r]\s+\d+\s*=>\s*)|[\n]/","",var_export($vs,true));
+//        print_r($vs_str);
+       return " \n(isset(".$name.") && ".$s.$name.",".$vs_str.")) \n ";
    }
    
    /**
