@@ -62,6 +62,10 @@ class array_test extends PHPUnit_Framework_TestCase{
       $this->assertEquals($this->arr[6], $result[6]);
       $this->assertEquals(1, count($result));
       
+//       try{
+//         $result=rArray::filter($this->arr, "名字 in( 'rArray数组') hello");
+//       }catch(Exception $e){}
+//       $this->assertFalse($result);
 //      preg_match_all("/(\S+)\s?=\s?(\S+)\s/", " 名字1.1 = rArray asdasd",$matches);
 //      preg_match_all("/\s(\S+?)\s*([>=<]={0,2})\s*[\"']?(.+?)[\"']?\s/", " 名字1.1 = rArray asdasd",$matches);
 //      print_r($matches);

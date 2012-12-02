@@ -263,7 +263,9 @@ Array(
       $code.='if('.$a.'!='.$b.')return '.$a.$c.$b.";\n";
     }
     $code.="return true;";
-    return @uasort($arr, create_function('$a,$b', $code));
+    $function=create_function('$a,$b', $code);
+    if(!$function)return false;
+    return @uasort($arr, $function);
    }
    
    /**
@@ -290,6 +292,7 @@ Array(
       $cond_str= preg_replace_callback("/\s(\S+?)\s*((\snot\s+)?in)\s*\((.+?)\)\s/", array('self','_filter_callback_2'), $cond_str);
 // print_r($cond_str);die;
       $function=create_function('$a', "return (".$cond_str.");");
+      if(!$function)return false;
       $result=array_filter($arr,$function);
      return $result;
    }
