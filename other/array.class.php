@@ -289,14 +289,49 @@ Array(
     */
    public static function filter($arr,$cond){
       $cond=" ".preg_replace("/[\(\)]/"," \\0 ", $cond)." ";
-      $cond_str= preg_replace_callback("/\s(\S+?)\s*(!?[>=<]={0,2})\s*[\"']?(.+?)[\"']?\s/", array('self','_filter_callback_1'), $cond);
+      $cond_stage=array();
+      
+      $cond_str=$cond;
+      
+      //match in not in
       $cond_str= preg_replace_callback("/\s(\S+?)\s*((\snot\s+)?in)\s*\((.+?)\)\s/", array('self','_filter_callback_2'), $cond_str);
-// print_r($cond_str);die;
+      self::_stage($cond_stage, $cond_str);
+      
+      //match function call
+      $cond_str= preg_replace_callback("/\s(!?\s*\w+?)\s*\((.+?)(,.+?)?\)\s+((!?[>=<]=?)\s*([\"']?.+?[\"']?))?\s/", array('self','_filter_callback_3'), $cond_str);
+      self::_stage($cond_stage, $cond_str);
+      
+      //match <>=!
+      $cond_str= preg_replace_callback("/\s(\S+?)\s*(!?[>=<]={0,2})\s*[\"']?(.+?)[\"']?\s/", array('self','_filter_callback_1'), $cond_str);
+      self::_stage($cond_stage, $cond_str);
+      
+      //将暂存的表达式还原
+     foreach($cond_stage as $_uid=>$_stags){
+         for($i=0;$i<count($_stags);$i++){
+            $cond_str=preg_replace("#".$_uid."#", substr($_stags[$i],1,-1), $cond_str,1);
+         }
+     }
+      
+//       var_dump($cond_str);die;
+// print_r($cond_str."\n");
+      
       $function=create_function('$a', "return (".$cond_str.");");
       if(!$function)return false;
       $result=array_filter($arr,$function);
      return $result;
    }
+   
+   private static function _stage(&$stage,&$cond_str){
+       $reg="/\(\(.+?\)\)/";
+       if(preg_match_all($reg, $cond_str, $matches)){
+           $uniqueId="array_filter_".uniqid();//每暂存一次 使用一个新的uuid
+           foreach ($matches[0] as $_t){
+             $stage[$uniqueId][]=$_t;
+           }
+           $cond_str=preg_replace($reg, $uniqueId, $cond_str);
+       }
+   }
+   
    /**
     * 处理比较操作
     * @param array $matches
@@ -309,8 +344,8 @@ Array(
        $val=is_numeric($matches[3])?$matches[3]:'"'.$matches[3].'"';
        $call=$name.$s.$val;
        $is_not=substr($s, 0,1)=="!";
-       if(!$is_not)return " (isset(".$name.") && ".$call.")  ";
-       return " (!isset(".$name.") || ".$call.")  ";
+       if(!$is_not)return " ((isset(".$name.") && ".$call."))  ";
+       return " ((!isset(".$name.") || ".$call."))  ";
    }
    /**
     * 处理in,not in操作
@@ -330,11 +365,36 @@ Array(
 //        print_r($vs_str);
        $call= ($is_in?"in_array":"!in_array")."(".$name.",".$vs_str.")";
        //in_array
-       if($is_in) return " (isset(".$name.") && ".$call.")  ";
+       if($is_in) return " ((isset(".$name.") && ".$call."))  ";
        //not in array
-       return " (!isset(".$name.") || ".$call.")  ";
+       return " ((!isset(".$name.") || ".$call."))  ";
    }
    
+   private static function _filter_callback_3($matches){
+          $function_support_is=array('isset','is_array','is_int','is_num','is_bool','is_double','is_integer','is_float','is_long','is_string','empty');
+//        print_r($matches);
+          $funName=trim($matches[1]);//函数名称
+          $paraName=trim($matches[2]);//参数变量名称
+          $name='$a["'.str_replace(".", '"]["', $paraName).'"]';
+          
+          $is_not=substr($funName, 0,1)=="!";
+          $funName_real=$is_not?substr($funName, 1):$funName;//去掉前面的！的函数名
+          
+          
+          if(in_array($funName_real, $function_support_is)){
+              return " (({$funName}({$name}))) ";
+          }
+          
+          //处理 strlen(id)>1 、substr(id,1,2)=='a'
+          $function_support_other=array('strlen','count','substr','in_array');
+          if(in_array($funName, $function_support_other)){
+               $paraMore=$matches[3];//其他参数
+               $t=$matches[5];//操作符，如> = <
+               $v=var_export($matches[6],true);//期望值
+               if($t=="=")$t="==";
+              return " (( {$funName}({$name} {$paraMore}){$t}{$v} )) ";
+          }
+   }
    /**
     * 将二维数组转换为属性结构
     * @example
