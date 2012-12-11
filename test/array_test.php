@@ -11,13 +11,34 @@ class array_test extends PHPUnit_Framework_TestCase{
             array('id'=>array('a','b'),'name'=>"ddd",'i'=>6),
             array('id'=>array('a','b','c'),'name'=>"eee",'i'=>7,'m'=>array('f'=>'eee'),"名字"=>"rArray数组"),
     );
-    
+
+   public function test_nameSplit(){
+       $res=rArray::nameSplit("a.b.c");
+       $this->assertEquals(array("a","b","c"), $res);
+       $res=rArray::nameSplit("杜.伟");
+       $this->assertEquals(array("杜","伟"), $res);
+       $res=rArray::nameSplit("杜\.伟");
+       $this->assertEquals(array("杜.伟"), $res);
+       $res=rArray::nameSplit("a.b.c\.d");
+       $this->assertEquals(array("a","b","c.d"), $res);
+   }
+   
     public function test_getCols(){
         $res=rArray::getCols($this->arr, "id",true);
         $result=array(1,2,3,4,array("a","b"),array("a","b","c"));
         $res=array_values($res);
 //         print_r($res);
         $this->assertEquals($result, $res,"test_getCols failed");
+        
+        $res=rArray::getCols($this->arr, "name");
+        $result=array();
+        foreach ($this->arr as $_tmp){
+            $result[]=$_tmp['name'];
+        }
+        $this->assertEquals($result, $res);
+        
+        $res=rArray::getCols($this->arr, "m.f");
+        $this->assertEquals(array("eee"), $res);
     }
     
     public function test_getRow(){
@@ -95,6 +116,64 @@ class array_test extends PHPUnit_Framework_TestCase{
        $this->assertEquals(4, $result[0]['children'][0]['children'][0]['id']);
        $this->assertEquals(2, $result[1]['id']);
     }
+    
+    public function test_groupby(){
+        $arr=array( array('id'=>1,'name'=>"aaa",'c'=>array('a'=>'a',2)),
+                    array('id'=>1,'name'=>"bbb"),
+                    array('id'=>3,'name'=>"ccc",'c'=>array('a'=>'a',2)),
+                    );
+        $res=rArray::groupBy($arr, "id");
+        $this->assertEquals(2, count($res));
+        $this->assertEquals(2, count($res[1]));
+        $this->assertEquals($arr[0], $res[1][0]);
+        $this->assertEquals($arr[1], $res[1][1]);
+        $this->assertEquals($arr[2], $res[3][0]);
+        
+        $res=rArray::groupBy($arr, "c.a");
+        $this->assertEquals(array('a'=>array($arr[0],$arr[2]),""=>array($arr[1])), $res);
+    }
+    
+    public function test_select(){
+        $res=rArray::select($this->arr, "name as 名字");
+        $result=array();
+        foreach ($this->arr as $tmp){
+            $result[]=array("名字"=>$tmp["name"]);
+        }
+        $this->assertEquals($result, $res);
+        $res=rArray::select($this->arr, "id.0 as id0,n*me,i");
+        $result=array (0 =>array ('id0' => NULL,'name' => 'aaa','i' => 1,),1 =>array ('id0' => NULL,'name' => 'bbb','i' => 2,),2 =>array ('id0' => NULL,'name' => 'ccc','i' => 3,),3 =>array ('id0' => NULL,'name' => 'ccc','i' => 4,),4 =>array ('id0' => 'a','name' => 'ccc','i' => 5,),5 =>array ('id0' => 'a','name' => 'ddd','i' => 6,),6 =>array ('id0' => 'a','name' => 'eee','i' => 7,),);
+        $this->assertEquals($result, $res);
+        
+        $res=rArray::select($this->arr, "na\we/e");
+        $res1=rArray::select($this->arr, "name");
+        $this->assertEquals($res, $res1);
+        
+        $arr=array(
+                array("aaaa"=>'1'),
+                array("aaa"=>'2'),
+                array("aa"=>'3'),
+                );
+        $res=rArray::select($arr, "a{2\,3}/e");
+        $result=array (0 =>array (),1 =>array ('aaa' => '2',),2 =>array ('aa' => '3',),);
+        $this->assertEquals($result, $res);
+    }
+    
+    public function test_BySql(){
+          $res=rArray::bySql($this->arr, "select id,name as 名字 where id >1 order by id desc group by id");
+          $result=array (4 =>array (0 =>array ('id' => '4','名字' => 'ccc',),),3 =>array (0 =>array ('id' => 3,'名字' => 'ccc',),),2 =>array (0 =>array ('id' => 2,'名字' => 'bbb',),),);
+           $this->assertEquals($result, $res);
+           
+//           $this->_export($result);
+        //         rArray::bySql($this->arr, "select id,name as 名字 ");
+    }
+    
+    private function _export($res){
+        print_r("\n");
+        print_r($res);
+        $str=var_export($res,true);
+        echo "\n".preg_replace("/\s*\n\s*/", "", $str)."\n";
+    }
+    
 }
 // $a=new array_test();
-// $a->test_filter();
+// $a->test_getCols();
