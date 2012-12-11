@@ -12,8 +12,8 @@ class rArray{
   * @param string $trim 是否进行trim
   */
    public static function removeEmpty(&$arr,$trim=true){
-       if(!is_array($arr))return;
-       foreach ($arr as $k=>$v){
+       if(!is_array($arr))return false;
+       foreach ($arr as $k=>&$v){
          if(is_array($v)){
             self::removeEmpty($v,$trim);
          }else if(is_string($v)){
@@ -24,10 +24,27 @@ class rArray{
                 $arr[$k]=$v;
                }
              }    
-         }
+        }
    }
    /**
-    * 获取一个二维数组的指定的列
+    * 对数组原属trim
+    * @param array $arr
+    * @param boolean $recursive
+    * @return boolean
+    */
+   public static function trim(&$arr,$recursive=true){
+       if(!is_array($arr))return false;
+       foreach ($arr as $k=>&$v){
+           if(is_array($v)){
+               self::trim($v,$recursive);
+           }else if(is_string($v)){
+               $v=trim($v);
+           }
+       }
+       return true;
+   }
+   /**
+    * 获取一个多维数组的指定的列
     * @example
     * <pre>
     * $arr=array(
@@ -48,21 +65,28 @@ class rArray{
       if(!is_array($arr))return array();
       $result=array();
       foreach ($arr as $one){
-          if(isset($one[$colName])){
-           $result[]=$one[$colName];
-           }
+          $tmp=self::getRow($one, $colName);
+          if(null != $tmp){
+             $result[]=$tmp;
+          }
       }
       if($unique)$result=self::unique($result);
       return $result;
    }
    
+   /**
+    * 支持二维数组的unique
+    * @param array $arr
+    * @return array
+    */
    public static function unique($arr){
        if(!is_array($arr))return array();
        return array_map("unserialize", array_unique(array_map("serialize", $arr)));
    }
    
+   
    /**
-    * 获取二维数组的一个key的统计数据
+    * 获取多维数组的一个key的统计数据
     * @param array $arr
     * @param string $colName
     * @param string $type 类型：max、min、sum、avg
@@ -102,7 +126,7 @@ class rArray{
     * @return Ambigous <unknown, NULL>
     */
    public static function getRow($arr,$rowName,$type=null){
-       $row_arr=explode(".", preg_replace("/\s/", "", $rowName));
+       $row_arr=self::nameSplit($rowName);
        $data=$arr;
        foreach ($row_arr as $name){
            $data=is_array($data) && isset($data[$name])?$data[$name]:null;
@@ -110,6 +134,15 @@ class rArray{
        if($type)settype($data, $type);
        return $data;
    }
+   
+   public static function nameSplit($nameStr,$delimiter="."){
+       $names= preg_split("/(?<!\\\)\\{$delimiter}/",$nameStr);
+       foreach ($names as $i=>$name){
+           $names[$i]=str_replace("\\{$delimiter}", $delimiter, $name);
+       }
+       return $names;
+   }
+   
    
    /**
     * 将一个二维数组 按照指定的$k作为主键
@@ -173,11 +206,16 @@ class rArray{
     * @param string $valName
     * @return array
     */
-   public static function hashToArray($arr,$keyName,$valName){
+   public static function hashToArray($arr,$keyName,$valName=null){
     if(!is_array($arr))return array();
     $result=array();
     foreach($arr as $k=>$v){
-       $result[]=array($keyName=>$k,$valName=>$v);
+        if($valName!=null){
+          $result[]=array($keyName=>$k,$valName=>$v);
+        }else if(is_array($v)){
+          $v[$keyName]=$k;
+          $result[]=$v;
+        }
       }
      return $result;
    }
@@ -188,22 +226,22 @@ class rArray{
     * @example
     * <pre>
     * $arr=array(
-    *    array('id'=>1,'name'="aaa"),
-    *    array('id'=>1,'name'="bbb"),
-    *    array('id'=>3,'name'="ccc"),
+    *    array('id'=>1,'name'=>"aaa"),
+    *    array('id'=>1,'name'=>"bbb"),
+    *    array('id'=>3,'name'=>"ccc"),
     *    )
     * toHash($arr,'id');
     *  结果为：
     *  $arr=array(
     *    1=>array(
-    *      array('id'=>1,'name'="aaa"),
-    *      array('id'=>1,'name'="bbb")
+    *      array('id'=>1,'name'=>"aaa"),
+    *      array('id'=>1,'name'=>"bbb")
     *          ),
     *    3=>array(
-    *       array('id'=>3,'name'="ccc"),
+    *       array('id'=>3,'name'=>"ccc"),
     *          )
     *    )
-    *  toGroup($arr,'id');
+    *  groupBy($arr,'id');
     *    结果为：
     *  $arr=array(
     *    1=>"aaa",
@@ -215,15 +253,21 @@ class rArray{
     * @param string $key
     * @return array
     */
-   public static function toGroup($arr,$key){
+   public static function groupBy($arr,$key){
     if(!is_array($arr))return array();
      $result=array();
      foreach ($arr as $one){
-        if(isset($one[$key])){
-            $result[$one[$key].""][]=$one;
+        $tmp=self::getRow($one, $key);
+        if($tmp==null)$tmp="";
+        if(!is_array($tmp)){
+            $result[$tmp.""][]=$one;
           }
        }
      return $result;
+   }
+   
+   public static function toGroup($arr,$key){
+       return self::groupBy($arr, $key);
    }
    
    /**
@@ -250,13 +294,13 @@ Array(
     */
    public static function orderBy(&$arr,$cond){
     if(!is_array($arr))return false;
-    $cond_arr=explode(",", $cond);
+    $cond_arr=self::nameSplit($cond,",");
     $code="";
     foreach ($cond_arr as $_con){
       $_sub_con_arr=preg_split("/\s+/", trim($_con));
       $_k_name=$_sub_con_arr[0];
       $_sort_type=isset($_sub_con_arr[1])?strtolower($_sub_con_arr[1]):'asc';
-      $_k_name=str_replace(".", "']['", $_k_name);
+      $_k_name=implode("']['", self::nameSplit($_k_name));
       $a="\$a['".$_k_name."']";
       $b="\$b['".$_k_name."']";
       $c=$_sort_type=="desc"?"<":">";
@@ -321,6 +365,11 @@ Array(
      return $result;
    }
    
+   /**
+    * 多处理过的筛选条件进行暂存
+    * @param array $stage
+    * @param string $cond_str
+    */
    private static function _stage(&$stage,&$cond_str){
        $reg="/\(\(.+?\)\)/";
        if(preg_match_all($reg, $cond_str, $matches)){
@@ -339,7 +388,7 @@ Array(
     */
    private static function _filter_callback_1($matches){
 //        print_r($matches);
-       $name='$a["'.str_replace(".", '"]["', $matches[1]).'"]';
+       $name='$a["'.implode('"]["', self::nameSplit($matches[1])).'"]';
        $s=$matches[2]=="="?"==":$matches[2];
        $val=is_numeric($matches[3])?$matches[3]:'"'.$matches[3].'"';
        $call=$name.$s.$val;
@@ -354,10 +403,10 @@ Array(
     */
    private static function _filter_callback_2($matches){
 //        print_r($matches);
-       $name='$a["'.str_replace(".", '"]["', $matches[1]).'"]';
+       $name='$a["'.implode('"]["', self::nameSplit($matches[1])).'"]';
        $type=trim(preg_replace("/\s+/"," ",$matches[2]));
        $is_in=$type=="in";
-       $vs=explode(",", $matches[4]);
+       $vs=self::nameSplit($matches[4],",");
        foreach ($vs as &$v){
            $v=preg_replace("/^[\"']|[\"']$/", "", trim($v));
        }
@@ -375,7 +424,7 @@ Array(
 //        print_r($matches);
           $funName=trim($matches[1]);//函数名称
           $paraName=trim($matches[2]);//参数变量名称
-          $name='$a["'.str_replace(".", '"]["', $paraName).'"]';
+          $name='$a["'.implode('"]["', self::nameSplit($paraName)).'"]';
           
           $is_not=substr($funName, 0,1)=="!";
           $funName_real=$is_not?substr($funName, 1):$funName;//去掉前面的！的函数名
@@ -386,7 +435,7 @@ Array(
           }
           
           //处理 strlen(id)>1 、substr(id,1,2)=='a'
-          $function_support_other=array('strlen','count','substr','in_array');
+          $function_support_other=array('strlen','count','substr');
           if(in_array($funName, $function_support_other)){
                $paraMore=$matches[3];//其他参数
                $t=$matches[5];//操作符，如> = <
@@ -455,7 +504,7 @@ Array(
    }
    
    private static function _getAllChildren(&$arr,$idField,$parentIdField,$childField,$idValue){
-       $map=self::toGroup($arr, $parentIdField);
+       $map=self::groupBy($arr, $parentIdField);
        if(isset($map[$idValue])){
            $cs=$map[$idValue];
            foreach($cs as $i=>$v){
@@ -468,6 +517,52 @@ Array(
        }else{
            return array();
        }
+   }
+   
+   /**
+    * @param array $arr
+    * @param string $select
+    * @return array
+    */
+   public static function select($arr,$select){
+       if(empty($arr) || !is_array($arr))return array();
+       $fiels=self::nameSplit($select,",");
+       self::trim($fiels);
+       $result=array();
+       foreach ($arr as $i=>$row){
+           $data=array();
+           foreach ($fiels as $field){
+               if(preg_match("/^(\S+)\s+as\s+(\S+)$/", $field,$matches)){
+                   $data[$matches[2]]=self::getRow($row, $matches[1]);
+               }else if(false !== strpos($field, "*") || preg_match("/.+\/e$/", $field)){
+                   $eg_key=str_replace(array("*","/e"), array("\S+",""), $field);
+                   foreach ($row as $_k=>$_v){
+                       if(preg_match("/^{$eg_key}$/", $_k)){
+                           $data[$_k]=$_v;
+                       }
+                   }
+               }else{
+                   $data[$field]=isset($row[$field])?$row[$field]:null;
+               }
+           }
+           $result[$i]=$data;
+       }
+       return $result;
+   }
+   
+   public static function bySql($arr,$sql){
+       $sql.=" ";
+       preg_match_all("/^\s*select\s+(.+?)\s*(where\s+(.+?))?(\s+order\s*by\s+(.+?))?(\s+group\s*by\s+(.+?))?$/i", $sql, $matches, PREG_SET_ORDER);
+       $match=$matches[0];
+       self::trim($match);
+       if(!empty($match[3]))$arr=self::filter($arr, $match[3]);
+//        print_r($arr);
+//        print_r($match);
+       if(!empty($match[5]))self::orderBy($arr, $match[5]);
+       $arr=self::select($arr, $match[1]);
+//        print_r($arr);
+       if(!empty($match[7]))$arr=self::groupBy($arr, trim($match[7]));
+       return $arr;
    }
    
 }
