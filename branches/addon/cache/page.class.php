@@ -2,6 +2,7 @@
 /**
  *@copyright rareMVC
  *@author duwei
+ *@package addon\cache
  *@example
  * 页面缓存
  * 默认采用文件缓存,也可以修改为其他缓存方式  如 memcache

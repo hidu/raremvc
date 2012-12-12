@@ -9,7 +9,7 @@
  * $min_articleid=$dao->min(null,"where articleid>?",5);
  * 获取articleid=5的title字段
  * $title=$dao->getOneField('title', 'where articleid=?',5);
- * 
+ * @package addon\dao
  */
 final class rDao extends rDao_base{
   private static $instances=array();

@@ -2,7 +2,7 @@
 /**
  *在一次请求过程中的上下文缓存 
  * @author duwei
- *
+ *@package addon\cache
  */
 class rCache_request extends rCache{
       private static $cacheData=array();

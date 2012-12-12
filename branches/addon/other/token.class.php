@@ -1,8 +1,9 @@
 <?php
 /**
+ *表单token 生成和验证 
  * @copyright rareMVC
  * @author duwei
- *表单token 生成和验证 
+ * @package addon\other
  *
  */
 class rToken{

@@ -1,4 +1,8 @@
 <?php
+/**
+ * @author duwei
+ * @package addon\db\driver
+ */
 class rdb_driver_postgresql{
    public static function setEncode($encode,$pdo){
       $pdo->exec("SET NAMES $encode");

@@ -1,8 +1,9 @@
 <?php
 /**
+ *通用工具类
  *@copyright rareMVC 
  *@author duwei
- *通用工具类
+ *@package addon
  */
 class rTookit{
    

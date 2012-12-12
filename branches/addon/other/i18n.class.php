@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package addon\other
+ * @author duwei
+ *
+ */
 class rI18n{
   /**
    * 客户端接受的语言

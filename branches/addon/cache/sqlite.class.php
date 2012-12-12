@@ -2,6 +2,7 @@
 /**
  * 使用sqlite数据库进行缓存处理
  * @author duwei
+ *@package addon\cache
  */
 class rCache_sqlite extends rCache{
     private $db;

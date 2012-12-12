@@ -4,6 +4,7 @@
  * 在过滤器中调用 rCache_etag::regirest();即可 
  * 关键方法已经进行了拆分可以按照实际需求进行组装，而不用调用默认的rCache_etag::regirest();
  * @author duwei
+ *@package addon\cache
  */
 class rCache_etag{
    

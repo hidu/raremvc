@@ -5,7 +5,7 @@
  * simple dao 
  * @author duwei
  * @since 2012-04-02
- *
+ *@package addon\dao
  */
 abstract class rDao_base{
   protected $table_name;

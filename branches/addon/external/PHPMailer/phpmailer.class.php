@@ -30,7 +30,6 @@
 /**
  * PHPMailer - PHP email transport class
  * NOTE: Requires PHP version 5 or later
- * @package PHPMailer
  * @author Andy Prevost
  * @author Marcus Bointon
  * @copyright 2004 - 2009 Andy Prevost
@@ -40,6 +39,10 @@
 
 if (version_compare(PHP_VERSION, '5.0.0', '<') ) exit("Sorry, this version of PHPMailer will only run on PHP version 5 or greater!\n");
 
+/**
+ * 
+ * @package  addon\external\PHPMailer
+ */
 class PHPMailer {
 
   /////////////////////////////////////////////////
@@ -2310,7 +2313,10 @@ class PHPMailer {
     }
   }
 }
-
+/**
+ * 
+ * @package  addon\external\PHPMailer
+ */
 class phpmailerException extends Exception {
   public function errorMessage() {
     $errorMsg = '<strong>' . $this->getMessage() . "</strong><br />\n";

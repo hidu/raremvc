@@ -23,7 +23,7 @@
  * @link http://phpthumb.gxdlabs.com
  * @license http://www.opensource.org/licenses/mit-license.php The MIT License
  * @version 3.0
- * @package PhpThumb
+ * @package  addon\external
  * @filesource
  */
 
@@ -60,8 +60,7 @@ require_once THUMBLIB_BASE_PATH . '/GdThumb.inc.php';
  * 
  * Refer to the documentation for the create function for more information
  * 
- * @package PhpThumb
- * @subpackage Core
+ * @package addon\external
  */
 class PhpThumbFactory
 {

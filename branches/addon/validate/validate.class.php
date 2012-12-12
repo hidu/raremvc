@@ -5,11 +5,15 @@
  * 具备数据过滤功能，可以使用getFormData方法来获取通过验证的数据
  * 该验证类只支持一维数组
  * @author duwei
- * @package rara Addon
  */
 require_once dirname(__FILE__).'/type.class.php';
 require_once dirname(__FILE__).'/rule.class.php';
 
+/**
+ * 
+ * @author duwei
+ * @package addon\validate
+ */
 class rValidate{
   private $config;
   private $validate=true;

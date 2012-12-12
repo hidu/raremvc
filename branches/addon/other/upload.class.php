@@ -1,4 +1,9 @@
 <?php
+/**
+ * @package addon\other
+ * @author duwei
+ *
+ */
 class rUpload{
     /**
      *从$_FILE中获取格式化的file

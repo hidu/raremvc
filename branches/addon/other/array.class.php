@@ -2,7 +2,7 @@
 /**
  * 一个超级强大的数组的工具类
  * @author duwei<duv123@gmail.com>
- *
+ *@package addon\other
  */
 class rArray{
     
@@ -110,20 +110,20 @@ class rArray{
    }
    
    /**
+    * 获取多维数组的一行数据
+    * @param array $arr
+    * @param string $rowName 如“0.name”
+    * @param string $type 结果类型 所有的settype方法支持的类型
+    * @return mixed
     * @example
     * <pre>
     *       $arr=array(
                 array('id'=>1,'name'=>"aaa"),
                 array('id'=>array('a','b'),'name'=>"ccc"),
         );
-        $result=rArray::getRow($arr,"1.id.0");
+        $result=self::getRow($arr,"1.id.0");
         得到结果为'a'
     * </pre>
-    * 获取多维数组的一行数据
-    * @param array $arr
-    * @param string $rowName 如“0.name”
-    * @param string $type 结果类型 所有的settype方法支持的类型
-    * @return Ambigous <unknown, NULL>
     */
    public static function getRow($arr,$rowName,$type=null){
        $row_arr=self::nameSplit($rowName);
@@ -190,10 +190,7 @@ class rArray{
     * 将hashMap转换为普通数组
     * @example
     * <pre>
-    * $arr=array(
-    *    1=>'a',
-    *    2=>'b',
-    * );
+    * $arr=array( 1=>'a', 2=>'b', );
     * self::hashToArray($arr,'id','name');
     * 结果为：
     * array(
@@ -222,7 +219,6 @@ class rArray{
    
    /**
     * 将二维数组按照指定的键分组
-    *   * 如
     * @example
     * <pre>
     * $arr=array(
@@ -237,20 +233,14 @@ class rArray{
     *      array('id'=>1,'name'=>"aaa"),
     *      array('id'=>1,'name'=>"bbb")
     *          ),
-    *    3=>array(
-    *       array('id'=>3,'name'=>"ccc"),
-    *          )
+    *    3=>array(array('id'=>3,'name'=>"ccc"),)
     *    )
     *  groupBy($arr,'id');
-    *    结果为：
-    *  $arr=array(
-    *    1=>"aaa",
-    *    2=>"bbb",
-    *    3=>"ccc",
-     *    )
+    *  结果为：
+    *  $arr=array( 1=>"aaa", 2=>"bbb", 3=>"ccc" )
     *  </pre>
     * @param array $arr
-    * @param string $key
+    * @param string $key 分组的数组的键，支持使用.来进行多维的键的分组
     * @return array
     */
    public static function groupBy($arr,$key){
@@ -266,6 +256,9 @@ class rArray{
      return $result;
    }
    
+   /**
+    * @see self::groupBy
+    */
    public static function toGroup($arr,$key){
        return self::groupBy($arr, $key);
    }
@@ -313,7 +306,8 @@ Array(
    }
    
    /**
-    * 对多维数组按照条件进行筛选
+    * 对多维数组按照条件进行筛选 
+    * 对于取非判断，若该项不存在也认为是真
     * @example
     * <pre>$arr=array(
             array('id'=>1,'name'=>"aaa"),
@@ -324,9 +318,19 @@ Array(
             array('id'=>array('a','b'),'name'=>"ddd"),
     );
     <font color=blue>$cond="(id>=1 and id<2) and name=aaa or id.0=a or id==4";</font>
-       $result= rArray::filter($arr, $cond);
-       </pre>
-       对于取非判断，若该项不存在也认为是真
+       $result= rArray::filter($arr, $cond); </pre>
+      <div>
+        <b>支持如下函数判断字段类型:</b>
+        <span style='color:blue'>'isset','is_array','is_int','is_num','is_bool','is_double','is_integer','is_float','is_long','is_string','empty'</span>
+       以及substr
+      </div>
+       cond demo:
+       <ol>
+         <li>id in(1,2) and id not in(4)</li>
+         <li>name in('aaa',"aaa")  and is_string(name)</li>
+         <li>id!=1 and id<3 and substr(name,1,1)=d</li>
+         <li>strlen(name)>=1 and strlen(name)!=2</li>
+       </ol>
     * @param array $arr
     * @param string $cond 筛选条件,支持>=<、in、not in筛选 如 <font color=red>(id>=1 and id<2) and name=aaa or id.0=a or id==4 or id in (1)</font>
     * @return array
@@ -445,7 +449,7 @@ Array(
           }
    }
    /**
-    * 将二维数组转换为属性结构
+    * 将二维数组转换为树形结构
     * @example
     * <pre>
 *         $arr=array(
@@ -521,8 +525,17 @@ Array(
    
    /**
     * @param array $arr
-    * @param string $select
+    * @param string $select 要筛选出来的字段名称，支持*通配符或者正则，如 <font color=blue>id.0 as id0,n*me,i,a{2\,3}/e</font>
     * @return array
+    * @example<pre>
+    * $arr=array(
+                array("aaaa"=>'1'),
+                array("aaa"=>'2'),
+                array("aa"=>'3'),
+                );
+        $res=self::select($arr, "a{2\,3}/e");
+        $result=array (0 =>array (),1 =>array ('aaa' => '2',),2 =>array ('aa' => '3',),);
+    * </pre>
     */
    public static function select($arr,$select){
        if(empty($arr) || !is_array($arr))return array();

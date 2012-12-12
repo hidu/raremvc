@@ -1,8 +1,9 @@
 <?php
 /**
+ *统一的用户SESSION基础类
  *@copyright rareMVC 
  *@author duwei
- *统一的用户SESSION基础类
+ *@package addon\session
  */
 class rUser{
    /**

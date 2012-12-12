@@ -2,7 +2,7 @@
 /**
  *使用pdo 进行session存储 
  * @author duwei
- *
+ *@package addon\session
  */
 class rDbSession{
     

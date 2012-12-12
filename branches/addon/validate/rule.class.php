@@ -5,7 +5,7 @@
  * public static function 规则($当前值[,$参数1,$参数2,[$所有的值]])
  * 最完整的函数例子如 equalTo($value,$to,$allvalue)
  * @author duwei
- *
+ *@package addon\validate
  */
 class rValidate_rule{
   /**
