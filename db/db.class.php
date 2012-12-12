@@ -6,6 +6,7 @@
  * 
  *@copyright rareMVC
  *@author duwei<duv123@gmail.com>
+ *@package addon\db
  *@tutorial
  *<pre>
  *数据库配置文件存放在

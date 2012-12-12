@@ -1,4 +1,10 @@
 <?php
+/**
+ * 
+ *@author duwei
+ *@package addon\cache
+ */
+
 class rCache_browser{
    protected static $lastTime=0;
    protected static $maxAge=0;

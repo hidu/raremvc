@@ -2,6 +2,7 @@
 /**
  * crontab cycle parse
  * @author duwei
+ * @package addon\other
  */
 class rCycle{
     

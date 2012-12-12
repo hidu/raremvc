@@ -3,7 +3,7 @@
  * 通用分页类
  * @copyright rareMVC
  * @author duwei
- *
+ *@package addon\other
  */
 class rPager{
     protected  $total;      //总数

@@ -39,7 +39,7 @@
  * @copyright   Copyright (C) 2007-2009 Christoph Dorn
  * @author      Christoph Dorn <christoph@christophdorn.com>
  * @license     http://www.opensource.org/licenses/bsd-license.php
- * @package     FirePHPCore
+ * @package     addon\external\FirePHPCore
  */
 
 if(!class_exists('FirePHP',false)) {
@@ -55,6 +55,7 @@ if(!class_exists('FirePHP',false)) {
  * @param mixed $Object
  * @return true
  * @throws Exception
+ * @package  addon\external\FirePHPCore
  */
 function fb()
 {
@@ -64,7 +65,10 @@ function fb()
     return call_user_func_array(array($instance,'fb'),$args);
 }
 
-
+/**
+ * 
+ * @package addon\external\FirePHPCore
+ */
 class FB
 {
     /**

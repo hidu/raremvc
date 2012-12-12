@@ -1,9 +1,6 @@
 <?php
 /**
  * 对memcache的一个简单封装
- *@copyright rareMVC 
- * @author duwei
- *
  *配置文件默认读取app的config目录下的memcache.php
  *若该配置文件不存在则读取根目录lib下的config/memcache.php
  *配置文件格式如下：
@@ -33,6 +30,10 @@
   
   $config['servers']=array($first,$second);
   return $config;
+
+ *@copyright rareMVC 
+*@package addon\cache
+ * @author duwei
 **/
 class rCache_memcache extends rCache{
   private $config;

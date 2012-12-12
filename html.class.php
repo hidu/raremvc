@@ -1,8 +1,9 @@
 <?php
 /**
+ * html表单输出工具类
  * @copyright rareMVC
  * @author duwei
- * html表单输出工具类
+ * @package addon
  */
 class rHtml{
   

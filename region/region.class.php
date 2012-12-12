@@ -2,6 +2,7 @@
 /**
  * 地域相关功能,参照 国家 行政区划代码
  * @author duwei <duv123@gmail.com>
+ * @package addon\region
  */
 class rRegion{
     

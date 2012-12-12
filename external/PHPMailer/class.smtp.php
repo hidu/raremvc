@@ -30,7 +30,7 @@
 /**
  * PHPMailer - PHP SMTP email transport class
  * NOTE: Designed for use with PHP version 5 and up
- * @package PHPMailer
+ * @package  addon\external\PHPMailer
  * @author Andy Prevost
  * @author Marcus Bointon
  * @copyright 2004 - 2008 Andy Prevost

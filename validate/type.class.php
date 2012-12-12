@@ -1,8 +1,9 @@
 <?php
 /**
+ *验证类型
  * @copyright rareMVC 
  * @author duwei
- *验证类型
+ * @package addon\validate
  */
 class rValidate_type {
     /**

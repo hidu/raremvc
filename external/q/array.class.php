@@ -8,7 +8,6 @@
  * @copyright Copyright (c) 2006-2009 Qeeyuan Inc. {@link http://www.qeeyuan.com}
  * @license New BSD License {@link http://qeephp.com/license/}
  * @version $Id: array.php 2286 2009-03-05 08:50:23Z dualface $
- * @package helper
  */
 
 /**
@@ -16,7 +15,7 @@
  *
  * @author YuLei Liao <liaoyulei@qeeyuan.com>
  * @version $Id: array.php 2286 2009-03-05 08:50:23Z dualface $
- * @package helper
+ * @package addon\external
  */
 abstract class qArray
 {

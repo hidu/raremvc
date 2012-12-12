@@ -2,7 +2,7 @@
 /**
  *@copyright rareMVC 
  *@author duwei
- *
+ *@package addon\cache
  */
 abstract class rCache{
    abstract public function has($key);

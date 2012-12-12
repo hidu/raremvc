@@ -2,7 +2,7 @@
 /**
  *图像验证码 
  * @author duwei
- *
+ *@package addon\other
  */
 class rCaption{
     private static $key="rareCaption";   

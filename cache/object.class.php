@@ -1,8 +1,9 @@
 <?php
 /**
+ *对象缓存，缓存的数据会自动进行虚拟化处理、取出时进行反虚拟化
  *@copyright rareMVC 
  *@author duwei
- *对象缓存，缓存的数据会自动进行虚拟化处理、取出时进行反虚拟化
+ *@package addon\cache
  */
 class rCache_object extends rCache{
    /**

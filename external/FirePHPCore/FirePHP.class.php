@@ -39,7 +39,6 @@
  * @copyright       Copyright (C) 2007-2009 Christoph Dorn
  * @author          Christoph Dorn <christoph@christophdorn.com>
  * @license         http://www.opensource.org/licenses/bsd-license.php
- * @package         FirePHPCore
  */
 
 /**
@@ -68,7 +67,7 @@ if (!defined('E_USER_DEPRECATED')) {
  * @copyright       Copyright (C) 2007-2009 Christoph Dorn
  * @author          Christoph Dorn <christoph@christophdorn.com>
  * @license         http://www.opensource.org/licenses/bsd-license.php
- * @package         FirePHPCore
+ * @package   addon\external\FirePHPCore
  */
 class FirePHP {
 

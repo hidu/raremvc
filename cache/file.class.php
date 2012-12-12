@@ -3,7 +3,7 @@
  *@copyright rareMVC
  *文件缓存 
  * @author duwei
- *
+*@package addon\cache
  */
 class rCache_file extends rCache{
     protected  $cacheBath;
