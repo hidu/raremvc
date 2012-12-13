@@ -27,7 +27,7 @@ class rArray{
         }
    }
    /**
-    * 对数组原属trim
+    * 对数组元素依次trim
     * @param array $arr
     * @param boolean $recursive
     * @return boolean
@@ -110,7 +110,7 @@ class rArray{
    }
    
    /**
-    * 获取多维数组的一行数据
+    * 获取多维数组的一行/项数据
     * @param array $arr
     * @param string $rowName 如“0.name”
     * @param string $type 结果类型 所有的settype方法支持的类型
@@ -135,6 +135,12 @@ class rArray{
        return $data;
    }
    
+   /**
+    * 将一个字符串按照分隔符进行切分，若分隔符前面有\则不切分
+    * @param string $nameStr 待分割的字符
+    * @param string $delimiter 分隔符，单个字符 如.,
+    * @return array
+    */
    public static function nameSplit($nameStr,$delimiter="."){
        $names= preg_split("/(?<!\\\)\\{$delimiter}/",$nameStr);
        foreach ($names as $i=>$name){
@@ -283,7 +289,7 @@ Array(
 )
     * </pre>
     * @param array $arr 待排序的数组
-    * @param 排序条件 $cond 如 <font color=red>updateTime desc,uid asc,more.updateTime desc</font>
+    * @param string $cond 排序条件 如 <font color=red>updateTime desc,uid asc,more.updateTime desc</font>
     */
    public static function orderBy(&$arr,$cond){
     if(!is_array($arr))return false;
@@ -321,11 +327,12 @@ Array(
        $result= rArray::filter($arr, $cond); </pre>
       <div>
         <b>支持如下函数判断字段类型:</b>
-        <span style='color:blue'>'isset','is_array','is_int','is_num','is_bool','is_double','is_integer','is_float','is_long','is_string','empty'</span>
-       以及substr，strlen,count 函数，可以使用match函数来进行正则匹配
+        <span style='color:red'>isset,is_array,is_int,is_num,is_bool,is_double,is_integer,is_float,is_long,is_string,empty</span><br/>
+       以及 <span style='color:red'>substr，strlen,count</span> 函数，
+       并且可以使用<span style='color:red'>match</span>函数来进行正则匹配
       </div>
        cond demo:
-       <ol>
+       <ol style='color:blue'>
          <li>id in(1,2) and id not in(4)</li>
          <li>name in('aaa',"aaa")  and is_string(name)</li>
          <li>id!=1 and id<3 and substr(name,1,1)=d</li>
@@ -617,7 +624,7 @@ Array(
         结果为：
         array ('a' =>array ('b' => 'c','c' => 'd',),'d' => 'd','f' =>array (0 => 'f1',),'e' =>array ('e1' =>array ('ee1' => 'ea1',),),);
       
-        $res=rArray::mergeDeep($a,$b,true);
+        $res=rArray::mergeDeep($a,$b,<font color=red>true</font>);
         结果为：
        array ('a' =>array ('b' => 'c','c' => 'd',),'d' => '','f' =>array (),'e' =>array ('e1' =>array ('ee1' => 'ea1',),),);
         </pre>
