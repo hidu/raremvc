@@ -53,7 +53,21 @@ class array_test extends PHPUnit_Framework_TestCase{
         $this->assertEquals(0, $res);
     }
     
-    public function test_filter(){
+    public function test_filter_match(){
+        $result=rArray::filter($this->arr, "match(name,'a*') and id<2");
+        $this->assertEquals(array($this->arr[0]), $result);
+        
+        $result=rArray::filter($this->arr, "match(name,/a.*/) and id<2");
+        $this->assertEquals(array($this->arr[0]), $result);
+        
+        $result=rArray::filter($this->arr, "match(name,/a(.*)/) and id<2");
+        $this->assertEquals(array($this->arr[0]), $result);
+        
+        $result=rArray::filter($this->arr, "!match(name,/a(.*)/) and id<3");
+        $this->assertEquals(array(1=>$this->arr[1]), $result);
+    }
+    
+    public function _test_filter(){
        $result= rArray::filter($this->arr, "(id>=1 and id<2) and name=aaa or id.2=c or id=='4'");
        $a1=array(0,3,6);
       $this->assertEquals($a1, array_keys($result));
@@ -92,6 +106,8 @@ class array_test extends PHPUnit_Framework_TestCase{
      $this->assertEquals(6,$result[5]['i']);
      $this->assertEquals(1,$result[0]['i']);
      $this->assertEquals(2,count($result));
+     
+     
 //       try{
 //         $result=rArray::filter($this->arr, "名字 in( 'rArray数组') hello");
 //       }catch(Exception $e){}
@@ -159,7 +175,7 @@ class array_test extends PHPUnit_Framework_TestCase{
     }
     
     public function test_BySql(){
-          $res=rArray::bySql($this->arr, "select id,name as 名字 where id >1 order by id desc group by id");
+          $res=rArray::selectByFullSql($this->arr, "select id,name as 名字 where id >1 order by id desc group by id");
           $result=array (4 =>array (0 =>array ('id' => '4','名字' => 'ccc',),),3 =>array (0 =>array ('id' => 3,'名字' => 'ccc',),),2 =>array (0 =>array ('id' => 2,'名字' => 'bbb',),),);
            $this->assertEquals($result, $res);
            
@@ -172,6 +188,31 @@ class array_test extends PHPUnit_Framework_TestCase{
         print_r($res);
         $str=var_export($res,true);
         echo "\n".preg_replace("/\s*\n\s*/", "", $str)."\n";
+    }
+    
+    public function test_mergeDeep(){
+        
+        $a=array('a'=>array('b'=>'c'),'d'=>'d','f'=>array('f1'),'e'=>array('e1'=>array('ee1'=>'ea')));
+        $b=array('a'=>array('c'=>'d'),'d'=>'','f'=>array(),'e'=>array('e1'=>array('ee1'=>'ea1')));
+        $res=rArray::mergeDeep($a,$b);
+        $result1=array ('a' =>array ('b' => 'c','c' => 'd',),'d' => 'd','f' =>array (0 => 'f1',),'e' =>array ('e1' =>array ('ee1' => 'ea1',),),);
+        $this->assertEquals($result1, $res);
+
+        $res=rArray::mergeDeep($a,$b,1);
+        $this->assertEquals($result1, $res);
+
+        $res=rArray::mergeDeep($a,$b,true);
+        $result1=array ('a' =>array ('b' => 'c','c' => 'd',),'d' => '','f' =>array (),'e' =>array ('e1' =>array ('ee1' => 'ea1',),),);
+        $this->assertEquals($result1, $res);
+        
+        $res=rArray::mergeDeep();
+        $this->assertFalse($res);
+        
+        $res=rArray::mergeDeep($a);
+        $this->assertEquals($a, $res);
+        
+        $res=rArray::mergeDeep($a,1);
+        $this->assertEquals($a, $res);
     }
     
 }
