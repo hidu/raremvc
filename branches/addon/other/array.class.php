@@ -322,7 +322,7 @@ Array(
       <div>
         <b>支持如下函数判断字段类型:</b>
         <span style='color:blue'>'isset','is_array','is_int','is_num','is_bool','is_double','is_integer','is_float','is_long','is_string','empty'</span>
-       以及substr
+       以及substr，strlen,count 函数，可以使用match函数来进行正则匹配
       </div>
        cond demo:
        <ol>
@@ -330,6 +330,8 @@ Array(
          <li>name in('aaa',"aaa")  and is_string(name)</li>
          <li>id!=1 and id<3 and substr(name,1,1)=d</li>
          <li>strlen(name)>=1 and strlen(name)!=2</li>
+         <li>match(name,'a*') and id<2  使用通配符匹配</li>
+         <li>!match(name,/a(.*)/) and id<3 使用正则表达式</li>
        </ol>
     * @param array $arr
     * @param string $cond 筛选条件,支持>=<、in、not in筛选 如 <font color=red>(id>=1 and id<2) and name=aaa or id.0=a or id==4 or id in (1)</font>
@@ -341,7 +343,7 @@ Array(
       
       $cond_str=$cond;
       
-      //match in not in
+      //match in,not in
       $cond_str= preg_replace_callback("/\s(\S+?)\s*((\snot\s+)?in)\s*\((.+?)\)\s/", array('self','_filter_callback_2'), $cond_str);
       self::_stage($cond_stage, $cond_str);
       
@@ -362,7 +364,8 @@ Array(
       
 //       var_dump($cond_str);die;
 // print_r($cond_str."\n");
-      
+      if(empty($cond_str))return false;
+     
       $function=create_function('$a', "return (".$cond_str.");");
       if(!$function)return false;
       $result=array_filter($arr,$function);
@@ -424,6 +427,7 @@ Array(
    }
    
    private static function _filter_callback_3($matches){
+         self::trim($matches);
           $function_support_is=array('isset','is_array','is_int','is_num','is_bool','is_double','is_integer','is_float','is_long','is_string','empty');
 //        print_r($matches);
           $funName=trim($matches[1]);//函数名称
@@ -446,6 +450,20 @@ Array(
                $v=var_export($matches[6],true);//期望值
                if($t=="=")$t="==";
               return " (( {$funName}({$name} {$paraMore}){$t}{$v} )) ";
+          }
+          
+          $not_pre=$is_not?"!":"";
+          if($funName_real=="match"){
+              $con=preg_replace("/^\s*['\"]|['\"]\s*$/","",ltrim($matches[3],","));
+              if(preg_match("/^\/.+\/$/", $con)){
+                  $con=preg_replace("/\s+([\(\)])\s+/", "\\1", $con);
+                  //匹配正则表达式
+              }else if(false !==strpos($con, "*")){
+                  $con="/".str_replace("*", ".*", $con)."/";
+              }else{
+                  $con="";
+              }
+              return $con?" (({$not_pre}preg_match('{$con}',{$name}))) ":"";
           }
    }
    /**
@@ -524,6 +542,7 @@ Array(
    }
    
    /**
+    * 从多维数组中筛选出需要的列
     * @param array $arr
     * @param string $select 要筛选出来的字段名称，支持*通配符或者正则，如 <font color=blue>id.0 as id0,n*me,i,a{2\,3}/e</font>
     * @return array
@@ -562,8 +581,15 @@ Array(
        }
        return $result;
    }
-   
-   public static function bySql($arr,$sql){
+   /**
+    * 使用完整的sql语句来对数据进行筛选、排序、分组等
+    * 不支持limit
+    * @param array $arr
+    * @param string $sql 如 select id,name as 名字 where id >1 order by id desc group by id
+    * @return array
+    */
+   public static function selectByFullSql($arr,$sql){
+       if(!is_array($arr) || empty($arr))return array();
        $sql.=" ";
        preg_match_all("/^\s*select\s+(.+?)\s*(where\s+(.+?))?(\s+order\s*by\s+(.+?))?(\s+group\s*by\s+(.+?))?$/i", $sql, $matches, PREG_SET_ORDER);
        $match=$matches[0];
@@ -576,6 +602,49 @@ Array(
 //        print_r($arr);
        if(!empty($match[7]))$arr=self::groupBy($arr, trim($match[7]));
        return $arr;
+   }
+   
+   /**
+    * merge deep
+    * 支持多个参数，一次合并多个数组,默认对于值为array()、''、null的不会进行merge
+    * 若最后一个参数为true,则对上述空值也会进行merge
+    * @return boolean|mixed|array
+    * @example
+    * <pre>
+    *  $a=array('a'=>array('b'=>'c'),'d'=>'d','f'=>array('f1'),'e'=>array('e1'=>array('ee1'=>'ea')));
+        $b=array('a'=>array('c'=>'d'),'d'=>'','f'=>array(),'e'=>array('e1'=>array('ee1'=>'ea1')));
+        $res=rArray::mergeDeep($a,$b);
+        结果为：
+        array ('a' =>array ('b' => 'c','c' => 'd',),'d' => 'd','f' =>array (0 => 'f1',),'e' =>array ('e1' =>array ('ee1' => 'ea1',),),);
+      
+        $res=rArray::mergeDeep($a,$b,true);
+        结果为：
+       array ('a' =>array ('b' => 'c','c' => 'd',),'d' => '','f' =>array (),'e' =>array ('e1' =>array ('ee1' => 'ea1',),),);
+        </pre>
+    */
+   public static function mergeDeep(){
+     $num = func_num_args();
+     if($num==0)return false;
+     if($num==1)return func_get_arg(0);
+     $lastVal=func_get_arg($num-1);
+     if(is_bool($lastVal) && $num==2)return func_get_arg(0);
+     $extend_empty=is_bool($lastVal)?$lastVal:false;
+     
+     $args_arr = func_get_args();
+     $first= array_shift($args_arr);
+     if(is_bool($lastVal))array_pop($args_arr);
+     foreach ($args_arr as $arr){
+         if(!is_array($arr))continue;
+         foreach ($arr as $k=>$v){
+             $is_empty=($v=="" || $v==array()||$v==null);
+             if( ($extend_empty && $is_empty ) || (!$is_empty && !is_array($v)) ){
+                 $first[$k]=$v;
+             }else if(is_array($v)){
+                 $first[$k]=self::mergeDeep($first[$k],$v,$extend_empty);
+             }
+         }
+     }
+     return $first;
    }
    
 }
